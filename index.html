@@ -357,14 +357,14 @@ table.dt tr:hover td{background:#fbfcff}
     <button class="sb-item" onclick="showTab('strategic',this)"><i class="ti ti-chart-pie"></i> Strategic</button>
     <button class="sb-item" onclick="showTab('cashflow',this)"><i class="ti ti-chart-line"></i> Cash Flow</button>
     <div class="sb-section">รายการ</div>
-    <button class="sb-item" onclick="showTab('ap',this)"><i class="ti ti-receipt"></i> AP / จ่าย <span class="sb-badge" id="ap-badge">22</span></button>
-    <button class="sb-item" onclick="showTab('ar',this)"><i class="ti ti-coin"></i> AR / รับ <span class="sb-badge amber" id="ar-badge">3</span></button>
+    <button class="sb-item" onclick="showTab('ap',this)" title="จำนวน AP ที่ยังไม่ชำระ"><i class="ti ti-receipt"></i> AP / จ่าย <span class="sb-badge" id="ap-badge" title="รายการ AP ยังไม่ชำระ">22</span></button>
+    <button class="sb-item" onclick="showTab('ar',this)" title="Billing Note + Debtor ที่ยังค้างอยู่"><i class="ti ti-coin"></i> AR / รับ <span class="sb-badge amber" id="ar-badge" title="Billing Note + Debtor ค้างชำระ">3</span></button>
     <button class="sb-item" onclick="showTab('fix',this)"><i class="ti ti-calendar-repeat"></i> FIX Expenses</button>
     <div class="sb-section">วิเคราะห์</div>
-    <button class="sb-item" onclick="showTab('risks',this)"><i class="ti ti-alert-triangle"></i> Risks <span class="sb-badge">4</span></button>
+    <button class="sb-item" onclick="showTab('risks',this)" title="จำนวนความเสี่ยงที่ Active + Urgent"><i class="ti ti-alert-triangle"></i> Risks <span class="sb-badge" id="risk-badge" title="ความเสี่ยง Active">4</span></button>
     <button class="sb-item" onclick="showTab('pulse',this)"><i class="ti ti-file-report"></i> Monthly Pulse</button>
     <div class="sb-section">จัดการ</div>
-    <button class="sb-item" onclick="checkImportAccess(this)"><i class="ti ti-arrows-exchange"></i> Import / Export</button>
+    <button class="sb-item" onclick="showTab('import',this)"><i class="ti ti-arrows-exchange"></i> Import / Export</button>
     <div class="sb-section">ตรวจสอบ</div>
     <button class="sb-item" onclick="showTab('audit',this)"><i class="ti ti-table-inspect"></i> Audit Data <span class="sb-badge amber" id="audit-badge">—</span></button>
     <button class="sb-item" onclick="showTab('howto',this)"><i class="ti ti-book-2"></i> หลักการคำนวณ</button>
@@ -397,7 +397,7 @@ table.dt tr:hover td{background:#fbfcff}
     <span id="countdown-display" style="color:var(--green)">⏱ 5:00</span>
     <button class="tb-btn" id="sync-btn" onclick="syncNow()" style="background:var(--green);color:#fff;border-color:var(--green)"><i class="ti ti-refresh"></i> Sync Sheet</button>
     <div class="tb-divider"></div>
-    <button class="tb-btn" onclick="checkImportAccess(null)"><i class="ti ti-upload"></i> Import</button>
+    <button class="tb-btn" onclick="showTab('import',null)"><i class="ti ti-upload"></i> Import</button>
     <button class="tb-btn primary" onclick="openPrintDialog()"><i class="ti ti-printer"></i> Print</button>
   </header>
 
@@ -893,41 +893,60 @@ table.dt tr:hover td{background:#fbfcff}
     <!-- ═══ IMPORT/EXPORT ═══ -->
     <div id="tab-import" class="panel">
 
-      <!-- Live Connection Status -->
-      <div class="chart-box" style="margin-bottom:14px">
+      <!-- Import Admin — Password Protected -->
+      <div class="chart-box" style="margin-bottom:14px;position:relative;overflow:hidden">
         <div class="chart-header" style="margin-bottom:12px">
           <div>
-            <div class="chart-title"><i class="ti ti-database" style="font-size:15px;vertical-align:-2px;margin-right:4px;color:var(--green)"></i>แหล่งข้อมูล — Google Sheets Live</div>
+            <div class="chart-title"><i class="ti ti-database" style="font-size:15px;vertical-align:-2px;margin-right:4px;color:var(--green)"></i>Import Admin — Google Sheets Live</div>
             <div class="chart-sub">ข้อมูลดึงตรงจาก Google Sheets ผ่าน Apps Script · Sync อัตโนมัติทุก 4 นาที</div>
           </div>
-          <button class="tb-btn" onclick="syncNow()" style="background:var(--green);color:#fff;border-color:var(--green)"><i class="ti ti-refresh"></i> Sync ตอนนี้</button>
-        </div>
-        <div class="live-conn-card">
-          <span class="live-conn-dot" id="imp-dot"></span>
-          <div class="live-conn-info">
-            <strong>TRC-R3สรุป_ALL</strong>
-            <span id="imp-r3-status" style="color:var(--text3)">ยังไม่ได้ Sync</span>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span id="imp-lock-badge" style="font-size:10px;padding:3px 8px;border-radius:20px;background:var(--red-lt);color:var(--red);font-weight:600"><i class="ti ti-lock" style="font-size:11px;vertical-align:-1px"></i> ล็อค</span>
+            <button class="tb-btn" id="imp-unlock-btn" onclick="checkImportAccess(null)" style="font-size:11px;background:var(--amber);color:#fff;border-color:var(--amber)"><i class="ti ti-lock-open"></i> ปลดล็อค Import</button>
+            <button class="tb-btn" id="imp-sync-btn" onclick="syncNow()" style="display:none;background:var(--green);color:#fff;border-color:var(--green)"><i class="ti ti-refresh"></i> Sync ตอนนี้</button>
           </div>
-          <strong id="imp-r3-cnt" style="font-size:12px;color:var(--blue)">—</strong>
         </div>
-        <div class="live-conn-card">
-          <span class="live-conn-dot" id="imp-dot2"></span>
-          <div class="live-conn-info">
-            <strong>TRC-PO3รายละเอียด</strong>
-            <span id="imp-po3-status" style="color:var(--text3)">ยังไม่ได้ Sync</span>
+
+        <!-- Locked overlay -->
+        <div id="imp-locked-view" style="padding:24px;text-align:center">
+          <div style="width:44px;height:44px;background:var(--amber-lt);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px"><i class="ti ti-lock" style="font-size:22px;color:var(--amber)"></i></div>
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px">Import Admin ถูกล็อค</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:12px">กด "ปลดล็อค Import" แล้วกรอกรหัสผ่าน 6 หลักเพื่อดูสถานะการเชื่อมต่อและ Sync</div>
+          <div style="display:flex;gap:8px;justify-content:center;align-items:center;font-size:11px;color:var(--text3)">
+            <span class="sb-dot" id="imp-dot-mini" style="background:var(--text3)"></span>
+            <span id="imp-lock-sync-txt">สถานะ Sync: —</span>
           </div>
-          <strong id="imp-po3-cnt" style="font-size:12px;color:var(--red)">—</strong>
         </div>
-        <div class="live-conn-card">
-          <span class="live-conn-dot" id="imp-dot3"></span>
-          <div class="live-conn-info">
-            <strong>TRC_F4จ่าย</strong>
-            <span id="imp-f4-status" style="color:var(--text3)">ยังไม่ได้ Sync</span>
+
+        <!-- Unlocked content (hidden until password) -->
+        <div id="imp-unlocked-view" style="display:none">
+          <div class="live-conn-card">
+            <span class="live-conn-dot" id="imp-dot"></span>
+            <div class="live-conn-info">
+              <strong>TRC-R3สรุป_ALL</strong>
+              <span id="imp-r3-status" style="color:var(--text3)">ยังไม่ได้ Sync</span>
+            </div>
+            <strong id="imp-r3-cnt" style="font-size:12px;color:var(--blue)">—</strong>
           </div>
-          <strong id="imp-f4-cnt" style="font-size:12px;color:var(--green)">—</strong>
-        </div>
-        <div style="margin-top:10px;padding:9px 14px;background:var(--blue-lt);border-radius:8px;font-size:11px;color:var(--blue)">
-          <strong>GAS URL:</strong> <span style="font-family:monospace;font-size:10px;word-break:break-all" id="imp-gas-url">—</span>
+          <div class="live-conn-card">
+            <span class="live-conn-dot" id="imp-dot2"></span>
+            <div class="live-conn-info">
+              <strong>TRC-PO3รายละเอียด</strong>
+              <span id="imp-po3-status" style="color:var(--text3)">ยังไม่ได้ Sync</span>
+            </div>
+            <strong id="imp-po3-cnt" style="font-size:12px;color:var(--red)">—</strong>
+          </div>
+          <div class="live-conn-card">
+            <span class="live-conn-dot" id="imp-dot3"></span>
+            <div class="live-conn-info">
+              <strong>TRC_F4จ่าย</strong>
+              <span id="imp-f4-status" style="color:var(--text3)">ยังไม่ได้ Sync</span>
+            </div>
+            <strong id="imp-f4-cnt" style="font-size:12px;color:var(--green)">—</strong>
+          </div>
+          <div style="margin-top:10px;padding:9px 14px;background:var(--blue-lt);border-radius:8px;font-size:11px;color:var(--blue)">
+            <strong>GAS URL:</strong> <span style="font-family:monospace;font-size:10px;word-break:break-all" id="imp-gas-url">—</span>
+          </div>
         </div>
       </div>
 
@@ -948,6 +967,11 @@ table.dt tr:hover td{background:#fbfcff}
           <div class="exp-opt" onclick="openPrintDialog('ap')">
             <div class="exp-icon" style="background:var(--red-lt);color:var(--red)"><i class="ti ti-receipt"></i></div>
             <div class="exp-info"><p>AP เจ้าหนี้การค้า</p><span>AP Table · AP ค้างชำระ · FX</span></div>
+            <button class="tb-btn" style="font-size:10px;padding:3px 10px">Print</button>
+          </div>
+          <div class="exp-opt" onclick="openPrintDialog('fix')">
+            <div class="exp-icon" style="background:#f0fdf4;color:#16a34a"><i class="ti ti-calendar-repeat"></i></div>
+            <div class="exp-info"><p>FIX Expenses</p><span>ค่าใช้จ่ายคงที่ · 26 รายการ · กำหนดชำระ</span></div>
             <button class="tb-btn" style="font-size:10px;padding:3px 10px">Print</button>
           </div>
           <div class="exp-opt" onclick="openPrintDialog('risks')">
@@ -1274,7 +1298,7 @@ table.dt tr:hover td{background:#fbfcff}
     <span>|</span>
     <span>D19 Check: <strong id="sb-d19-val" style="color:var(--text3)">รอ Sync</strong></span>
     <span id="sync-status-msg" style="color:var(--text3)">แหล่งข้อมูล: Google Sheets (live)</span>
-    <span style="margin-left:auto">PT Dashboard v1.2 — PEO Tech Co., Ltd. | Google Sheets Live Integration</span>
+    <span style="margin-left:auto">PT Dashboard v1.1 — PEO Tech Co., Ltd. | Google Sheets Live Integration</span>
   </div>
 </div><!-- end main -->
 
@@ -1290,11 +1314,12 @@ table.dt tr:hover td{background:#fbfcff}
     <div class="pd-chips" id="pd-sections">
       <button class="pd-chip" onclick="pdSection(this,'all')">📋 ทั้งหมด</button>
       <button class="pd-chip" onclick="pdSection(this,'overview')">📊 Overview</button>
-      <button class="pd-chip" onclick="pdSection(this,'ar')">💰 AR ลูกหนี้</button>
+      <button class="pd-chip" onclick="pdSection(this,'cashflow')">💧 Cash Flow</button>
       <button class="pd-chip" onclick="pdSection(this,'ap')">🧾 AP เจ้าหนี้</button>
+      <button class="pd-chip" onclick="pdSection(this,'ar')">💰 AR ลูกหนี้</button>
+      <button class="pd-chip" onclick="pdSection(this,'fix')">📅 FIX Expenses</button>
       <button class="pd-chip" onclick="pdSection(this,'risks')">⚠ Risk Monitor</button>
       <button class="pd-chip" onclick="pdSection(this,'pulse')">📄 PT-Pulse</button>
-      <button class="pd-chip" onclick="pdSection(this,'cashflow')">💧 Cash Flow</button>
     </div>
     <div class="pd-row2">
       <div>
@@ -1595,8 +1620,8 @@ function updateARCards() {
   var dso = (allAmt > 0 && outstanding > 0) ? Math.round(outstanding/(allAmt/days)) : 0;
   hEl('ar-dso-val', dso > 0 ? '~'+dso+' วัน' : '—');
   hEl('ar-dso-sub', 'AR คงค้าง ÷ (Revenue ÷ '+days+' วัน)');
-  // Sidebar badge
-  var openCnt = AR_DATA.filter(function(r){return r.status!=='Paid';}).length;
+  // Sidebar badge — แสดงเฉพาะ Billing Note + Debtor (รายการที่ยังค้างอยู่จริง)
+  var openCnt = AR_DATA.filter(function(r){return r.status==='Billing Note'||r.status==='Debtor';}).length;
   hEl('ar-badge', openCnt > 0 ? openCnt : '');
   // Left panel stats
   hEl('arl-all-amt','฿'+fmtN(allAmt)); hEl('arl-all-cnt', AR_DATA.length+' รายการ');
@@ -2281,7 +2306,7 @@ var _printSectionLabel = '';
 
 var _printLabels = {
   all:'ทั้งหมด', overview:'Overview', ar:'AR ลูกหนี้',
-  ap:'AP เจ้าหนี้', risks:'Risk Monitor', pulse:'PT-Pulse', cashflow:'Cash Flow'
+  ap:'AP เจ้าหนี้', fix:'FIX Expenses', risks:'Risk Monitor', pulse:'PT-Pulse', cashflow:'Cash Flow'
 };
 
 function openPrintDialog(section) {
@@ -2403,6 +2428,19 @@ function updateImportTab() {
   hEl('imp-f4-status', f4ok ? 'เชื่อมต่อแล้ว' : 'รอ Sync');
   hEl('imp-f4-cnt', f4ok ? '✓' : '—');
   updateExpRangeInfo();
+  // Update mini status dot in locked view
+  var miniDot = document.getElementById('imp-dot-mini');
+  var miniTxt = document.getElementById('imp-lock-sync-txt');
+  var anyOk = r3ok || po3ok || f4ok;
+  if (miniDot) miniDot.style.background = anyOk ? 'var(--green)' : 'var(--text3)';
+  if (miniTxt) {
+    if (anyOk) {
+      var t = _lastSyncISO ? new Date(_lastSyncISO).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}) : '—';
+      miniTxt.textContent = 'Sync ล่าสุด: '+t+' | R3:'+AR_DATA.length+' AP:'+AP_UNPAID.length;
+    } else {
+      miniTxt.textContent = 'สถานะ Sync: รอ...';
+    }
+  }
 }
 
 // ════════════════════════════════════════
@@ -2981,11 +3019,25 @@ var _pendingImportBtn = null;
 
 function checkImportAccess(btn) {
   if (_importUnlocked) {
-    showTab('import', btn);
+    _showImportAdminUnlocked();
     return;
   }
   _pendingImportBtn = btn;
   openImportPW();
+}
+
+function _showImportAdminUnlocked() {
+  var locked = document.getElementById('imp-locked-view');
+  var unlocked = document.getElementById('imp-unlocked-view');
+  var badge = document.getElementById('imp-lock-badge');
+  var unlockBtn = document.getElementById('imp-unlock-btn');
+  var syncBtn = document.getElementById('imp-sync-btn');
+  if (locked) locked.style.display = 'none';
+  if (unlocked) unlocked.style.display = 'block';
+  if (badge) { badge.innerHTML = '<i class="ti ti-lock-open" style="font-size:11px;vertical-align:-1px"></i> ปลดล็อคแล้ว'; badge.style.background = 'var(--green-lt)'; badge.style.color = 'var(--green)'; }
+  if (unlockBtn) unlockBtn.style.display = 'none';
+  if (syncBtn) syncBtn.style.display = 'inline-flex';
+  updateImportTab();
 }
 
 function openImportPW() {
@@ -3025,13 +3077,17 @@ function submitImportPW() {
   if (val === _IMPORT_PASS) {
     _importUnlocked = true;
     closeImportPW();
-    var btn = _pendingImportBtn;
     _pendingImportBtn = null;
-    showTab('import', btn);
-    // highlight sidebar button
-    document.querySelectorAll('.sb-item').forEach(function(b){
-      if(b.textContent.indexOf('Import')>=0) b.classList.add('active');
-    });
+    // If we're currently on the import tab, reveal admin section
+    var importTab = document.getElementById('tab-import');
+    if (importTab && importTab.classList.contains('active')) {
+      _showImportAdminUnlocked();
+    } else {
+      // Navigate to import tab and reveal
+      var impSbBtn = document.querySelector('.sb-item[onclick*="import"]');
+      showTab('import', impSbBtn);
+      setTimeout(_showImportAdminUnlocked, 50);
+    }
   } else {
     document.getElementById('impw-err').textContent = '⛔ รหัสผ่านไม่ถูกต้อง — ไม่อนุญาต';
     var inp = document.getElementById('impw-input');
