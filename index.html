@@ -309,11 +309,11 @@ table.dt tr:hover td{background:#fbfcff}
   #audit-overlay,#audit-modal,
   #print-overlay,#print-dialog,
   .tb-btn,.toggle-grp,.cal-preset{display:none!important}
-  /* reset layout */
+  /* reset body flex → block so sidebar disappears cleanly */
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  body{background:#fff!important;font-size:10px}
-  #main{display:block!important;overflow:visible!important;height:auto!important}
-  #content{padding:8px 10px!important;overflow:visible!important;height:auto!important;display:block!important}
+  html,body{background:#fff!important;font-size:10px;display:block!important;height:auto!important;overflow:visible!important}
+  #main{display:block!important;overflow:visible!important;height:auto!important;width:100%!important}
+  #content{padding:10px 12px!important;overflow:visible!important;height:auto!important;display:block!important;width:100%!important;box-sizing:border-box!important}
   /* hide all panels */
   .panel{display:none!important;page-break-after:always}
   /* show only print-target */
@@ -1755,20 +1755,31 @@ function initCashHealth(){
   hEl('coll-risk-sub',overdue.length+' Overdue');
 
   // ── OD bar ──
-  var odPct=Math.round(OD_USED/OD_LIMIT*100);
+  var odPct = (OD_LIMIT > 0) ? Math.round(OD_USED / OD_LIMIT * 100) : 0;
   var oBar=document.getElementById('od-bar');
   if(oBar){
     oBar.style.width=Math.min(odPct,100)+'%';
     oBar.style.background=odPct>=90?'var(--red)':odPct>=70?'var(--amber)':'var(--green)';
-    hEl('od-pct-lbl',odPct+'%');
-    hEl('od-used-lbl','ใช้ไป ฿'+fmtN(OD_USED));
-    hEl('od-rem-lbl','คงเหลือ ~฿'+fmtN(OD_LIMIT-OD_USED));
-    hEl('od-tot-lbl','วงเงินรวม ฿'+fmtN(OD_LIMIT));
+    if(OD_LIMIT > 0){
+      hEl('od-pct-lbl', odPct+'%');
+      hEl('od-used-lbl','ใช้ไป ฿'+fmtN(OD_USED));
+      hEl('od-rem-lbl','คงเหลือ ~฿'+fmtN(OD_LIMIT-OD_USED));
+      hEl('od-tot-lbl','วงเงินรวม ฿'+fmtN(OD_LIMIT));
+    } else {
+      hEl('od-pct-lbl','—%');
+      hEl('od-used-lbl','ยังไม่ได้ตั้งค่า');
+      hEl('od-rem-lbl','');
+      hEl('od-tot-lbl','ใส่ค่าจริงที่ OD_LIMIT ใน code');
+    }
     var wb=document.getElementById('od-warn-badge');
-    if(wb&&odPct>=70){
-      wb.style.display='inline-flex';
-      wb.className='indicator ind-'+(odPct>=90?'red':'amber');
-      wb.textContent='⚠ '+(odPct>=90?'ใกล้เต็มวงเงิน':'ระวัง ~'+odPct+'%');
+    if(wb){
+      if(OD_LIMIT > 0 && odPct>=70){
+        wb.style.display='inline-flex';
+        wb.className='indicator ind-'+(odPct>=90?'red':'amber');
+        wb.textContent='⚠ '+(odPct>=90?'ใกล้เต็มวงเงิน':'ระวัง ~'+odPct+'%');
+      } else {
+        wb.style.display='none';
+      }
     }
   }
 
