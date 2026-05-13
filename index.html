@@ -1,0 +1,2516 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PT Dashboard — PEO Tech Co., Ltd.</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sidebar-w:220px;
+  --hdr-h:54px;
+  --bg:#f5f6fa;
+  --surface:#ffffff;
+  --border:#e3e6ef;
+  --text:#1a1d2e;
+  --text2:#5a6078;
+  --text3:#9ba0b4;
+  --blue:#2563eb;
+  --blue-lt:#eff4ff;
+  --green:#16a34a;
+  --green-lt:#f0fdf4;
+  --red:#dc2626;
+  --red-lt:#fef2f2;
+  --amber:#d97706;
+  --amber-lt:#fffbeb;
+  --radius:10px;
+  --radius-sm:6px;
+  --shadow:0 1px 4px rgba(0,0,0,.07);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+#sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;z-index:10}
+.sb-logo{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-logo-icon{width:34px;height:34px;background:var(--blue);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0}
+.sb-logo-text p{font-weight:700;font-size:13px;color:var(--text)}
+.sb-logo-text span{font-size:10px;color:var(--text3)}
+.sb-nav{flex:1;overflow-y:auto;padding:10px 8px}
+.sb-section{font-size:10px;font-weight:600;letter-spacing:.07em;color:var(--text3);text-transform:uppercase;padding:10px 10px 4px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-size:12px;transition:all .15s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left}
+.sb-item:hover{background:var(--bg);color:var(--text)}
+.sb-item.active{background:var(--blue-lt);color:var(--blue);font-weight:600}
+.sb-item i{font-size:16px;flex-shrink:0}
+.sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;padding:1px 5px;border-radius:10px;font-weight:600}
+.sb-badge.amber{background:var(--amber)}
+.sb-footer{padding:12px 8px;border-top:1px solid var(--border)}
+.sb-footer-info{padding:8px 10px;background:var(--amber-lt);border-radius:var(--radius-sm);font-size:10px;color:var(--amber)}
+.sb-footer-info strong{display:block;font-size:11px;margin-bottom:2px}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#topbar{height:var(--hdr-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+#topbar-title{font-weight:700;font-size:15px;flex:1}
+#topbar-sub{font-size:11px;color:var(--text3)}
+.tb-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:#fff;cursor:pointer;font-size:11px;color:var(--text2);font-family:inherit}
+.tb-btn:hover{background:var(--bg)}
+.tb-btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.tb-btn.primary:hover{background:#1d4ed8}
+.tb-btn i{font-size:15px}
+.tb-divider{width:1px;height:24px;background:var(--border)}
+#cal-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:#fff;cursor:pointer;font-size:11px;color:var(--text)}
+#cal-pill i{font-size:14px;color:var(--blue)}
+
+/* CONTENT */
+#content{flex:1;overflow-y:auto;padding:20px}
+
+/* PANELS */
+.panel{display:none}
+.panel.active{display:block}
+
+/* CARDS */
+.cards-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow)}
+.card-label{font-size:11px;color:var(--text3);margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.card-label i{font-size:14px}
+.card-val{font-size:24px;font-weight:700;line-height:1.2;margin-bottom:6px}
+.card-val.green{color:var(--green)}
+.card-val.red{color:var(--red)}
+.card-val.blue{color:var(--blue)}
+.card-trend{font-size:11px;display:flex;align-items:center;gap:4px;margin-bottom:10px}
+.trend-up{color:var(--green)}.trend-dn{color:var(--red)}
+.mini-bars{display:flex;align-items:flex-end;gap:3px;height:30px;margin-bottom:4px}
+.mb{width:12px;border-radius:2px 2px 0 0;background:#c7d7fe;flex-shrink:0}
+.mb.cur{background:var(--blue)}
+.card-divider{border:none;border-top:1px solid var(--border);margin:8px 0}
+.card-sub{font-size:11px;color:var(--text3);display:flex;justify-content:space-between;margin-bottom:3px}
+.card-sub span:last-child{color:var(--text);font-weight:500}
+.progress-bar{height:5px;border-radius:3px;background:var(--border);margin:6px 0}
+.progress-fill{height:5px;border-radius:3px;background:var(--blue)}
+.indicator{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 8px;border-radius:20px;font-weight:600}
+.ind-green{background:var(--green-lt);color:var(--green)}
+.ind-red{background:var(--red-lt);color:var(--red)}
+.ind-amber{background:var(--amber-lt);color:var(--amber)}
+
+/* CHART BOXES */
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);margin-bottom:16px}
+
+/* AR LEFT PANEL */
+.ar-stat{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;cursor:pointer;transition:background .15s}
+.ar-stat:hover{background:var(--blue-lt)}
+.ar-stat.arl-active-all{background:var(--bg);border-color:var(--blue)}
+.ar-stat.arl-active-bn{background:var(--blue-lt);border-color:var(--blue)}
+.ar-stat.arl-active-dt{background:var(--red-lt);border-color:var(--red)}
+.ar-stat.arl-active-pd{background:var(--green-lt);border-color:var(--green)}
+.ar-stat-lbl{font-size:10px;color:var(--text3);margin-bottom:2px}
+.ar-stat-amt{font-size:13px;font-weight:700;line-height:1.2}
+.ar-stat-cnt{font-size:10px;color:var(--text3);margin-top:1px}
+.ar-inv-item{padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.ar-inv-item:hover{background:var(--blue-lt)}
+.ar-inv-item.hl{background:#eff4ff}
+.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.chart-title{font-weight:600;font-size:13px}
+.chart-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.toggle-grp{display:flex;gap:3px}
+.tog{font-size:11px;padding:4px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--text3);font-family:inherit}
+.tog.on{background:var(--blue-lt);color:var(--blue);border-color:#bfcffe;font-weight:600}
+
+/* CHART LEGEND */
+.chart-leg{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:var(--text3);margin-bottom:10px}
+.leg-dot{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:3px;vertical-align:middle}
+
+/* GRID 2-col */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table.dt{width:100%;border-collapse:collapse;font-size:12px}
+table.dt th{background:#f8f9fc;font-weight:600;color:var(--text2);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);font-size:11px}
+table.dt td{padding:7px 10px;border-bottom:1px solid #f0f1f7;vertical-align:middle}
+table.dt tr:last-child td{border-bottom:none}
+table.dt tr:hover td{background:#fbfcff}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;white-space:nowrap}
+.b-paid{background:var(--green-lt);color:var(--green)}
+.b-bn{background:var(--blue-lt);color:var(--blue)}
+.b-debt{background:var(--red-lt);color:var(--red)}
+.b-pend{background:var(--amber-lt);color:var(--amber)}
+.b-new{background:#f3f4f6;color:var(--text2)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.text-red{color:var(--red);font-weight:600}
+.text-amber{color:var(--amber);font-weight:600}
+.text-green{color:var(--green);font-weight:600}
+.text-blue{color:var(--blue);font-weight:600}
+
+/* RISK CARDS */
+.risk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
+.risk-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;border-left:4px solid var(--border)}
+.risk-card.red{border-left-color:var(--red)}
+.risk-card.amber{border-left-color:var(--amber)}
+.risk-card.green{border-left-color:var(--green)}
+.risk-title{font-weight:600;font-size:12px;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.risk-val{font-size:20px;font-weight:700;margin-bottom:4px}
+.risk-desc{font-size:11px;color:var(--text3);line-height:1.4}
+
+/* IMPORT/EXPORT */
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:32px;text-align:center;cursor:pointer;transition:all .2s;background:#fafbff}
+.upload-zone:hover{border-color:var(--blue);background:var(--blue-lt)}
+.upload-zone i{font-size:32px;color:var(--text3);display:block;margin-bottom:8px}
+.upload-zone p{font-size:13px;color:var(--text2)}
+.upload-zone span{font-size:11px;color:var(--text3)}
+.exp-opt{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;margin-bottom:8px;transition:all .15s}
+.exp-opt:hover{border-color:var(--blue);background:var(--blue-lt)}
+.exp-icon{width:32px;height:32px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.ei-pdf{background:#fef2f2;color:var(--red)}
+.ei-xls{background:#f0fdf4;color:var(--green)}
+.ei-csv{background:#f0fdf4;color:#059669}
+.ei-md{background:#ede9fe;color:#7c3aed}
+.ei-web{background:var(--blue-lt);color:var(--blue)}
+.exp-info p{font-weight:600;font-size:12px}
+.exp-info span{font-size:11px;color:var(--text3)}
+
+/* PRINT PREVIEW */
+.preview-tabs{display:flex;gap:3px;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:0}
+.ptab{padding:8px 14px;border:none;background:none;cursor:pointer;font-size:12px;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;transition:all .15s}
+.ptab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.preview-content{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.preview-bar{background:#f8f9fc;padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text3)}
+.preview-body{padding:20px}
+.preview-doc{background:#fff;border:1px solid #ddd;border-radius:4px;padding:24px;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.doc-hdr{display:flex;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid var(--blue)}
+.doc-co{font-size:15px;font-weight:700;color:var(--blue)}
+.doc-co2{font-size:10px;color:#666;margin-top:2px}
+.doc-meta{text-align:right;font-size:10px;color:#666}
+.doc-meta strong{font-size:12px;color:#333;display:block}
+.doc-title{text-align:center;font-size:13px;font-weight:700;background:var(--blue-lt);color:var(--blue);padding:6px;border-radius:4px;margin-bottom:12px}
+.doc-table{width:100%;border-collapse:collapse;font-size:10px}
+.doc-table th{background:var(--blue);color:#fff;padding:5px 7px;font-size:10px}
+.doc-table td{padding:4px 7px;border-bottom:1px solid #eee}
+.doc-table tr:nth-child(even) td{background:#f9f9f9}
+.doc-foot{margin-top:10px;text-align:right;font-size:11px}
+.doc-total{background:var(--blue-lt);padding:6px 12px;border-radius:4px;display:inline-block}
+.watermark{position:relative}
+.watermark::before{content:'PEO TECH CONFIDENTIAL';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:24px;font-weight:700;color:rgba(37,99,235,.06);pointer-events:none;white-space:nowrap;letter-spacing:3px;z-index:0}
+
+/* CALENDAR POPUP */
+#cal-popup{display:none;position:fixed;top:60px;right:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 8px 30px rgba(0,0,0,.12);z-index:1000;padding:16px;width:580px}
+.cal-presets{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.cal-preset{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--text3);font-family:inherit}
+.cal-preset.on{background:var(--blue-lt);color:var(--blue);border-color:#bfcffe;font-weight:600}
+.cal-months{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cal-month-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cal-nav{background:none;border:none;cursor:pointer;color:var(--text3);padding:2px 6px;border-radius:4px;font-size:14px}
+.cal-nav:hover{background:var(--bg)}
+.cal-month-name{font-size:12px;font-weight:600}
+.cal-dow{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:10px;color:var(--text3);margin-bottom:4px}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:1px}
+.cday{text-align:center;font-size:11px;padding:4px 2px;border-radius:4px;cursor:pointer;position:relative;color:var(--text)}
+.cday:hover{background:var(--bg)}
+.cday.other{color:var(--text3)}
+.cday.s-start,.cday.s-end{background:var(--blue);color:#fff;border-radius:4px}
+.cday.in-range{background:var(--blue-lt);color:var(--blue)}
+.cday.today{font-weight:700}
+.cday.today::after{content:'';position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:3px;height:3px;border-radius:50%;background:currentColor}
+.cday.has-ev::before{content:'';position:absolute;top:1px;right:2px;width:4px;height:4px;border-radius:50%;background:var(--red)}
+.cal-footer{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.cal-range-txt{font-size:12px;color:var(--text3)}
+.cal-range-txt strong{color:var(--text)}
+#cal-overlay{display:none;position:fixed;inset:0;z-index:999}
+
+/* PULSE */
+.pulse-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:14px}
+.pulse-section h3{font-size:13px;font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.michael{background:var(--red-lt);border:1px solid #fca5a5;border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--red);margin-top:10px}
+.michael strong{display:block;margin-bottom:3px}
+
+/* STATUS BAR */
+#statusbar{height:32px;background:#f8f9fc;border-top:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:16px;font-size:10px;color:var(--text3);flex-shrink:0}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:4px;display:inline-block}
+
+/* GOOGLE SHEETS SYNC */
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+#sync-btn i.spinning{animation:spin 1s linear infinite}
+#countdown-display{transition:color .3s;font-size:11px;font-weight:700;min-width:52px;text-align:center}
+#sync-status-msg{font-size:10px;transition:color .3s}
+
+/* SYNC LOADING POPUP */
+#sync-loading-overlay{display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.35);cursor:not-allowed}
+#sync-loading-box{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3001;background:#fff;border-radius:14px;padding:28px 36px;box-shadow:0 8px 40px rgba(0,0,0,.18);text-align:center;min-width:220px}
+#sync-loading-box .sl-spinner{width:44px;height:44px;border:4px solid #e3e6ef;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+#sync-loading-box .sl-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+#sync-loading-box .sl-sub{font-size:11px;color:var(--text3)}
+
+/* AUDIT MODAL */
+#audit-overlay{display:none;position:fixed;inset:0;z-index:1999;background:rgba(0,0,0,.5)}
+#audit-modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2000;background:var(--surface);border-radius:var(--radius);width:92vw;max-width:1100px;max-height:88vh;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+#audit-modal.open{display:flex}
+.am-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;background:#f8f9fc;border-radius:var(--radius) var(--radius) 0 0}
+.am-hdr-title{font-weight:700;font-size:14px;flex:1}
+.am-hdr-sub{font-size:11px;color:var(--text3)}
+.am-close{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;cursor:pointer;color:var(--text2);padding:4px 10px;font-family:inherit}
+.am-close:hover{background:var(--red-lt);color:var(--red);border-color:var(--red)}
+.am-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:#fff}
+.am-tab{padding:9px 18px;border:none;background:none;cursor:pointer;font-size:12px;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;font-weight:500;display:flex;align-items:center;gap:6px}
+.am-tab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.am-tab:hover{background:var(--bg)}
+.am-body{flex:1;overflow:auto;padding:16px}
+.am-meta{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.am-meta-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 14px;font-size:11px}
+.am-meta-card strong{display:block;font-size:13px;font-weight:700;color:var(--text)}
+.am-meta-card span{color:var(--text3)}
+.am-raw-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-sm);max-height:420px;overflow-y:auto}
+.am-raw-tbl{width:100%;border-collapse:collapse;font-size:11px}
+.am-raw-tbl th{background:var(--blue);color:#fff;padding:6px 10px;text-align:left;font-size:10px;font-weight:600;white-space:nowrap;position:sticky;top:0;z-index:1}
+.am-raw-tbl td{padding:5px 10px;border-bottom:1px solid #f0f1f7;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis}
+.am-raw-tbl tr:nth-child(even) td{background:#fafbff}
+.am-raw-tbl tr:hover td{background:var(--blue-lt)}
+.am-map-box{background:var(--amber-lt);border:1px solid #fcd34d;border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;font-size:11px;line-height:1.6}
+.am-map-box strong{color:var(--amber);display:block;margin-bottom:4px;font-size:12px}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon"><i class="ti ti-building-factory-2"></i></div>
+    <div class="sb-logo-text">
+      <p>PEO Tech</p>
+      <span>PT Dashboard v1.1</span>
+    </div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section">หน้าหลัก</div>
+    <button class="sb-item active" onclick="showTab('overview',this)"><i class="ti ti-layout-dashboard"></i> Overview</button>
+    <button class="sb-item" onclick="showTab('strategic',this)"><i class="ti ti-chart-pie"></i> Strategic</button>
+    <button class="sb-item" onclick="showTab('cashflow',this)"><i class="ti ti-chart-line"></i> Cash Flow</button>
+    <div class="sb-section">รายการ</div>
+    <button class="sb-item" onclick="showTab('ap',this)"><i class="ti ti-receipt"></i> AP / จ่าย <span class="sb-badge" id="ap-badge">22</span></button>
+    <button class="sb-item" onclick="showTab('ar',this)"><i class="ti ti-coin"></i> AR / รับ <span class="sb-badge amber" id="ar-badge">3</span></button>
+    <button class="sb-item" onclick="showTab('fix',this)"><i class="ti ti-calendar-repeat"></i> FIX Expenses</button>
+    <div class="sb-section">วิเคราะห์</div>
+    <button class="sb-item" onclick="showTab('risks',this)"><i class="ti ti-alert-triangle"></i> Risks <span class="sb-badge">4</span></button>
+    <button class="sb-item" onclick="showTab('pulse',this)"><i class="ti ti-file-report"></i> Monthly Pulse</button>
+    <div class="sb-section">จัดการ</div>
+    <button class="sb-item" onclick="showTab('import',this)"><i class="ti ti-arrows-exchange"></i> Import / Export</button>
+    <div class="sb-section">ตรวจสอบ</div>
+    <button class="sb-item" onclick="showTab('audit',this)"><i class="ti ti-table-inspect"></i> Audit Data <span class="sb-badge amber" id="audit-badge">—</span></button>
+    <button class="sb-item" onclick="showTab('howto',this)"><i class="ti ti-book-2"></i> หลักการคำนวณ</button>
+  </div>
+  <div class="sb-footer">
+    <div class="sb-footer-info">
+      <strong>⚠ Peak Window D20–28</strong>
+      ภาระรวม ~฿1.58M — ตรวจ D19
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <!-- TOPBAR -->
+  <header id="topbar">
+    <div>
+      <div id="topbar-title">PT Financial Dashboard</div>
+      <div id="topbar-sub">PEO Tech Co., Ltd. | ข้อมูล ณ 09 พ.ค. 2569</div>
+    </div>
+    <button class="tb-btn" id="btn-cur-month" onclick="applyCurrentMonth()" title="เลือกเดือนปัจจุบัน" style="padding:5px 10px;font-size:11px;gap:4px">
+      <i class="ti ti-calendar-month" style="font-size:14px;color:var(--blue)"></i> เดือนนี้
+    </button>
+    <div id="cal-pill" onclick="toggleCal()">
+      <i class="ti ti-calendar"></i>
+      <span id="cal-label">เม.ย. 2026 — พ.ค. 2026</span>
+      <i class="ti ti-chevron-down" style="font-size:12px;color:var(--text3)"></i>
+    </div>
+    <div class="tb-divider"></div>
+    <span id="countdown-display" style="color:var(--green)">⏱ 5:00</span>
+    <button class="tb-btn" id="sync-btn" onclick="syncNow()" style="background:var(--green);color:#fff;border-color:var(--green)"><i class="ti ti-refresh"></i> Sync Sheet</button>
+    <div class="tb-divider"></div>
+    <button class="tb-btn" onclick="showTab('import',document.querySelector('.sb-item:nth-child(10))'))"><i class="ti ti-upload"></i> Import</button>
+    <button class="tb-btn primary" onclick="doPrint()"><i class="ti ti-printer"></i> Print</button>
+  </header>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- ═══ OVERVIEW ═══ -->
+    <div id="tab-overview" class="panel active">
+      <div class="cards-row">
+        <!-- Revenue -->
+        <div class="card">
+          <div class="card-label"><i class="ti ti-trending-up" style="color:var(--green)"></i> รายรับ (Revenue)</div>
+          <div class="card-val green" id="rev-val">—</div>
+          <div class="card-trend trend-up"><i class="ti ti-arrow-up" style="font-size:12px"></i> +4.2% vs เดือนก่อน</div>
+          <div class="mini-bars">
+            <div class="mb" style="height:16px"></div>
+            <div class="mb" style="height:20px"></div>
+            <div class="mb" style="height:17px"></div>
+            <div class="mb cur" style="height:30px"></div>
+          </div>
+          <div style="font-size:10px;color:var(--text3)">ม.ค. ก.พ. มี.ค. เม.ย.</div>
+          <hr class="card-divider">
+          <div class="card-sub"><span>Lotus's FM</span><span>฿4,850,000</span></div>
+          <div class="card-sub"><span>Caster + Lub</span><span>฿250,000</span></div>
+        </div>
+        <!-- Expenses -->
+        <div class="card">
+          <div class="card-label"><i class="ti ti-receipt-2" style="color:var(--red)"></i> รายจ่าย (Expenses)</div>
+          <div class="card-val red" id="exp-val">—</div>
+          <div class="card-trend trend-dn"><i class="ti ti-arrow-down" style="font-size:12px"></i> <span id="exp-trend-txt">รอ Sync</span></div>
+          <hr class="card-divider">
+          <div class="card-sub"><span>Fixed / ค่าใช้จ่ายคงที่</span><span id="exp-fixed">—</span></div>
+          <div class="card-sub"><span>Payroll / เงินเดือน</span><span id="exp-payroll">—</span></div>
+          <div class="card-sub"><span>AP / อื่นๆ</span><span class="text-amber" id="exp-ap">—</span></div>
+        </div>
+        <!-- Net -->
+        <div class="card">
+          <div class="card-label"><i class="ti ti-coin" style="color:var(--blue)"></i> Net</div>
+          <div class="card-val blue" id="net-val">—</div>
+          <div style="margin-bottom:8px">
+            <div class="progress-bar"><div class="progress-fill" id="net-bar" style="width:0%"></div></div>
+            <div style="font-size:10px;color:var(--text3);display:flex;justify-content:space-between"><span id="net-margin-txt">—% margin</span><span>ของ Revenue</span></div>
+          </div>
+          <hr class="card-divider">
+          <div class="card-sub"><span>Day 19 Check</span><span><span class="indicator ind-green"><i class="ti ti-circle-check" style="font-size:12px"></i> GREEN</span></span></div>
+          <div class="card-sub"><span>FX Risk</span><span><span class="indicator ind-red">🔴 OPEN</span></span></div>
+          <div class="card-sub"><span>Lotus's FM</span><span><span class="indicator ind-amber">⚠ ติดตาม</span></span></div>
+        </div>
+      </div>
+
+      <!-- ─── CASH HEALTH ROW 1: AR / AP / Gap / Risk ─── -->
+      <div class="cards-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="card">
+          <div class="card-label"><i class="ti ti-file-invoice" style="color:var(--green)"></i>AR Invoice รวม</div>
+          <div class="card-val" id="ar-total-val" style="font-size:18px;color:var(--green)">...</div>
+          <div style="font-size:11px;color:var(--text3)" id="ar-total-sub">...</div>
+        </div>
+        <div class="card">
+          <div class="card-label"><i class="ti ti-receipt-2" style="color:var(--red)"></i>AP ค้างจ่ายรวม</div>
+          <div class="card-val" id="ap-ch-val" style="font-size:18px;color:var(--red)">...</div>
+          <div style="font-size:11px;color:var(--text3)" id="ap-ch-sub">...</div>
+        </div>
+        <div class="card">
+          <div class="card-label"><i class="ti ti-arrows-diff" style="color:var(--blue)"></i>NET CASH GAP</div>
+          <div class="card-val" id="cash-gap-val" style="font-size:18px">...</div>
+          <div style="font-size:11px;color:var(--text3)">AR ค้างรับ – AP ค้างจ่าย (THB)</div>
+        </div>
+        <div class="card">
+          <div class="card-label"><i class="ti ti-alert-triangle" style="color:var(--amber)"></i>Collections Risk</div>
+          <div class="card-val" id="coll-risk-val" style="font-size:18px">฿0</div>
+          <div style="font-size:11px;color:var(--text3)" id="coll-risk-sub">0 Overdue</div>
+        </div>
+      </div>
+
+      <!-- ─── OD CREDIT LINE BAR ─── -->
+      <div class="chart-box" style="padding:14px 18px;margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div><span style="font-size:11px;font-weight:600;color:var(--text2)">⚡ OD CREDIT LINE</span><span style="font-size:11px;color:var(--text3);margin-left:8px">วงเงินสินเชื่อหมุนเวียน (รอข้อมูลจริง)</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span id="od-pct-lbl" style="font-size:13px;font-weight:700;color:var(--text2)">—%</span><span id="od-warn-badge" style="display:none" class="indicator"></span></div>
+        </div>
+        <div style="height:12px;background:var(--border);border-radius:6px;overflow:hidden;margin-bottom:6px"><div id="od-bar" style="height:100%;border-radius:6px;width:0;background:var(--green);transition:width .5s"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3)">
+          <span id="od-used-lbl">ใช้ไป —</span><span id="od-rem-lbl">คงเหลือ —</span><span id="od-tot-lbl">วงเงินรวม — <span style="color:var(--text3)">(ปรับค่าที่ OD_LIMIT / OD_USED ใน JS)</span></span>
+        </div>
+      </div>
+
+      <!-- ─── CASH HEALTH ROW 2: DSO / AP items / AP Coverage / Top AR ─── -->
+      <div class="cards-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="card">
+          <div class="card-label"><i class="ti ti-clock" style="color:var(--blue)"></i>DSO (วันเฉลี่ยรับเงิน)</div>
+          <div class="card-val" id="dso-val" style="font-size:22px;color:var(--blue)">—</div>
+          <div style="font-size:10px;color:var(--text3)">&lt;50d ดี · &lt;75d ระวัง · &gt;75d วิกฤต</div>
+        </div>
+        <div class="card">
+          <div class="card-label"><i class="ti ti-receipt" style="color:var(--amber)"></i>AP THB รายการค้าง</div>
+          <div class="card-val" id="ap-items-val" style="font-size:22px;color:var(--amber)">—</div>
+          <div style="font-size:10px;color:var(--text3)" id="ap-items-sub">overdue + urgent + upcoming</div>
+        </div>
+        <div class="card">
+          <div class="card-label"><i class="ti ti-calendar-stats" style="color:var(--amber)"></i>AP Coverage</div>
+          <div class="card-val" id="ap-cov-val" style="font-size:22px;color:var(--amber)">—</div>
+          <div style="font-size:10px;color:var(--text3)">เดือน · AP ÷ Revenue รายเดือน</div>
+        </div>
+        <div class="card">
+          <div class="card-label"><i class="ti ti-users" style="color:var(--text2)"></i>Top ลูกค้าค้างรับ</div>
+          <div class="card-val" id="top-ar-val" style="font-size:18px">—</div>
+          <div style="font-size:10px;color:var(--text3)" id="top-ar-sub">—</div>
+        </div>
+      </div>
+
+      <!-- ─── FINANCIAL STATUS BAR ─── -->
+      <div style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 16px;margin-bottom:8px;box-shadow:var(--shadow);flex-wrap:wrap">
+        <span style="font-size:12px;color:var(--text3);font-weight:600">สถานะการเงิน:</span>
+        <span id="fin-status-badge" class="indicator ind-amber" style="font-size:13px;font-weight:700;padding:4px 14px">CAUTION</span>
+        <div style="width:1px;height:18px;background:var(--border)"></div>
+        <span style="font-size:11px;color:var(--text3)">Cash Gap: <strong id="cash-gap-inline" style="color:var(--text)">—</strong></span>
+        <span style="font-size:11px;color:var(--text3)">DSO: <strong id="dso-inline">—</strong></span>
+        <span style="font-size:11px;color:var(--text3)" id="top1-cust-inline"></span>
+        <span style="margin-left:auto;font-size:10px;color:var(--text3)">GO &gt;฿5M / CAUTION ฿2–5M / STOP &lt;฿2M (Net/เดือน)</span>
+      </div>
+
+      <!-- ─── PAYROLL + BANK INFO BAR (รอข้อมูลจริง) ─── -->
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px;background:var(--bg);border:1px dashed var(--border);border-radius:var(--radius-sm);padding:6px 12px;font-size:11px;color:var(--text3)"><i class="ti ti-users" style="font-size:14px"></i>Payroll — รอข้อมูล</div>
+        <div style="display:flex;align-items:center;gap:6px;background:var(--bg);border:1px dashed var(--border);border-radius:var(--radius-sm);padding:6px 12px;font-size:11px;color:var(--text3)"><i class="ti ti-building-bank" style="font-size:14px"></i>Bank — รอข้อมูล</div>
+      </div>
+
+      <!-- ─── STRESS TEST ─── -->
+      <div style="background:var(--amber-lt);border:1px solid #fcd34d;border-radius:var(--radius);padding:10px 14px;margin-bottom:16px">
+        <div style="font-size:11px;font-weight:600;color:var(--amber);margin-bottom:8px"><i class="ti ti-test-pipe" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Stress Test 30d — จำลองสถานการณ์ AR เลื่อน</div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <button class="tb-btn" id="st-normal" onclick="runStress(this,'normal')" style="background:var(--blue);color:#fff;border-color:var(--blue)">ปกติ</button>
+          <button class="tb-btn" id="st-top1" onclick="runStress(this,'top1')">Top1 เลื่อน 30d</button>
+          <button class="tb-btn" id="st-top12" onclick="runStress(this,'top12')">Top1+2 เลื่อน 30d</button>
+          <button class="tb-btn" id="st-bignote" onclick="runStress(this,'bignote')">Billing Note ทั้งหมด</button>
+          <span style="margin-left:auto;font-size:12px;font-weight:600">Cash Gap 30d: <strong id="stress-result" style="color:var(--green)">—</strong></span>
+        </div>
+      </div>
+
+      <!-- D19 Calculator -->
+      <div class="chart-box" style="margin-bottom:16px">
+        <div class="chart-header">
+          <div><div class="chart-title"><i class="ti ti-calculator" style="font-size:15px;vertical-align:-2px;margin-right:4px"></i>Day 19 Pre-Check Calculator</div>
+          <div class="chart-sub">กรอก Balance วันที่ 19 เพื่อประเมิน peak window D20–28</div></div>
+          <span id="d19-result" class="indicator ind-green" style="font-size:13px;padding:6px 14px">🟢 GREEN</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px">
+            <label style="font-size:12px;color:var(--text2);white-space:nowrap">Balance D19 (฿):</label>
+            <input type="number" id="d19-bal" value="2100000" oninput="calcD19()" style="width:140px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit">
+          </div>
+          <div style="font-size:11px;color:var(--text3)">ภาระ D20–28: <strong style="color:var(--text)">฿1,584,949</strong></div>
+          <div style="font-size:11px;color:var(--text3)">Buffer: <strong id="d19-buf" style="color:var(--green)">+฿515,051</strong></div>
+        </div>
+        <div style="font-size:10px;color:var(--text3);margin-top:6px">ภาระ D20–28: สินเชื่อ ฿80K + เงินกู้ผู้ถือหุ้น ฿210K + ภพ.30 ~฿300K + ปกส ฿28K + เงินเดือน ฿887K + OD ฿80.2K = ฿1,584,949</div>
+      </div>
+
+      <!-- Cash Flow Chart -->
+      <div class="chart-box">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Cash Flow รายวัน — Balance Trend</div>
+            <div class="chart-sub">แสดง peak window D20–28 (แรเงาแดง) และ D19 check line (เส้นส้ม)</div>
+          </div>
+          <div class="toggle-grp">
+            <button class="tog on" onclick="switchCF(this,'m')">เดือนนี้</button>
+            <button class="tog" onclick="switchCF(this,'q')">Q2</button>
+            <button class="tog" onclick="switchCF(this,'y')">YTD</button>
+          </div>
+        </div>
+        <div class="chart-leg">
+          <span><span class="leg-dot" style="background:#2563eb"></span>Bank Balance</span>
+          <span><span class="leg-dot" style="background:rgba(220,38,38,.2);border-radius:0"></span>Peak D20–28</span>
+          <span><span class="leg-dot" style="background:var(--amber);width:2px;height:10px"></span>D19 Line</span>
+          <span><span class="leg-dot" style="border-radius:50%;background:var(--red)"></span>AP Due</span>
+          <span><span class="leg-dot" style="border-radius:50%;background:var(--green)"></span>AR Recv</span>
+        </div>
+        <div style="position:relative;width:100%;height:240px">
+          <canvas id="cfChart" role="img" aria-label="Daily cash flow chart showing balance trend with peak obligation window D20-28 highlighted">Daily balance from D1-D30 showing stress around D20-28 and recovery after D28.</canvas>
+        </div>
+      </div>
+    </div><!-- end overview -->
+
+    <!-- ═══ STRATEGIC ═══ -->
+    <div id="tab-strategic" class="panel">
+      <div class="grid2">
+        <!-- Revenue Mix Donut -->
+        <div class="chart-box" style="margin-bottom:0">
+          <div class="chart-header"><div class="chart-title"><i class="ti ti-chart-donut" style="font-size:15px;vertical-align:-2px;margin-right:4px"></i>Revenue Mix</div></div>
+          <div style="position:relative;width:100%;height:200px"><canvas id="donutChart" role="img" aria-label="Revenue mix donut chart">Lotus FM 95%, Other 5%.</canvas></div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;font-size:11px;margin-top:10px">
+            <span><span class="leg-dot" style="background:#2563eb"></span>Lotus's FM 95%</span>
+            <span><span class="leg-dot" style="background:#16a34a"></span>Caster 3%</span>
+            <span><span class="leg-dot" style="background:#d97706"></span>Lubrication 1.5%</span>
+            <span><span class="leg-dot" style="background:#9333ea"></span>Marine 0.5%</span>
+          </div>
+        </div>
+        <!-- Expense Pie -->
+        <div class="chart-box" style="margin-bottom:0">
+          <div class="chart-header"><div class="chart-title"><i class="ti ti-chart-pie" style="font-size:15px;vertical-align:-2px;margin-right:4px"></i>Expense Breakdown</div></div>
+          <div style="position:relative;width:100%;height:200px"><canvas id="pieChart" role="img" aria-label="Expense breakdown pie chart">Fixed 42%, Payroll 27%, AP 30%, Other 1%.</canvas></div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;font-size:11px;margin-top:10px">
+            <span><span class="leg-dot" style="background:#2563eb"></span>Fixed 42%</span>
+            <span><span class="leg-dot" style="background:#dc2626"></span>Payroll 27%</span>
+            <span><span class="leg-dot" style="background:#d97706"></span>AP unpaid 30%</span>
+            <span><span class="leg-dot" style="background:#6b7280"></span>อื่นๆ 1%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Waterfall P&L -->
+      <div class="chart-box">
+        <div class="chart-header">
+          <div class="chart-title"><i class="ti ti-chart-bar" style="font-size:15px;vertical-align:-2px;margin-right:4px"></i>Waterfall — P&L เดือน เม.ย. 2026</div>
+        </div>
+        <div style="position:relative;width:100%;height:220px"><canvas id="waterfallChart" role="img" aria-label="Waterfall P&L chart showing revenue minus expenses equals net profit">Revenue 5.1M minus Fixed 1.38M minus Payroll 0.89M minus AP 0.99M equals Net 1.84M.</canvas></div>
+      </div>
+
+      <!-- KPI Indicators -->
+      <div class="grid3">
+        <div class="chart-box" style="margin-bottom:0">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">Revenue vs Target</div>
+          <div style="font-size:20px;font-weight:700;color:var(--green)">฿5.1M</div>
+          <div style="font-size:11px;color:var(--text3)">Target: ฿4.8M</div>
+          <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:106%;background:var(--green)"></div></div>
+          <div style="font-size:10px;color:var(--green);margin-top:3px">+6% above target</div>
+          <span class="indicator ind-green" style="margin-top:8px">● On Track</span>
+        </div>
+        <div class="chart-box" style="margin-bottom:0">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">Net Margin</div>
+          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:2px">
+            <div style="font-size:20px;font-weight:700;color:var(--blue)">36%</div>
+            <div style="font-size:10px;background:var(--blue-lt);color:var(--blue);padding:1px 6px;border-radius:10px;font-weight:600">เดือนนี้</div>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">เม.ย. 2026: Revenue ฿5.1M → Net ฿1.84M</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:36%;background:var(--blue)"></div></div>
+          <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:6px">
+            <div style="display:flex;align-items:baseline;gap:6px">
+              <div style="font-size:14px;font-weight:600;color:var(--text2)">0.3%</div>
+              <div style="font-size:10px;background:#f3f4f6;color:var(--text2);padding:1px 6px;border-radius:10px;font-weight:600">Annual YTD</div>
+            </div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px">Revenue ฿61.8M / Net ฿190K — ต่างกับ Monthly เพราะคนละ timeframe</div>
+          </div>
+          <span class="indicator ind-amber" style="margin-top:8px">⚠ YTD ต่ำกว่า target 5%</span>
+        </div>
+        <div class="chart-box" style="margin-bottom:0">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">FX Exposure</div>
+          <div style="font-size:20px;font-weight:700;color:var(--red)">~฿25.2M</div>
+          <div style="font-size:11px;color:var(--text3)">USD + EUR + CNY open</div>
+          <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:100%;background:var(--red)"></div></div>
+          <div style="font-size:10px;color:var(--red);margin-top:3px">ยังไม่ hedge</div>
+          <span class="indicator ind-red" style="margin-top:8px">🔴 Risk</span>
+        </div>
+      </div>
+    </div><!-- end strategic -->
+
+    <!-- ═══ CASH FLOW ═══ -->
+    <div id="tab-cashflow" class="panel">
+      <div class="chart-box">
+        <div class="chart-header">
+          <div><div class="chart-title">Cash Flow Projection — Monthly</div><div class="chart-sub">Q1–Q2 2026 | Bank Balance + AP/AR overlay</div></div>
+          <div class="toggle-grp">
+            <button class="tog on" onclick="switchMonthlyCF(this,'q2')">Q2</button>
+            <button class="tog" onclick="switchMonthlyCF(this,'ytd')">YTD</button>
+          </div>
+        </div>
+        <div style="position:relative;width:100%;height:260px"><canvas id="monthlyChart" role="img" aria-label="Monthly cash flow chart">Monthly balance Jan-May 2026.</canvas></div>
+      </div>
+      <div class="grid2">
+        <div class="chart-box" style="margin-bottom:0">
+          <div class="chart-title" style="margin-bottom:12px">ยอดรวม AP vs AR</div>
+          <div style="position:relative;width:100%;height:160px"><canvas id="apArBar" role="img" aria-label="AP vs AR bar chart">Comparing AP and AR monthly.</canvas></div>
+        </div>
+        <div class="chart-box" style="margin-bottom:0">
+          <div class="chart-title" style="margin-bottom:12px">Peak Obligations — เดือนนี้</div>
+          <table class="dt"><thead><tr><th>วัน</th><th>รายการ</th><th class="num">฿</th></tr></thead>
+          <tbody>
+            <tr><td>D1</td><td>เกียรตินาคิน</td><td class="num text-red">73,000</td></tr>
+            <tr><td>D15</td><td>ภงด.1/3/53 + KF2243</td><td class="num text-amber">76,244</td></tr>
+            <tr><td>D20</td><td>ไทยเครดิต + Fleet Cards</td><td class="num text-red">84,890</td></tr>
+            <tr><td>D23</td><td>ภพ.30 (VAT)</td><td class="num text-red">~300,000</td></tr>
+            <tr><td>D24</td><td>ปกส. (ประกันสังคม)</td><td class="num text-red">~28,000</td></tr>
+            <tr><td>D25</td><td>เงินเดือน + TOT + TrueMove</td><td class="num text-red">~889,000</td></tr>
+            <tr><td>D28</td><td>BOT + OD สินเชื่อหมุนเวียน</td><td class="num text-red">—</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+    </div><!-- end cashflow -->
+
+    <!-- ═══ AP ═══ -->
+    <div id="tab-ap" class="panel">
+      <div class="cards-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="card"><div class="card-label">AP ยังไม่ชำระ (THB)</div><div class="card-val red" style="font-size:18px">฿986,087</div><div style="font-size:11px;color:var(--text3)">22 รายการ</div></div>
+        <div class="card"><div class="card-label">FX Open (USD)</div><div class="card-val red" style="font-size:18px">฿16.1M</div><div style="font-size:11px;color:var(--text3)">Suzhou + TRI FISCHE</div></div>
+        <div class="card"><div class="card-label">FX Open (EUR)</div><div class="card-val amber" style="font-size:18px">฿2.2M</div><div style="font-size:11px;color:var(--text3)">DROPSA S.P.A.</div></div>
+        <div class="card"><div class="card-label">FX Open (CNY)</div><div class="card-val amber" style="font-size:18px">฿9.1M</div><div style="font-size:11px;color:var(--text3)">Suzhou CNY</div></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-header"><div class="chart-title"><i class="ti ti-receipt" style="font-size:15px;vertical-align:-2px;margin-right:4px"></i>AP — ยังไม่ชำระ (THB)</div>
+        <div class="toggle-grp"><button class="tog on">ยังไม่ชำระ</button><button class="tog">ทั้งหมด</button></div></div>
+        <div class="tbl-wrap">
+          <table class="dt">
+            <thead><tr><th>PO No.</th><th>Vendor</th><th>สถานะ</th><th class="num">มูลค่า (฿)</th><th>ครบกำหนด</th></tr></thead>
+            <tbody id="ap-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-header"><div class="chart-title"><i class="ti ti-world" style="font-size:15px;vertical-align:-2px;margin-right:4px"></i>FX Open Positions</div></div>
+        <div class="tbl-wrap">
+          <table class="dt">
+            <thead><tr><th>PO No.</th><th>Vendor</th><th>Currency</th><th class="num">มูลค่า THB</th><th>Rate</th><th>สถานะ</th></tr></thead>
+            <tbody id="fx-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- end ap -->
+
+    <!-- ═══ AR ═══ -->
+    <div id="tab-ar" class="panel">
+      <div style="display:flex;gap:14px;align-items:flex-start">
+
+        <!-- ── LEFT: Invoice panel ── -->
+        <div id="ar-left" style="width:260px;flex-shrink:0;display:flex;flex-direction:column;gap:10px">
+          <!-- Summary stats -->
+          <div class="chart-box" style="padding:12px;margin-bottom:0">
+            <div style="font-size:11px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:5px">
+              <i class="ti ti-receipt-2" style="color:var(--blue);font-size:14px"></i> Invoice Summary
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <div class="ar-stat" id="arl-all" onclick="arLeftFilter('all')">
+                <div class="ar-stat-lbl">รวมทั้งหมด</div>
+                <div class="ar-stat-amt" style="color:var(--text)" id="arl-all-amt">—</div>
+                <div class="ar-stat-cnt" id="arl-all-cnt">0 รายการ</div>
+              </div>
+              <div class="ar-stat" id="arl-bn" onclick="arLeftFilter('Billing Note')">
+                <div class="ar-stat-lbl">Billing Note</div>
+                <div class="ar-stat-amt" style="color:var(--blue)" id="arl-bn-amt">—</div>
+                <div class="ar-stat-cnt" id="arl-bn-cnt">0 รายการ</div>
+              </div>
+              <div class="ar-stat" id="arl-dt" onclick="arLeftFilter('Debtor')">
+                <div class="ar-stat-lbl">Debtor</div>
+                <div class="ar-stat-amt" style="color:var(--red)" id="arl-dt-amt">—</div>
+                <div class="ar-stat-cnt" id="arl-dt-cnt">0 รายการ</div>
+              </div>
+              <div class="ar-stat" id="arl-pd" onclick="arLeftFilter('Paid')">
+                <div class="ar-stat-lbl">Paid</div>
+                <div class="ar-stat-amt" style="color:var(--green)" id="arl-pd-amt">—</div>
+                <div class="ar-stat-cnt" id="arl-pd-cnt">0 รายการ</div>
+              </div>
+            </div>
+            <input id="ar-search" type="text" placeholder="🔍 ค้นหา Invoice / ลูกค้า..."
+              oninput="arLeftFilter('search')"
+              style="width:100%;margin-top:8px;padding:5px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:11px;font-family:inherit;outline:none;background:var(--bg)">
+          </div>
+          <!-- Invoice list -->
+          <div class="chart-box" style="padding:0;margin-bottom:0">
+            <div style="padding:8px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:11px;font-weight:600"><i class="ti ti-list" style="font-size:13px;vertical-align:-2px"></i> รายการ Invoice</span>
+              <span style="font-size:10px;color:var(--text3)" id="arl-count-lbl">ทั้งหมด</span>
+            </div>
+            <div id="ar-inv-list" style="max-height:calc(100vh - 360px);overflow-y:auto"></div>
+          </div>
+        </div><!-- end ar-left -->
+
+        <!-- ── RIGHT: Cards + table ── -->
+        <div style="flex:1;min-width:0">
+          <div class="cards-row" style="grid-template-columns:repeat(4,1fr)">
+            <div class="card"><div class="card-label">Billing Note ค้าง</div><div class="card-val blue" id="ar-billing-val" style="font-size:18px">—</div><div style="font-size:11px;color:var(--text3)" id="ar-billing-sub">รอ Sync ข้อมูล</div></div>
+            <div class="card"><div class="card-label">Debtor (ค้างชำระ)</div><div class="card-val red" id="ar-debtor-val" style="font-size:18px">—</div><div style="font-size:11px;color:var(--text3)" id="ar-debtor-sub">รอ Sync ข้อมูล</div></div>
+            <div class="card"><div class="card-label">Lotus's (AR)</div><div class="card-val green" id="ar-lotus-val" style="font-size:18px">—</div><div style="font-size:11px;color:var(--text3)" id="ar-lotus-sub">รอ Sync ข้อมูล</div></div>
+            <div class="card"><div class="card-label">DSO (วันเฉลี่ยเก็บเงิน)</div><div class="card-val amber" id="ar-dso-val" style="font-size:18px">—</div><div style="font-size:11px;color:var(--text3)" id="ar-dso-sub">คำนวณจาก R3</div></div>
+          </div>
+          <div class="chart-box">
+            <div class="chart-header">
+              <div class="chart-title"><i class="ti ti-coin" style="font-size:15px;vertical-align:-2px;margin-right:4px"></i>AR — รายการทั้งหมด</div>
+              <div class="toggle-grp" id="ar-filter">
+                <button class="tog on" onclick="filterAR('all',this)">ทั้งหมด</button>
+                <button class="tog" onclick="filterAR('Debtor',this)">Debtor</button>
+                <button class="tog" onclick="filterAR('Billing Note',this)">Billing Note</button>
+                <button class="tog" onclick="filterAR('Paid',this)">Paid</button>
+              </div>
+            </div>
+            <div class="tbl-wrap">
+              <table class="dt">
+                <thead><tr><th>Invoice No.</th><th>ลูกค้า</th><th>สถานะ</th><th class="num">สุทธิ (฿)</th><th>วันที่</th></tr></thead>
+                <tbody id="ar-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div><!-- end ar-right -->
+      </div>
+    </div><!-- end ar -->
+
+    <!-- ═══ FIX EXPENSES ═══ -->
+    <div id="tab-fix" class="panel">
+      <div class="cards-row" style="grid-template-columns:repeat(3,1fr)">
+        <div class="card"><div class="card-label">Fixed Expenses/เดือน</div><div class="card-val blue" style="font-size:18px">฿1,384,000</div><div style="font-size:11px;color:var(--text3)">26 รายการ</div></div>
+        <div class="card"><div class="card-label">Fixed Interest/เดือน</div><div class="card-val red" style="font-size:18px">฿688,200</div><div style="font-size:11px;color:var(--text3)">10 รายการ</div></div>
+        <div class="card"><div class="card-label">Peak D20–28</div><div class="card-val red" style="font-size:18px">฿1,584,949</div><div style="font-size:11px;color:var(--text3)">ภาระรวมช่วงวิกฤต</div></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-header"><div class="chart-title"><i class="ti ti-calendar-repeat" style="font-size:15px;vertical-align:-2px;margin-right:4px"></i>FIX Expenses — ค่าใช้จ่ายคงที่</div></div>
+        <div class="tbl-wrap">
+          <table class="dt">
+            <thead><tr><th>#</th><th>รายการ</th><th>รายละเอียด</th><th>ใบแจ้งหนี้</th><th>กำหนดชำระ</th></tr></thead>
+            <tbody id="fix-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- end fix -->
+
+    <!-- ═══ RISKS ═══ -->
+    <div id="tab-risks" class="panel">
+      <div class="risk-grid">
+        <div class="risk-card red">
+          <div class="risk-title"><span class="indicator ind-red">🔴 ACTIVE</span> Lotus's FM Delivery</div>
+          <div class="risk-val text-red">฿2,964,820</div>
+          <div class="risk-desc">Penalty cap | ฿41,507/วัน | Kiddy Cart CBM blocked<br>Deadline: End-May 2026 — <span id="lotus-days-left" style="font-weight:600;color:var(--red)">กำลังคำนวณ...</span></div>
+          <div class="michael"><strong>🔴 Michael decides: ติดตามสถานะ delivery Kiddy Cart — Nack รายงานทุกวัน</strong></div>
+        </div>
+        <div class="risk-card red" style="border-left-color:#b91c1c;background:#fff5f5">
+          <div class="risk-title"><span class="indicator ind-red" style="animation:pulse 1s infinite">🔴 URGENT</span> ภส.01-01 Excise Tax</div>
+          <div id="excise-countdown" style="background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:4px 8px;border-radius:4px;margin-bottom:6px;display:inline-block">⏰ กำลังคำนวณ...</div>
+          <div class="risk-val text-red">Due: 15 พ.ค. 2026</div>
+          <div class="risk-desc" id="excise-desc">ภาษีสรรพสามิต ครบกำหนด — ยังไม่ได้รับการยืนยัน<br>ต้องดำเนินการก่อน 15 พ.ค. 2026</div>
+          <div class="michael"><strong>🔴 Michael decides: ยืนยันยอด ภส.01-01 และสั่งชำระทันที</strong></div>
+        </div>
+        <div class="risk-card red">
+          <div class="risk-title"><span class="indicator ind-red">🔴 UNHEDGED</span> FX Exposure</div>
+          <div class="risk-val text-red">~฿25.2M open</div>
+          <div class="risk-desc">USD: ฿16.1M | EUR: ฿2.2M | CNY: ฿9.1M<br>~฿630K per ฿1 move — ยังไม่ hedge</div>
+          <div style="font-size:10px;color:var(--red);font-weight:600;margin:6px 0 2px">Deadline กำหนด decide: ภายใน 31 พ.ค. 2026 — <span id="fx-days-left" style="font-style:normal">กำลังคำนวณ...</span></div>
+          <div class="michael"><strong>🔴 Michael decides ภายใน 31 พ.ค.: กำหนดนโยบาย FX hedging — forward contract / natural hedge / รับ risk ไว้เอง</strong></div>
+        </div>
+        <div class="risk-card amber">
+          <div class="risk-title"><span class="indicator ind-amber">⚠ RECURRING</span> Peak D20–28</div>
+          <div class="risk-val text-amber">฿1,584,949</div>
+          <div class="risk-desc">ภาระวันที่ 20–28 ทุกเดือน<br>ตรวจ Balance ก่อน D19 — ปัจจุบัน: 🟢 GREEN</div>
+          <div style="font-size:10px;color:var(--amber);font-weight:600;margin:6px 0 2px">Action: D19 check ทุกเดือน (ถัดไป: <span id="peak-next-date">กำลังคำนวณ...</span>)</div>
+          <div style="font-size:10px;color:var(--text3)">ถ้า Balance &lt; ฿1.88M → แจ้ง Michael ทันที</div>
+        </div>
+      </div>
+
+      <div class="chart-box">
+        <div class="chart-header"><div class="chart-title">FX Open Position Breakdown</div></div>
+        <div style="position:relative;width:100%;height:180px"><canvas id="fxChart" role="img" aria-label="FX exposure bar chart">USD 16.1M, CNY 9.1M, EUR 2.2M.</canvas></div>
+      </div>
+    </div><!-- end risks -->
+
+    <!-- ═══ PULSE ═══ -->
+    <div id="tab-pulse" class="panel">
+      <div class="pulse-section">
+        <h3><i class="ti ti-file-report"></i> PT-Pulse-2026-04-v1.1</h3>
+        <table class="dt">
+          <thead><tr><th>Section</th><th>รายการ</th><th class="num">฿</th><th>สถานะ</th></tr></thead>
+          <tbody>
+            <tr><td rowspan="2" style="font-weight:600;color:var(--green)">Revenue</td><td>Lotus's FM Billing</td><td class="num">4,850,000</td><td><span class="badge b-paid">✓ Paid</span></td></tr>
+            <tr><td>Caster + Lub + Marine</td><td class="num">250,000</td><td><span class="badge b-paid">✓ Paid</span></td></tr>
+            <tr><td rowspan="3" style="font-weight:600;color:var(--red)">Expenses</td><td>Fixed Obligations</td><td class="num">1,384,000</td><td><span class="badge b-pend">D20–28</span></td></tr>
+            <tr><td>Payroll (เม.ย.)</td><td class="num">886,749</td><td><span class="badge b-paid">✓ จ่ายแล้ว</span></td></tr>
+            <tr><td>AP Unpaid (THB)</td><td class="num">986,087</td><td><span class="badge b-pend">รอจ่าย</span></td></tr>
+            <tr><td style="font-weight:600;color:var(--blue)">Cash / OD</td><td>Bank Balance D19 est.</td><td class="num">2,100,000</td><td><span class="badge b-paid">🟢 GREEN</span></td></tr>
+            <tr><td style="font-weight:600;color:var(--blue)">Net</td><td>เดือนนี้ (Revenue – Expenses)</td><td class="num text-blue" style="font-weight:700">1,842,864</td><td><span class="badge b-bn">36% margin</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pulse-section">
+        <h3><i class="ti ti-flag"></i> Operational Flags</h3>
+        <table class="dt"><thead><tr><th>Risk</th><th>รายละเอียด</th><th>สถานะ</th></tr></thead>
+        <tbody>
+          <tr><td>Lotus's FM Delivery</td><td>Kiddy Cart CBM blocked — penalty ฿41,507/วัน cap ฿2,964,820</td><td><span class="badge b-debt">🔴 ACTIVE</span></td></tr>
+          <tr><td>ภส.01-01</td><td>ครบกำหนด 15 พ.ค. 2026</td><td><span class="badge b-debt">🔴 OPEN</span></td></tr>
+          <tr><td>FX Unhedged</td><td>~฿25.2M open position — ~฿630K per ฿1</td><td><span class="badge b-debt">🔴 RISK</span></td></tr>
+          <tr><td>Peak D20–28</td><td>Pre-check D19: Balance ≈ ฿2.1M vs ภาระ ฿1.58M</td><td><span class="badge b-paid">🟢 GREEN</span></td></tr>
+        </tbody></table>
+      </div>
+      <div class="michael"><strong>🔴 Michael decides:</strong> FX hedging policy | ยืนยัน ภส.01-01 | Lotus's FM delivery status — Nack ต้องรายงานทุกวันจนถึง end-May</div>
+    </div><!-- end pulse -->
+
+    <!-- ═══ IMPORT/EXPORT ═══ -->
+    <div id="tab-import" class="panel">
+      <div class="grid2" style="margin-bottom:16px">
+        <div class="chart-box" style="margin-bottom:0">
+          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-upload" style="font-size:15px;vertical-align:-2px;margin-right:4px;color:var(--blue)"></i>Import ข้อมูล</div>
+          <div class="upload-zone" onclick="alert('เลือกไฟล์เพื่อ Import')">
+            <i class="ti ti-cloud-upload"></i>
+            <p>ลากไฟล์วางที่นี่ หรือ <strong style="color:var(--blue)">เลือกไฟล์</strong></p>
+            <span>รองรับ .xlsx · .csv · .md · .json · FlowAccount</span>
+          </div>
+          <div style="margin-top:12px;font-size:11px;color:var(--text3);margin-bottom:6px">Import ล่าสุด:</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px;padding:7px 10px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:5px">
+            <i class="ti ti-file-spreadsheet" style="color:var(--green)"></i>
+            <span style="flex:1">PO-AP.md</span><span style="color:var(--text3)">09 พ.ค. 09:14</span>
+            <span class="badge b-paid">✓ OK</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px;padding:7px 10px;background:var(--bg);border-radius:var(--radius-sm)">
+            <i class="ti ti-file-text" style="color:#059669"></i>
+            <span style="flex:1">RE-MAIN.md</span><span style="color:var(--text3)">09 พ.ค. 09:14</span>
+            <span class="badge b-paid">✓ OK</span>
+          </div>
+        </div>
+        <div class="chart-box" style="margin-bottom:0">
+          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-download" style="font-size:15px;vertical-align:-2px;margin-right:4px;color:var(--green)"></i>Export รายงาน</div>
+          <div class="exp-opt" onclick="showPreview('web')"><div class="exp-icon ei-web"><i class="ti ti-browser"></i></div><div class="exp-info"><p>Print Preview (Web)</p><span>ดูตัวอย่างก่อนพิมพ์ • Ctrl+P</span></div><button class="tb-btn" style="font-size:10px;padding:3px 10px">ดูตัวอย่าง</button></div>
+          <div class="exp-opt" onclick="showPreview('pdf')"><div class="exp-icon ei-pdf"><i class="ti ti-file-type-pdf"></i></div><div class="exp-info"><p>PDF Report</p><span>A4 · รวม Charts · ลายน้ำ PT</span></div><button class="tb-btn" style="font-size:10px;padding:3px 10px">Export</button></div>
+          <div class="exp-opt" onclick="showPreview('xls')"><div class="exp-icon ei-xls"><i class="ti ti-file-spreadsheet"></i></div><div class="exp-info"><p>Excel (.xlsx)</p><span>AP · AR · Summary tabs</span></div><button class="tb-btn" style="font-size:10px;padding:3px 10px">Export</button></div>
+          <div class="exp-opt" onclick="showPreview('csv')"><div class="exp-icon ei-csv"><i class="ti ti-file-text"></i></div><div class="exp-info"><p>CSV (raw data)</p><span>UTF-8 · ใช้กับ FlowAccount</span></div><button class="tb-btn" style="font-size:10px;padding:3px 10px">Export</button></div>
+          <div class="exp-opt" onclick="showPreview('md')"><div class="exp-icon" style="background:#ede9fe;color:#7c3aed"><i class="ti ti-markdown"></i></div><div class="exp-info"><p>Markdown (.md)</p><span>ส่ง Michael · บันทึก Pulse</span></div><button class="tb-btn" style="font-size:10px;padding:3px 10px">Export</button></div>
+        </div>
+      </div>
+
+      <!-- Print Preview -->
+      <div class="chart-box">
+        <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-eye" style="font-size:15px;vertical-align:-2px;margin-right:4px"></i>Print Preview</div>
+        <div class="preview-tabs">
+          <button class="ptab on" onclick="showPreview('web',this)">🌐 Web</button>
+          <button class="ptab" onclick="showPreview('pdf',this)">📄 PDF</button>
+          <button class="ptab" onclick="showPreview('xls',this)">📊 Excel</button>
+          <button class="ptab" onclick="showPreview('csv',this)">📝 CSV</button>
+          <button class="ptab" onclick="showPreview('md',this)">🔖 MD</button>
+          <div style="margin-left:auto;display:flex;gap:6px;padding-bottom:6px">
+            <button class="tb-btn" onclick="window.print()"><i class="ti ti-printer"></i> Print</button>
+            <button class="tb-btn primary" id="dl-btn"><i class="ti ti-download"></i> ดาวน์โหลด</button>
+          </div>
+        </div>
+        <div class="preview-content">
+          <div class="preview-bar" id="preview-bar"><i class="ti ti-file-report"></i> <span id="preview-bar-txt">Web Preview — PT-Pulse-2026-04-v1.1</span> <span style="margin-left:auto" id="preview-size">ขนาด: —</span></div>
+          <div class="preview-body" id="preview-body"></div>
+        </div>
+      </div>
+    </div><!-- end import -->
+
+    <!-- ═══ AUDIT ═══ -->
+    <div id="tab-audit" class="panel">
+      <div class="chart-box" style="margin-bottom:14px">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title"><i class="ti ti-table-inspect" style="font-size:15px;vertical-align:-2px;margin-right:4px"></i>Audit Data — Google Sheets Live</div>
+            <div class="chart-sub">ตรวจสอบข้อมูลดิบที่ระบบดึงมาแสดงในแต่ละหน้า — คลิก Sheet เพื่อดูตาราง</div>
+          </div>
+          <button class="tb-btn" onclick="syncNow()" style="background:var(--green);color:#fff;border-color:var(--green)"><i class="ti ti-refresh"></i> Sync ตอนนี้</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:16px;font-size:11px">
+          <span class="sb-dot" id="audit-dot" style="background:var(--text3)"></span>
+          <span id="audit-sync-txt" style="color:var(--text3)">ยังไม่ได้ Sync — กด Sync ตอนนี้</span>
+          <span style="margin-left:auto;color:var(--text3)" id="audit-sync-time"></span>
+        </div>
+        <div class="grid3" style="margin-bottom:0">
+          <div class="chart-box" style="margin-bottom:0;cursor:pointer;transition:box-shadow .2s" onclick="openAuditModal('r3')" onmouseover="this.style.boxShadow='0 4px 16px rgba(37,99,235,.15)'" onmouseout="this.style.boxShadow='var(--shadow)'">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+              <div style="width:36px;height:36px;background:var(--blue-lt);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center"><i class="ti ti-table" style="color:var(--blue);font-size:18px"></i></div>
+              <div><div style="font-weight:600;font-size:12px">TRC-R3สรุป_ALL</div><div style="font-size:10px;color:var(--text3)">Revenue Summary</div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span style="color:var(--text3)">แถวข้อมูล</span><strong id="audit-r3-rows">—</strong></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span style="color:var(--text3)">คอลัมน์</span><strong id="audit-r3-cols">—</strong></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--text3)">ใช้งาน</span><strong style="color:var(--blue)">Revenue Card</strong></div>
+            <div style="margin-top:10px;text-align:center;font-size:11px;color:var(--blue);font-weight:600"><i class="ti ti-eye" style="font-size:12px"></i> คลิกดูข้อมูลดิบ</div>
+          </div>
+          <div class="chart-box" style="margin-bottom:0;cursor:pointer;transition:box-shadow .2s" onclick="openAuditModal('po3')" onmouseover="this.style.boxShadow='0 4px 16px rgba(220,38,38,.15)'" onmouseout="this.style.boxShadow='var(--shadow)'">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+              <div style="width:36px;height:36px;background:var(--red-lt);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center"><i class="ti ti-receipt" style="color:var(--red);font-size:18px"></i></div>
+              <div><div style="font-weight:600;font-size:12px">TRC-PO3รายละเอียด</div><div style="font-size:10px;color:var(--text3)">AP / PO Detail</div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span style="color:var(--text3)">แถวข้อมูล</span><strong id="audit-po3-rows">—</strong></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span style="color:var(--text3)">คอลัมน์</span><strong id="audit-po3-cols">—</strong></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--text3)">ใช้งาน</span><strong style="color:var(--red)">AP Table · FX · Cash Health</strong></div>
+            <div style="margin-top:10px;text-align:center;font-size:11px;color:var(--blue);font-weight:600"><i class="ti ti-eye" style="font-size:12px"></i> คลิกดูข้อมูลดิบ</div>
+          </div>
+          <div class="chart-box" style="margin-bottom:0;cursor:pointer;transition:box-shadow .2s" onclick="openAuditModal('f4')" onmouseover="this.style.boxShadow='0 4px 16px rgba(22,163,74,.15)'" onmouseout="this.style.boxShadow='var(--shadow)'">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+              <div style="width:36px;height:36px;background:var(--green-lt);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center"><i class="ti ti-cash" style="color:var(--green);font-size:18px"></i></div>
+              <div><div style="font-weight:600;font-size:12px">TRC_F4จ่าย</div><div style="font-size:10px;color:var(--text3)">Payment / Expense</div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span style="color:var(--text3)">แถวข้อมูล</span><strong id="audit-f4-rows">—</strong></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span style="color:var(--text3)">คอลัมน์</span><strong id="audit-f4-cols">—</strong></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--text3)">ใช้งาน</span><strong style="color:var(--green)">Expenses Card · Net</strong></div>
+            <div style="margin-top:10px;text-align:center;font-size:11px;color:var(--blue);font-weight:600"><i class="ti ti-eye" style="font-size:12px"></i> คลิกดูข้อมูลดิบ</div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title" style="margin-bottom:10px"><i class="ti ti-arrows-transfer-down" style="font-size:15px;vertical-align:-2px;margin-right:4px"></i>Field Mapping — Sheet Column → Dashboard</div>
+        <table class="dt">
+          <thead><tr><th>Sheet Tab</th><th>คอลัมน์ที่ระบบหา</th><th>แสดงใน Dashboard</th><th>Fallback</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge b-bn">R3</span></td><td>revenue / รายรับ / รายได้ / total rev / ยอดรวม / amount</td><td>Revenue Card (Overview)</td><td>฿5,100,000</td></tr>
+            <tr><td><span class="badge b-debt">PO3</span></td><td>po / vendor / amount / due date / urgency / status</td><td>AP Table · Cash Health · DSO</td><td>22 รายการ hardcoded</td></tr>
+            <tr><td><span class="badge b-paid">F4</span></td><td>amount / จำนวน / มูลค่า / ยอด (col B fallback)</td><td>Expenses Card · Net Card</td><td>฿3,257,136</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- end audit -->
+
+    <!-- ═══ HOW-TO / สูตรคำนวณ ═══ -->
+    <div id="tab-howto" class="panel">
+      <div style="max-width:860px">
+
+        <!-- header -->
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+          <div style="width:42px;height:42px;background:var(--blue-lt);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-book-2" style="font-size:22px;color:var(--blue)"></i></div>
+          <div>
+            <div style="font-weight:700;font-size:15px">หลักการทำงาน &amp; สูตรคำนวณ</div>
+            <div style="font-size:11px;color:var(--text3)">PT Financial Dashboard — แหล่งข้อมูล, สูตร, เงื่อนไขแต่ละ metric</div>
+          </div>
+        </div>
+
+        <!-- ── 1. แหล่งข้อมูล ── -->
+        <div class="chart-box" style="margin-bottom:14px">
+          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-database" style="font-size:14px;vertical-align:-2px;margin-right:5px;color:var(--blue)"></i>1. แหล่งข้อมูล (Data Sources)</div>
+          <table class="dt">
+            <thead><tr><th>Sheet Tab</th><th>ส่งข้อมูลไปที่</th><th>Column ที่ระบบหา</th><th>หมายเหตุ</th></tr></thead>
+            <tbody>
+              <tr><td><span class="badge b-bn">R3</span> TRC-R3สรุป_ALL</td><td>Revenue card, AR breakdown, DSO, AR Table</td><td><strong>วันที่เอกสาร · เลขที่เอกสาร · อ้างอิง · ลูกค้า · สถานะ · มูลค่า · ภาษี · สุทธิ · เครดิต</strong></td><td>ใช้ column <code>สุทธิ</code> เป็น Revenue/AR amount</td></tr>
+              <tr><td><span class="badge b-debt">PO3</span> TRC-PO3รายละเอียด</td><td>AP Table, AP ค้างจ่าย, Cash Gap, AP Coverage</td><td>po · vendor · amount · due date · urgency · status</td><td>filter เฉพาะแถวที่ยังไม่ชำระ</td></tr>
+              <tr><td><span class="badge b-paid">F4</span> TRC_F4จ่าย</td><td>Expenses card, Net card, Margin bar</td><td>วันที่ · หมวด · จำนวน</td><td>เพิ่ม column "หมวด" เพื่อแยก Fixed/Payroll/AP</td></tr>
+              <tr><td><span class="badge" style="background:#6366f1;color:#fff">FX</span> hardcoded</td><td>FX Open (USD/EUR/CNY), AP FX total</td><td>—</td><td>ยังไม่ได้ดึงจาก Sheet</td></tr>
+              <tr><td><span class="badge" style="background:#64748b;color:#fff">OD</span> hardcoded</td><td>OD Credit Line bar</td><td>OD_LIMIT · OD_USED</td><td>ใส่ตัวเลขจริงใน code บรรทัด <code>var OD_LIMIT</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── 2. Overview Tab ── -->
+        <div class="chart-box" style="margin-bottom:14px">
+          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-layout-dashboard" style="font-size:14px;vertical-align:-2px;margin-right:5px;color:var(--green)"></i>2. Overview — Cards หลัก</div>
+          <table class="dt">
+            <thead><tr><th>Card</th><th>สูตร / ที่มา</th><th>Filter วันที่</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Revenue</strong></td><td><code>SUM(R3.จำนวน)</code> ทุกแถวในช่วงวันที่</td><td>✓ ตาม column วันที่ใน R3</td></tr>
+              <tr><td><strong>Expenses</strong></td><td><code>SUM(F4.จำนวน)</code> ทุกแถวในช่วงวันที่</td><td>✓ ตาม column วันที่ใน F4</td></tr>
+              <tr><td><strong>Fixed / Payroll / AP</strong></td><td><code>SUM(F4.จำนวน)</code> group by column <code>หมวด</code></td><td>✓</td></tr>
+              <tr><td><strong>Net</strong></td><td><code>Revenue − Expenses</code></td><td>✓ (คำนวณจาก 2 ค่าข้างต้น)</td></tr>
+              <tr><td><strong>Margin %</strong></td><td><code>Net ÷ Revenue × 100</code></td><td>✓</td></tr>
+              <tr><td><strong>Progress bar</strong></td><td>สี: เขียว ≥30%, เหลือง ≥15%, แดง &lt;15%</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── 3. Cash Health ── -->
+        <div class="chart-box" style="margin-bottom:14px">
+          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-heart-rate-monitor" style="font-size:14px;vertical-align:-2px;margin-right:5px;color:var(--amber)"></i>3. Cash Health Metrics (Overview แถว 2–3)</div>
+          <table class="dt">
+            <thead><tr><th>Metric</th><th>สูตร</th><th>เงื่อนไขสี</th></tr></thead>
+            <tbody>
+              <tr><td><strong>AR Invoice รวม</strong></td><td><code>SUM(R3.จำนวน)</code> ทุกสถานะ</td><td>—</td></tr>
+              <tr><td><strong>AR คงค้าง</strong></td><td><code>SUM(R3.จำนวน)</code> where status ≠ Paid</td><td>—</td></tr>
+              <tr><td><strong>AP ค้างจ่าย</strong></td><td><code>SUM(PO3.amount)</code> ที่ยังไม่ชำระ (THB)</td><td>—</td></tr>
+              <tr><td><strong>NET CASH GAP</strong></td><td><code>AR คงค้าง − AP ค้างจ่าย (THB)</code></td><td>เขียว = บวก, แดง = ติดลบ</td></tr>
+              <tr><td><strong>Collections Risk</strong></td><td><code>SUM(AR.amt)</code> where due date &lt; วันนี้</td><td>แดง = มี overdue</td></tr>
+              <tr><td><strong>DSO</strong></td><td><code>AR คงค้าง ÷ Revenue × 30</code></td><td>เขียว &lt;50d · เหลือง &lt;75d · แดง ≥75d</td></tr>
+              <tr><td><strong>AP Coverage</strong></td><td><code>AP (THB) ÷ Revenue รายเดือน</code> (หน่วย: เดือน)</td><td>—</td></tr>
+              <tr><td><strong>Top ลูกค้าค้างรับ</strong></td><td>AR คงค้าง sort desc → อันดับ 1</td><td>% = ลูกค้านั้น ÷ AR รวม</td></tr>
+              <tr><td><strong>OD Credit Line</strong></td><td><code>OD_USED ÷ OD_LIMIT × 100</code></td><td>เขียว &lt;70% · เหลือง &lt;90% · แดง ≥90%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── 4. AR Tab ── -->
+        <div class="chart-box" style="margin-bottom:14px">
+          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-coin" style="font-size:14px;vertical-align:-2px;margin-right:5px;color:var(--green)"></i>4. AR Tab — ลูกหนี้การค้า</div>
+          <table class="dt">
+            <thead><tr><th>Card</th><th>สูตร</th><th>เงื่อนไข</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Billing Note ค้าง</strong></td><td><code>SUM(R3.จำนวน)</code> where สถานะ ~ "Billing Note" หรือ "รอเก็บ"</td><td>—</td></tr>
+              <tr><td><strong>Debtor ค้างชำระ</strong></td><td><code>SUM(R3.จำนวน)</code> where สถานะ ~ "Debtor" หรือ "ค้างชำระ"</td><td>—</td></tr>
+              <tr><td><strong>Lotus's AR</strong></td><td><code>SUM(R3.จำนวน)</code> where ลูกค้า contains "Lotus" หรือ "โลตัส"</td><td>—</td></tr>
+              <tr><td><strong>DSO (AR tab)</strong></td><td><code>AR คงค้าง ÷ (Revenue ÷ จำนวนวันที่เลือก)</code></td><td>ใช้ช่วงวันที่ calendar</td></tr>
+              <tr><td><strong>AR Table</strong></td><td>แสดงทุกแถวจาก R3 (filter ได้: ทั้งหมด / Debtor / Billing Note / Paid)</td><td>—</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:10px;padding:10px;background:var(--blue-lt);border-radius:8px;font-size:11px;color:var(--blue)">
+            <strong>Status mapping อัตโนมัติจาก R3:</strong><br>
+            • Paid ← สถานะ contains: paid, ชำระแล้ว, รับแล้ว, จ่ายแล้ว<br>
+            • Billing Note ← สถานะ contains: billing note, รอเก็บ, รอรับ<br>
+            • Debtor ← สถานะ contains: debtor, ค้างชำระ, เกินกำหนด, overdue
+          </div>
+        </div>
+
+        <!-- ── 5. AP Tab ── -->
+        <div class="chart-box" style="margin-bottom:14px">
+          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-receipt" style="font-size:14px;vertical-align:-2px;margin-right:5px;color:var(--red)"></i>5. AP Tab — เจ้าหนี้การค้า</div>
+          <table class="dt">
+            <thead><tr><th>Metric</th><th>สูตร / เงื่อนไข</th></tr></thead>
+            <tbody>
+              <tr><td><strong>AP Table (PO3)</strong></td><td>แถวที่ status ≠ paid — filter ด้วย due date ตามช่วงวันที่ calendar</td></tr>
+              <tr><td><strong>Urgency: overdue</strong></td><td>due date &lt; วันนี้</td></tr>
+              <tr><td><strong>Urgency: urgent</strong></td><td>due date ≤ 7 วันนับจากวันนี้</td></tr>
+              <tr><td><strong>Urgency: upcoming</strong></td><td>due date ≤ 21 วัน</td></tr>
+              <tr><td><strong>Urgency: normal</strong></td><td>due date &gt; 21 วัน</td></tr>
+              <tr><td><strong>ISO Week format</strong></td><td>Y26/WW เช่น Y26/22 = สัปดาห์ที่ 22 (25–31 พ.ค. 2026)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── 6. D19 Calculator ── -->
+        <div class="chart-box" style="margin-bottom:14px">
+          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-calculator" style="font-size:14px;vertical-align:-2px;margin-right:5px;color:var(--amber)"></i>6. D19 Calculator (Cash Flow tab)</div>
+          <table class="dt">
+            <thead><tr><th>ค่า</th><th>รายละเอียด</th></tr></thead>
+            <tbody>
+              <tr><td><strong>OBLIGATION</strong></td><td>฿1,584,949 (hardcoded) — ค่าใช้จ่ายที่ต้องจ่ายภายในวันที่ 19–28</td></tr>
+              <tr><td><strong>Gap</strong></td><td><code>Bank Balance (กรอก) − OBLIGATION</code></td></tr>
+              <tr><td><span class="indicator ind-green">GREEN</span></td><td>Gap ≥ ฿300,000</td></tr>
+              <tr><td><span class="indicator ind-amber">AMBER</span></td><td>Gap ≥ ฿0 แต่ &lt; ฿300,000</td></tr>
+              <tr><td><span class="indicator ind-red">RED</span></td><td>Gap &lt; ฿0 (ไม่พอจ่าย)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── 7. Stress Test ── -->
+        <div class="chart-box" style="margin-bottom:14px">
+          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-trending-down" style="font-size:14px;vertical-align:-2px;margin-right:5px;color:var(--red)"></i>7. Stress Test (Cash Flow tab)</div>
+          <table class="dt">
+            <thead><tr><th>Scenario</th><th>สูตร</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Normal</strong></td><td><code>AR คงค้างทั้งหมด − AP THB</code></td></tr>
+              <tr><td><strong>ตัด Top-1</strong></td><td><code>(AR คงค้าง − ลูกค้าใหญ่ที่สุด) − AP THB</code> — จำลองถ้าเก็บเงินรายใหญ่ไม่ได้</td></tr>
+              <tr><td><strong>ตัด Top-1+2</strong></td><td><code>(AR คงค้าง − 2 รายใหญ่) − AP THB</code></td></tr>
+              <tr><td><strong>ตัด Billing Note</strong></td><td><code>AR เฉพาะ Debtor − AP THB</code> — จำลองถ้า Billing Note ทั้งหมดสูญหาย</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── 8. Financial Status ── -->
+        <div class="chart-box" style="margin-bottom:14px">
+          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-traffic-lights" style="font-size:14px;vertical-align:-2px;margin-right:5px;color:var(--text2)"></i>8. สถานะการเงิน (Status Bar ล่าง)</div>
+          <table class="dt">
+            <thead><tr><th>สถานะ</th><th>เงื่อนไข (Net รายเดือน)</th></tr></thead>
+            <tbody>
+              <tr><td><span class="badge b-paid">GO</span></td><td>Net ≥ ฿5,000,000</td></tr>
+              <tr><td><span class="badge b-pend">CAUTION</span></td><td>Net ≥ ฿2,000,000</td></tr>
+              <tr><td><span class="badge b-debt">STOP</span></td><td>Net &lt; ฿2,000,000</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── 9. Auto-Sync ── -->
+        <div class="chart-box" style="margin-bottom:14px">
+          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-refresh" style="font-size:14px;vertical-align:-2px;margin-right:5px;color:var(--blue)"></i>9. ระบบ Sync & Cache</div>
+          <table class="dt">
+            <thead><tr><th>รายการ</th><th>รายละเอียด</th></tr></thead>
+            <tbody>
+              <tr><td><strong>เปิดเว็บครั้งแรก</strong></td><td>Sync อัตโนมัติ + แสดง popup spinner</td></tr>
+              <tr><td><strong>Auto-sync</strong></td><td>ทุก <strong>4 นาที</strong> เงียบๆ ไม่มี popup — ตัวเลขเปลี่ยนเอง</td></tr>
+              <tr><td><strong>Countdown แสดง</strong></td><td>5 นาที reset ทุกครั้งที่ sync สำเร็จ</td></tr>
+              <tr><td><strong>กดปุ่ม Sync Sheet</strong></td><td>Force sync ทันที + popup</td></tr>
+              <tr><td><strong>GAS Cache</strong></td><td>5 นาที (CacheService) — sync ครั้งที่ 2 ใน 5 นาทีจะเร็วมาก</td></tr>
+              <tr><td><strong>GAS keepWarm</strong></td><td>Trigger ทุก 5 นาที อัตโนมัติ — ป้องกัน cold start</td></tr>
+              <tr><td><strong>Timeout</strong></td><td>30 วินาที — ถ้า GAS ไม่ตอบจะ error</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── 10. Date Filter ── -->
+        <div class="chart-box">
+          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-calendar-filter" style="font-size:14px;vertical-align:-2px;margin-right:5px;color:var(--blue)"></i>10. Date Filter (Calendar)</div>
+          <table class="dt">
+            <thead><tr><th>Section</th><th>Filter ตามวันที่ได้?</th><th>เงื่อนไข</th></tr></thead>
+            <tbody>
+              <tr><td>Revenue (R3)</td><td><span class="badge b-paid">✓</span></td><td>R3 ต้องมี column วันที่ · เดือน · date</td></tr>
+              <tr><td>Expenses / Net (F4)</td><td><span class="badge b-paid">✓</span></td><td>F4 ต้องมี column วันที่ · เดือน · date</td></tr>
+              <tr><td>AP Table (PO3)</td><td><span class="badge b-paid">✓</span></td><td>filter ตาม due date อัตโนมัติ</td></tr>
+              <tr><td>AR breakdown / DSO</td><td><span class="badge b-paid">✓</span></td><td>R3 ต้องมี column วันที่</td></tr>
+              <tr><td>กราฟ Strategic tab</td><td><span class="badge b-debt">✗</span></td><td>ยังเป็น hardcoded — รอข้อมูลจริงจาก Sheet</td></tr>
+              <tr><td>FX / OD</td><td><span class="badge b-debt">✗</span></td><td>hardcoded — ต้องเชื่อม Sheet เพิ่ม</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:10px;padding:10px;background:var(--amber-lt);border-radius:8px;font-size:11px;color:var(--amber)">
+            <strong>หมายเหตุ Date Parse:</strong> ระบบรองรับ ISO (2026-04-15), DD/MM/YYYY, YYYY/MM/DD และ Google Sheets serial number อัตโนมัติ
+          </div>
+        </div>
+
+      </div>
+    </div><!-- end howto -->
+
+  </div><!-- end content -->
+
+  <!-- STATUS BAR -->
+  <div id="statusbar">
+    <span class="sb-dot"></span>
+    <span>ข้อมูลอัปเดต: 09 พ.ค. 2569 09:14</span>
+    <span>|</span>
+    <span>AP ยังไม่ชำระ: <strong style="color:var(--red)">฿986,087</strong></span>
+    <span>|</span>
+    <span>AR Debtor: <strong style="color:var(--red)">฿191,830</strong></span>
+    <span>|</span>
+    <span>D19 Check: <strong style="color:var(--green)">🟢 GREEN</strong></span>
+    <span id="sync-status-msg" style="color:var(--text3)">แหล่งข้อมูล: Google Sheets (live)</span>
+    <span style="margin-left:auto">PT Dashboard v1.2 — PEO Tech Co., Ltd. | Google Sheets Live Integration</span>
+  </div>
+</div><!-- end main -->
+
+<!-- AUDIT MODAL -->
+<div id="audit-overlay" onclick="closeAuditModal()"></div>
+<div id="audit-modal">
+  <div class="am-hdr">
+    <div class="am-hdr-title"><i class="ti ti-table-inspect" style="margin-right:6px"></i><span id="am-title">Audit — Raw Sheet Data</span></div>
+    <span class="am-hdr-sub" id="am-sub"></span>
+    <button class="am-close" onclick="closeAuditModal()">✕ ปิด</button>
+  </div>
+  <div class="am-tabs">
+    <button class="am-tab on" onclick="switchAuditTab('r3',this)"><i class="ti ti-table"></i> R3สรุป_ALL</button>
+    <button class="am-tab" onclick="switchAuditTab('po3',this)"><i class="ti ti-receipt"></i> PO3รายละเอียด</button>
+    <button class="am-tab" onclick="switchAuditTab('f4',this)"><i class="ti ti-cash"></i> F4จ่าย</button>
+  </div>
+  <div class="am-body" id="am-body">
+    <div style="text-align:center;padding:40px;color:var(--text3)">Sync ก่อนเพื่อดูข้อมูลดิบ</div>
+  </div>
+</div>
+
+<!-- SYNC LOADING POPUP -->
+<div id="sync-loading-overlay"></div>
+<div id="sync-loading-box">
+  <div class="sl-spinner"></div>
+  <div class="sl-title">กำลัง Sync ข้อมูล...</div>
+  <div class="sl-sub" id="sl-sub-txt">กำลังดึงข้อมูลจาก Google Sheets</div>
+</div>
+
+<!-- CALENDAR POPUP -->
+<div id="cal-overlay" onclick="toggleCal()"></div>
+<div id="cal-popup">
+  <div class="cal-presets" id="cal-presets">
+    <button class="cal-preset on" onclick="applyPreset(this,'q2')">Q2 2026</button>
+    <button class="cal-preset" onclick="applyPreset(this,'month')">เดือนนี้</button>
+    <button class="cal-preset" onclick="applyPreset(this,'30d')">30 วันล่าสุด</button>
+    <button class="cal-preset" onclick="applyPreset(this,'q1')">Q1 2026</button>
+    <button class="cal-preset" onclick="applyPreset(this,'ytd')">ตั้งแต่ต้นปี</button>
+    <button class="cal-preset" onclick="applyPreset(this,'custom')">กำหนดเอง</button>
+  </div>
+  <div class="cal-months" id="cal-months"></div>
+  <div class="cal-footer">
+    <div class="cal-range-txt" id="cal-range-txt"><strong>01 เม.ย. 2026</strong> — <strong>09 พ.ค. 2026</strong></div>
+    <div style="display:flex;gap:8px">
+      <button class="tb-btn" onclick="clearRange()">ล้าง</button>
+      <button class="tb-btn primary" onclick="applyCalRange()">นำไปใช้</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════
+// AP due dates: Y26/WW = สัปดาห์ที่ WW ของปี 2026 (ISO week)
+// Y26/19=04-10พ.ค. | Y26/21=18-24พ.ค. | Y26/22=25-31พ.ค. | Y26/26=22-28มิ.ย. | Y26/31=27ก.ค.-02ส.ค.
+var AP_UNPAID=[
+  {po:'PO-D2602009',vendor:'เกรท ดิสทริบิวเทอร์',amt:148462.5,due:'04-10/05/2026',week:'Y26/19',urgency:'overdue',status:'ยังไม่ชำระ'},
+  {po:'PO-D2602011',vendor:'พี.ซี.เอส.ไฮเทค',amt:81320,due:'25-31/05/2026',week:'Y26/22',urgency:'upcoming',status:'ยังไม่ชำระ'},
+  {po:'PO-D2602016',vendor:'เกรท ดิสทริบิวเทอร์',amt:15836,due:'25-31/05/2026',week:'Y26/22',urgency:'upcoming',status:'ยังไม่ชำระ'},
+  {po:'PO-D2602018',vendor:'เกรท ดิสทริบิวเทอร์',amt:127330,due:'25-31/05/2026',week:'Y26/22',urgency:'upcoming',status:'ยังไม่ชำระ'},
+  {po:'PO-D2602022',vendor:'ล้อมเจริญ พริ้น',amt:10700,due:'25-31/05/2026',week:'Y26/22',urgency:'upcoming',status:'ยังไม่ชำระ'},
+  {po:'PO-D2602023',vendor:'เค.วี.เจ. ออฟฟิศ',amt:3249,due:'25-31/05/2026',week:'Y26/22',urgency:'upcoming',status:'ยังไม่ชำระ'},
+  {po:'PO-D2602024',vendor:'ธเนศ โปรดักส์',amt:2354,due:'25-31/05/2026',week:'Y26/22',urgency:'upcoming',status:'ยังไม่ชำระ'},
+  {po:'PO-D2603001',vendor:'กิจมงคล ฟาสเทนเนอร์',amt:23529.3,due:'25-31/05/2026',week:'Y26/22',urgency:'upcoming',status:'ยังไม่ชำระ'},
+  {po:'PO-D2603003',vendor:'สมบูรณ์โชค เครื่องครัว',amt:12840,due:'22-28/06/2026',week:'Y26/26',urgency:'normal',status:'ยังไม่ชำระ'},
+  {po:'PO-D2603005',vendor:'ธเนศ โปรดักส์',amt:2461,due:'25-31/05/2026',week:'Y26/22',urgency:'upcoming',status:'ยังไม่ชำระ'},
+  {po:'PO-D2603006',vendor:'พี.ซี.เอส.ไฮเทค',amt:81320,due:'25-31/05/2026',week:'Y26/22',urgency:'upcoming',status:'ยังไม่ชำระ'},
+  {po:'PO-D2603007',vendor:'พี.ซี.เอส.ไฮเทค',amt:6099,due:'25-31/05/2026',week:'Y26/22',urgency:'upcoming',status:'ยังไม่ชำระ'},
+  {po:'PO-D2603008',vendor:'แมคคานิคัล พาร์ท',amt:210790,due:'25-31/05/2026',week:'Y26/22',urgency:'upcoming',status:'ยังไม่ชำระ'},
+  {po:'PO-D2603009',vendor:'ดำรงยางยนต์',amt:15194,due:'25-31/05/2026',week:'Y26/22',urgency:'upcoming',status:'ยังไม่ชำระ'},
+  {po:'PO-D2603010',vendor:'ธเนศ โปรดักส์',amt:116630,due:'25-31/05/2026',week:'Y26/22',urgency:'upcoming',status:'ยังไม่ชำระ'},
+  {po:'PO-D2603011',vendor:'ธเนศ โปรดักส์',amt:23326,due:'25-31/05/2026',week:'Y26/22',urgency:'upcoming',status:'ยังไม่ชำระ'},
+  {po:'PO-D2603012',vendor:'รีมส์ แอนด์ โรลส์',amt:3745,due:'25-31/05/2026',week:'Y26/22',urgency:'upcoming',status:'ยังไม่ชำระ'},
+  {po:'PO-D2604001',vendor:'พี.เอส.ซี. สตีลดรัมส์',amt:8774,due:'04-10/05/2026',week:'Y26/19',urgency:'overdue',status:'ยังไม่ชำระ'},
+  {po:'PO-D2604002',vendor:'ไทยโพรเซส ลุบริเคชั่น',amt:40660,due:'25-31/05/2026',week:'Y26/22',urgency:'upcoming',status:'ยังไม่ชำระ'},
+  {po:'PO-D2604004',vendor:'ว่องอารีย์ คาสเตอร์',amt:24824,due:'18-24/05/2026',week:'Y26/21',urgency:'urgent',status:'ยังไม่ชำระ'},
+  {po:'PO-D2604005',vendor:'เคเอ็นเอส อินฟินิตี้',amt:8988,due:'04-10/05/2026',week:'Y26/19',urgency:'overdue',status:'ยังไม่ชำระ'},
+  {po:'PO-D2604006',vendor:'เกรท ดิสทริบิวเทอร์',amt:17655,due:'27/07-02/08/2026',week:'Y26/31',urgency:'normal',status:'ยังไม่ชำระ'}
+];
+var FX_OPEN=[
+  {po:'PO-P2604004',vendor:'Suzhou Jiushuo',cur:'USD',rate:32.65,thb:4118769.45},
+  {po:'PO-P2604005',vendor:'Suzhou Jiushuo',cur:'USD',rate:32.82,thb:9507910.2},
+  {po:'PO-P2604007',vendor:'TRI FISCHE WHEELS',cur:'USD',rate:32.76,thb:2437130.68},
+  {po:'PO-P2604009',vendor:'Suzhou Jiushuo',cur:'CNY',rate:4.79,thb:3625985.02},
+  {po:'PO-P2604010',vendor:'Suzhou Jiushuo',cur:'CNY',rate:4.79,thb:5460420.7},
+  {po:'PO-P2604001',vendor:'DROPSA S.P.A.',cur:'EUR',rate:37.96,thb:295114.47},
+  {po:'PO-P2604002',vendor:'DROPSA S.P.A.',cur:'EUR',rate:37.98,thb:1105315.08},
+  {po:'PO-P2604008',vendor:'DROPSA S.P.A.',cur:'EUR',rate:38.32,thb:723332.36}
+];
+var AR_DATA=[
+  {inv:'IV-H2605004',customer:'บ. ซินโคเมค (ประเทศไทย)',status:'Debtor',amt:106229.6,due:'46203'},
+  {inv:'IV-H2605003',customer:'บ. ซีพี แอ็กซ์ตร้า (มหาชน)',status:'Debtor',amt:85600,due:'46199'},
+  {inv:'IV-H2604022',customer:'บ. ซี.เจ.เอ็กซ์เพรส กรุ๊ป',status:'Billing Note',amt:110745,due:'46164'},
+  {inv:'IV-H2604023',customer:'บ. ซี.เจ.เอ็กซ์เพรส กรุ๊ป',status:'Billing Note',amt:72225,due:'46164'},
+  {inv:'IV-H2604026',customer:'บ. จีเอฟพีที นิชิเร',status:'Billing Note',amt:28890,due:'46168'},
+  {inv:'IV-H2604027',customer:'บ. จีเอฟพีที นิชิเร',status:'Billing Note',amt:36465.6,due:'46168'},
+  {inv:'IV-H2604043',customer:'บ. ซีพี แอ็กซ์ตร้า (ขายบิล)',status:'Billing Note',amt:30709,due:'46185'},
+  {inv:'IV-H2604031',customer:'บมจ. โรบินสัน ฉะเชิงเทรา',status:'Billing Note',amt:11556,due:'46198'},
+  {inv:'IV-H2604030',customer:'บมจ. โรบินสัน บุรีรัมย์',status:'Billing Note',amt:8474.4,due:'46198'},
+  {inv:'IV-H2604032',customer:'บมจ. โรบินสัน มุกดาหาร',status:'Billing Note',amt:3852,due:'46198'},
+  {inv:'IV-H2602023',customer:'บมจ. โรบินสัน ชลบุรี',status:'Billing Note',amt:4622.4,due:'46167'},
+  {inv:'IV-H2604002',customer:'บมจ. โรบินสัน ถลาง',status:'Billing Note',amt:1177,due:'46167'},
+  {inv:'IV-H2602024',customer:'บมจ. โรบินสัน สุพรรณบุรี',status:'Billing Note',amt:2773.44,due:'46167'},
+  {inv:'IV-H2604006',customer:'บ. จี สตีล (มหาชน)',status:'Billing Note',amt:26750,due:'46157'},
+  {inv:'IV-H2509048',customer:'บ. คามิคุระ อินเตอร์เทค',status:'Billing Note',amt:22470,due:'46255'},
+  {inv:'IV-H2604040',customer:'บ. ดีโปร คอร์ปโก้',status:'Billing Note',amt:8474.4,due:'46189'},
+  {inv:'IV-H2604007',customer:'บ. ซีพี แอ็กซ์ตร้า (มหาชน)',status:'Paid',amt:607631.6,due:'46142'},
+  {inv:'IV-L2602001',customer:'บ. ส.กิจชัย วู้ด แพนเนล',status:'Paid',amt:182114,due:'46085'},
+  {inv:'IV-H2604034',customer:'บ. ซีพี แอ็กซ์ตร้า (ขายบิล)',status:'Paid',amt:468638.6,due:'46142'}
+];
+var FIX_DATA=[
+  {no:1,item:'ค่าไฟฟ้านครหลวง',detail:'66/4, 66/7, 66/11',source:'Email',due:'19-20 ของทุกเดือน'},
+  {no:2,item:'ค่าน้ำประปา',detail:'66/7, 66/11',source:'Email',due:'27 ของทุกเดือน'},
+  {no:3,item:'ค่างวดรถ',detail:'กสิกร/โอริโค่/ทิสโก้/โตโยต้า',source:'Auto',due:'15/25/25/30'},
+  {no:4,item:'กรมสรรพากร',detail:'ภงด.1, ภงด.3/53, กยศ., ภพ.30',source:'Web',due:'15/15/15/23'},
+  {no:5,item:'ประกันสังคม',detail:'สายไหม',source:'ตารางปกส.',due:'24 ของทุกเดือน'},
+  {no:6,item:'กองทุนเงินทดแทน',detail:'สายไหม',source:'Web ปกส.',due:'31 มกราคม/ปี'},
+  {no:7,item:'Fleet Card กสิกรไทย',detail:'สายไหม',source:'ไปรษณีย์',due:'20 ของทุกเดือน'},
+  {no:8,item:'Fleet Card กรุงไทย',detail:'สายไหม',source:'ไปรษณีย์',due:'20 ของทุกเดือน'},
+  {no:9,item:'Fleet Card กรุงเทพ',detail:'สายไหม',source:'ไปรษณีย์',due:'25 ของทุกเดือน'},
+  {no:10,item:'บัตรเครดิต',detail:'—',source:'Email',due:'ศุกร์แรกของเดือน'},
+  {no:11,item:'เครื่องกรองน้ำ COWAY',detail:'690',source:'Email',due:'ศุกร์แรก (ตัดบัตร)'},
+  {no:12,item:'เงินเดือน',detail:'สายไหม',source:'Nack',due:'25 ของทุกเดือน'},
+  {no:13,item:'เงินกลางเดือน',detail:'สายไหม',source:'Nack',due:'ไม่เกินสัปดาห์ที่ 2'},
+  {no:14,item:'วิริยะประกันภัย (พรบ/เบี้ย)',detail:'สายไหม',source:'Google Sheet',due:'ตามทะเบียนรถ'},
+  {no:15,item:'เมืองไทยประกันภัย (อัคคีภัย)',detail:'66/4, 66/7, 66/11, ม.KC',source:'Auto',due:'ม.ค./19เม.ย./ม.ค.'},
+  {no:16,item:'ภาษีที่ดิน 3 ฉบับ (สายไหม)',detail:'18,172 / 47,894 / 58,534',source:'ไปรษณีย์',due:'30 มิ.ย. ของทุกปี'},
+  {no:17,item:'Easy Pass (การทางพิเศษ)',detail:'สายไหม',source:'ต๋อง',due:'สัปดาห์ละ 1 ครั้ง'},
+  {no:18,item:'เงินสดย่อย',detail:'สายไหม',source:'โบ/เบิร์ด',due:'สัปดาห์ละ 1 ครั้ง'},
+  {no:19,item:'คาร์แทรค เทคโนโลยี',detail:'52,415 (3 ปี)',source:'สัญญา',due:'8/10 ของทุกปี'},
+  {no:20,item:'ที.อาร์.สยามภัณฑ์',detail:'20,330',source:'—',due:'ภายใน 31 ส.ค./ปี'},
+  {no:21,item:'ทูฟ นอร์ด',detail:'38,520 (3 ปี)',source:'Email',due:'25/12 ของทุกปี'},
+  {no:22,item:'True Internet',detail:'2,243.79',source:'Email',due:'15 ของทุกเดือน'},
+  {no:23,item:'TOT/CAT',detail:'1,355.69',source:'ไปรษณีย์',due:'25 ของทุกเดือน'},
+  {no:24,item:'TrueMove H (TrueดีแทC)',detail:'สายไหม',source:'Email+ไปรษณีย์',due:'25 ของทุกเดือน'},
+  {no:25,item:'ไทยโอริกซ์ (ค่าเช่าเครื่องถ่าย)',detail:'2,118.60',source:'ไปรษณีย์',due:'ศุกร์ที่ 2/เดือน'},
+  {no:26,item:'แคนนอน มาร์เก็ตติ้ง (บริการสำเนา)',detail:'สายไหม',source:'ไปรษณีย์',due:'ศุกร์ที่ 2/เดือน'}
+];
+
+// ════════════════════════════════════════
+// RAW SHEET DATA (Audit)
+// ════════════════════════════════════════
+var _rawR3=null, _rawPO3=null, _rawF4=null, _lastSyncISO=null;
+var _filterStart=null, _filterEnd=null; // Date objects, null = no filter
+
+// parse Google Sheet date cell (ISO / DD/MM/YYYY / serial number)
+function parseSheetDate(val){
+  if(val===null||val===undefined||val==='') return null;
+  var s=String(val).trim();
+  if(!s) return null;
+  // ISO or standard parseable
+  var d=new Date(s);
+  if(!isNaN(d)&&s.length>=8) return d;
+  // DD/MM/YYYY or DD-MM-YYYY
+  var m=s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
+  if(m) return new Date(parseInt(m[3]),parseInt(m[2])-1,parseInt(m[1]));
+  // YYYY/MM/DD
+  m=s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+  if(m) return new Date(parseInt(m[1]),parseInt(m[2])-1,parseInt(m[3]));
+  // Google Sheets serial number (days since Dec 30 1899)
+  var n=parseFloat(s);
+  if(!isNaN(n)&&n>40000&&n<80000){
+    return new Date(Math.round((n-25569)*86400000));
+  }
+  return null;
+}
+
+// Find date column index in header array
+function findDateCol(hdr){
+  var keys=['date','วันที่','เดือน','month','period','งวด','วัน','ปี','year','วันที่ออกใบ','invoice date','posted'];
+  var idx=-1;
+  keys.forEach(function(kw){ if(idx<0){ var i=hdr.indexOf(kw); if(i>=0) idx=i; }});
+  if(idx<0) keys.forEach(function(kw){
+    if(idx<0) hdr.forEach(function(h,i){ if(idx<0&&h.indexOf(kw)>=0) idx=i; });
+  });
+  return idx;
+}
+
+// ════════════════════════════════════════
+// TAB SWITCHING
+// ════════════════════════════════════════
+function showTab(id,btn){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});
+  document.querySelectorAll('.sb-item').forEach(function(b){b.classList.remove('active')});
+  var el=document.getElementById('tab-'+id);
+  if(el)el.classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(id==='overview')initOverviewCharts();
+  if(id==='strategic')initStrategicCharts();
+  if(id==='cashflow')initCashFlowCharts();
+  if(id==='ap')renderAP();
+  if(id==='ar'){renderAR('all'); renderARInvList('all');}
+  if(id==='fix')renderFIX();
+  if(id==='risks')initRiskCharts();
+  if(id==='import')showPreview('web');
+  if(id==='audit')renderAuditTab();
+}
+
+// ════════════════════════════════════════
+// RENDER TABLES
+// ════════════════════════════════════════
+function renderAP(){
+  var tbody=document.getElementById('ap-tbody');
+  tbody.innerHTML=AP_UNPAID.map(function(r){
+    var dueClass=r.urgency==='overdue'?'text-red':r.urgency==='urgent'?'text-red':r.urgency==='upcoming'?'text-amber':'';
+    var dueBadge=r.urgency==='overdue'?'<span style="font-size:9px;background:#fef2f2;color:#dc2626;padding:1px 5px;border-radius:8px;margin-left:4px;font-weight:600">เกินกำหนด</span>':r.urgency==='urgent'?'<span style="font-size:9px;background:#fffbeb;color:#d97706;padding:1px 5px;border-radius:8px;margin-left:4px;font-weight:600">เร่งด่วน</span>':'';
+    var weekNote='<div style="font-size:9px;color:var(--text3)">'+r.week+'</div>';
+    return '<tr><td style="font-family:monospace;font-size:11px">'+r.po+'</td><td>'+r.vendor+'</td><td><span class="badge b-pend">ยังไม่ชำระ</span></td><td class="num text-red">'+r.amt.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td><td class="'+dueClass+'">'+r.due+dueBadge+weekNote+'</td></tr>';
+  }).join('');
+  var fxTbody=document.getElementById('fx-tbody');
+  fxTbody.innerHTML=FX_OPEN.map(function(r){
+    return '<tr><td style="font-family:monospace;font-size:11px">'+r.po+'</td><td>'+r.vendor+'</td><td><span class="badge '+(r.cur==='USD'?'b-bn':r.cur==='EUR'?'b-pend':'b-debt')+'">'+r.cur+'</span></td><td class="num text-red">'+r.thb.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td><td>'+r.rate+'</td><td><span class="badge b-pend">ยังไม่ hedge</span></td></tr>';
+  }).join('');
+}
+// ── AR Left Panel ──────────────────────
+var _arlFilter = 'all';
+function updateARCards() {
+  var bnAmt=0, dtAmt=0, pdAmt=0, lotusAmt=0, allAmt=0;
+  var bnCnt=0, dtCnt=0, pdCnt=0;
+  AR_DATA.forEach(function(r){
+    allAmt += r.amt;
+    if(r.status==='Billing Note'){ bnAmt+=r.amt; bnCnt++; }
+    else if(r.status==='Debtor'){ dtAmt+=r.amt; dtCnt++; }
+    else if(r.status==='Paid'){ pdAmt+=r.amt; pdCnt++; }
+    if(/lotus|โลตัส/i.test(r.customer)) lotusAmt+=r.amt;
+  });
+  var outstanding = bnAmt + dtAmt;
+  // Summary cards (right panel)
+  hEl('ar-billing-val','฿'+Math.round(bnAmt).toLocaleString('th-TH'));
+  hEl('ar-billing-sub', bnCnt > 0 ? bnCnt+' รายการ รอเก็บ' : 'ไม่มีรายการ');
+  hEl('ar-debtor-val','฿'+Math.round(dtAmt).toLocaleString('th-TH'));
+  hEl('ar-debtor-sub', dtCnt > 0 ? dtCnt+' รายการ ค้างชำระ' : 'ไม่มีรายการ');
+  hEl('ar-lotus-val','฿'+Math.round(lotusAmt).toLocaleString('th-TH'));
+  hEl('ar-lotus-sub', lotusAmt > 0 ? 'จาก AR Data' : 'ไม่พบรายการ Lotus');
+  var days = (_filterStart && _filterEnd) ? Math.max(1, Math.ceil((_filterEnd-_filterStart)/86400000)) : 30;
+  var dso = (allAmt > 0 && outstanding > 0) ? Math.round(outstanding/(allAmt/days)) : 0;
+  hEl('ar-dso-val', dso > 0 ? '~'+dso+' วัน' : '—');
+  hEl('ar-dso-sub', 'AR คงค้าง ÷ (Revenue ÷ '+days+' วัน)');
+  // Sidebar badge
+  var openCnt = AR_DATA.filter(function(r){return r.status!=='Paid';}).length;
+  hEl('ar-badge', openCnt > 0 ? openCnt : '');
+  // Left panel stats
+  hEl('arl-all-amt','฿'+fmtN(allAmt)); hEl('arl-all-cnt', AR_DATA.length+' รายการ');
+  hEl('arl-bn-amt', '฿'+fmtN(bnAmt));  hEl('arl-bn-cnt',  bnCnt+' รายการ');
+  hEl('arl-dt-amt', '฿'+fmtN(dtAmt));  hEl('arl-dt-cnt',  dtCnt+' รายการ');
+  hEl('arl-pd-amt', '฿'+fmtN(pdAmt));  hEl('arl-pd-cnt',  pdCnt+' รายการ');
+}
+function renderARInvList(filter) {
+  var q = '';
+  var data;
+  if(filter==='search'){
+    q=(document.getElementById('ar-search')||{}).value||'';
+    data=AR_DATA.filter(function(r){return (r.inv+r.customer).toLowerCase().indexOf(q.toLowerCase())>=0;});
+  } else if(filter && filter!=='all'){
+    data=AR_DATA.filter(function(r){return r.status===filter;});
+  } else {
+    data=AR_DATA;
+  }
+  var container=document.getElementById('ar-inv-list');
+  if(!container) return;
+  hEl('arl-count-lbl', (filter==='all'||!filter?'ทั้งหมด':filter)+' ('+data.length+')');
+  if(data.length===0){
+    container.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:11px">ไม่มีรายการ</div>';
+    return;
+  }
+  container.innerHTML=data.map(function(r){
+    var bc=r.status==='Paid'?'b-paid':r.status==='Billing Note'?'b-bn':r.status==='Debtor'?'b-debt':'b-pend';
+    var ac=r.status==='Debtor'?'var(--red)':r.status==='Billing Note'?'var(--blue)':r.status==='Paid'?'var(--green)':'var(--text)';
+    return '<div class="ar-inv-item" id="arl-'+r.inv+'" onclick="hlARRow(\''+r.inv+'\')">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+      '<div style="font-size:10px;font-weight:700;font-family:monospace;color:var(--blue)">'+r.inv+'</div>'+
+      '<div style="font-size:11px;font-weight:700;color:'+ac+'">฿'+Math.round(r.amt).toLocaleString('th-TH')+'</div>'+
+      '</div>'+
+      '<div style="font-size:10px;color:var(--text2);margin:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+r.customer+'</div>'+
+      '<div style="display:flex;justify-content:space-between;align-items:center">'+
+      '<span class="badge '+bc+'" style="font-size:9px">'+r.status+'</span>'+
+      '<span style="font-size:10px;color:var(--text3)">'+formatSerialDate(r.due)+'</span>'+
+      '</div></div>';
+  }).join('');
+}
+function formatSerialDate(val){
+  if(!val||val==='') return '—';
+  var s=String(val);
+  // If it's a serial number > 40000, convert
+  var n=parseFloat(s);
+  if(!isNaN(n)&&n>40000&&n<80000){
+    var dt=new Date(Math.round((n-25569)*86400000));
+    var thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    return dt.getDate()+' '+thM[dt.getMonth()]+' '+(dt.getFullYear());
+  }
+  // trim ISO date
+  return s.length>10?s.substring(0,10):s;
+}
+function hlARRow(inv){
+  document.querySelectorAll('#ar-tbody tr').forEach(function(row){
+    var td=row.querySelector('td:first-child');
+    if(td) row.style.background = (td.textContent||td.innerText||'').indexOf(inv)>=0?'#eff4ff':'';
+  });
+  document.querySelectorAll('.ar-inv-item').forEach(function(el){
+    el.classList.toggle('hl', el.id==='arl-'+inv);
+  });
+}
+function arLeftFilter(filter){
+  _arlFilter=filter;
+  // Update active state on stat boxes
+  ['all','bn','dt','pd'].forEach(function(k){
+    var el=document.getElementById('arl-'+k);
+    if(el) el.className='ar-stat'+(filter===({all:'all',bn:'Billing Note',dt:'Debtor',pd:'Paid'}[k])?(' arl-active-'+k):'');
+  });
+  // Sync main table filter
+  var mainF=(filter==='search')?'all':(filter==='all'?'all':filter);
+  document.querySelectorAll('#ar-filter .tog').forEach(function(b){
+    b.classList.toggle('on',
+      (mainF==='all'&&b.textContent.trim()==='ทั้งหมด')||
+      (mainF!=='all'&&b.textContent.trim()===mainF));
+  });
+  renderAR(mainF);
+  renderARInvList(filter);
+}
+function filterAR(status,btn){
+  document.querySelectorAll('#ar-filter .tog').forEach(function(b){b.classList.remove('on')});
+  if(btn)btn.classList.add('on');
+  renderAR(status);
+  renderARInvList(status);
+}
+function renderAR(filter){
+  updateARCards(); // always sync cards with current AR_DATA
+  var tbody=document.getElementById('ar-tbody');
+  var data=filter==='all'?AR_DATA:AR_DATA.filter(function(r){return r.status===filter});
+  if(data.length===0){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:20px">ไม่มีข้อมูล</td></tr>';return;}
+  tbody.innerHTML=data.map(function(r){
+    var bc=r.status==='Paid'?'b-paid':r.status==='Billing Note'?'b-bn':r.status==='Debtor'?'b-debt':'b-pend';
+    var amtCls=r.status==='Debtor'?'text-red':r.status==='Billing Note'?'text-blue':r.status==='Paid'?'text-green':'';
+    var invDisplay=r.inv+(r.ref&&r.ref!==r.inv?'<div style="font-size:10px;color:var(--text3)">'+r.ref+'</div>':'');
+    var custDisplay=r.customer+(r.credit?'<div style="font-size:10px;color:var(--text3)">เครดิต '+r.credit+'</div>':'');
+    return '<tr>'
+      +'<td style="font-family:monospace;font-size:11px">'+invDisplay+'</td>'
+      +'<td>'+custDisplay+'</td>'
+      +'<td><span class="badge '+bc+'">'+r.status+'</span></td>'
+      +'<td class="num '+amtCls+'">'+r.amt.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'
+      +'<td style="font-size:11px">'+formatSerialDate(r.due)+'</td>'
+      +'</tr>';
+  }).join('');
+}
+function renderFIX(){
+  var tbody=document.getElementById('fix-tbody');
+  tbody.innerHTML=FIX_DATA.map(function(r){
+    var dueCls=r.due.indexOf('20')>=0||r.due.indexOf('23')>=0||r.due.indexOf('25')>=0||r.due.indexOf('28')>=0?'text-red':'';
+    return '<tr><td>'+r.no+'</td><td><strong>'+r.item+'</strong></td><td style="font-size:11px;color:var(--text2)">'+r.detail+'</td><td style="font-size:11px">'+r.source+'</td><td class="'+dueCls+'" style="font-size:11px;font-weight:500">'+r.due+'</td></tr>';
+  }).join('');
+}
+
+// ════════════════════════════════════════
+// D19 CALCULATOR
+// ════════════════════════════════════════
+var OBLIGATION=1584949;
+function calcD19(){
+  var b=parseFloat(document.getElementById('d19-bal').value)||0;
+  var gap=b-OBLIGATION;
+  var el=document.getElementById('d19-result');
+  var buf=document.getElementById('d19-buf');
+  buf.textContent=(gap>=0?'+':'')+Math.round(gap).toLocaleString('th-TH');
+  if(gap>=300000){el.className='indicator ind-green';el.textContent='🟢 GREEN';buf.style.color='var(--green)';}
+  else if(gap>=0){el.className='indicator ind-amber';el.textContent='🟡 AMBER';buf.style.color='var(--amber)';}
+  else{el.className='indicator ind-red';el.textContent='🔴 RED';buf.style.color='var(--red)';}
+}
+
+// ════════════════════════════════════════
+// CASH HEALTH METRICS
+// ════════════════════════════════════════
+var OD_LIMIT = 0;  // วงเงิน OD รวม — ใส่ตัวเลขจริงที่นี่ หรือดึงจาก Google Sheet
+var OD_USED  = 0;  // ยอดที่ใช้ไปปัจจุบัน — ใส่ตัวเลขจริงที่นี่ หรือดึงจาก Google Sheet
+var MONTHLY_REV = 5100000; // Revenue รายเดือนอ้างอิง (เม.ย. 2026)
+
+function hEl(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+function fmtN(n){return Math.round(Math.abs(n)).toLocaleString('th-TH');}
+function fmtGap(n){return(n>=0?'+':'−')+'฿'+fmtN(n);}
+
+function initCashHealth(){
+  // AR
+  var arOut=AR_DATA.filter(function(r){return r.status!=='Paid';});
+  var arOutAmt=arOut.reduce(function(s,r){return s+r.amt;},0);
+  var arTotalAmt=AR_DATA.reduce(function(s,r){return s+r.amt;},0);
+  var arPaidAmt=arTotalAmt-arOutAmt;
+  // AP
+  var apThb=AP_UNPAID.reduce(function(s,r){return s+r.amt;},0);
+  var apFx=FX_OPEN.reduce(function(s,r){return s+r.thb;},0);
+  // Cash Gap
+  var cashGap=arOutAmt-apThb;
+  // Collections Risk — AR overdue (Excel serial < today)
+  var today=new Date();
+  var overdue=arOut.filter(function(r){
+    var s=parseInt(r.due);if(isNaN(s))return false;
+    return new Date((s-25569)*86400000)<today;
+  });
+  var overdueAmt=overdue.reduce(function(s,r){return s+r.amt;},0);
+  // DSO
+  var dso=Math.round(arOutAmt/MONTHLY_REV*30);
+  // AP Coverage (months)
+  var apCov=(apThb/MONTHLY_REV).toFixed(1);
+  // Top AR customer
+  var topAR=arOut.slice().sort(function(a,b){return b.amt-a.amt;})[0];
+  // AP urgency breakdown
+  var apO=AP_UNPAID.filter(function(r){return r.urgency==='overdue';}).length;
+  var apU=AP_UNPAID.filter(function(r){return r.urgency==='urgent';}).length;
+  var apUp=AP_UNPAID.filter(function(r){return r.urgency==='upcoming';}).length;
+
+  // ── render AR / AP / Gap / Risk cards ──
+  hEl('ar-total-val','฿'+fmtN(arTotalAmt));
+  hEl('ar-total-sub','รับแล้ว ฿'+fmtN(arPaidAmt)+' · ค้างรับ ฿'+fmtN(arOutAmt));
+  hEl('ap-ch-val','฿'+fmtN(apThb));
+  hEl('ap-ch-sub',AP_UNPAID.length+' รายการ THB · FX ฿'+fmtN(apFx));
+  var gEl=document.getElementById('cash-gap-val');
+  if(gEl){gEl.textContent=fmtGap(cashGap);gEl.style.color=cashGap>=0?'var(--green)':'var(--red)';}
+  var crEl=document.getElementById('coll-risk-val');
+  if(crEl){crEl.textContent=overdue.length>0?'฿'+fmtN(overdueAmt):'฿0';crEl.style.color=overdue.length>0?'var(--red)':'var(--green)';}
+  hEl('coll-risk-sub',overdue.length+' Overdue');
+
+  // ── OD bar ──
+  var odPct=Math.round(OD_USED/OD_LIMIT*100);
+  var oBar=document.getElementById('od-bar');
+  if(oBar){
+    oBar.style.width=Math.min(odPct,100)+'%';
+    oBar.style.background=odPct>=90?'var(--red)':odPct>=70?'var(--amber)':'var(--green)';
+    hEl('od-pct-lbl',odPct+'%');
+    hEl('od-used-lbl','ใช้ไป ฿'+fmtN(OD_USED));
+    hEl('od-rem-lbl','คงเหลือ ~฿'+fmtN(OD_LIMIT-OD_USED));
+    hEl('od-tot-lbl','วงเงินรวม ฿'+fmtN(OD_LIMIT));
+    var wb=document.getElementById('od-warn-badge');
+    if(wb&&odPct>=70){
+      wb.style.display='inline-flex';
+      wb.className='indicator ind-'+(odPct>=90?'red':'amber');
+      wb.textContent='⚠ '+(odPct>=90?'ใกล้เต็มวงเงิน':'ระวัง ~'+odPct+'%');
+    }
+  }
+
+  // ── metrics row ──
+  var dEl=document.getElementById('dso-val');
+  if(dEl){dEl.textContent=dso+'d';dEl.style.color=dso<50?'var(--green)':dso<75?'var(--amber)':'var(--red)';}
+  hEl('dso-inline',dso+'d');
+  hEl('ap-items-val',AP_UNPAID.length+' items');
+  hEl('ap-items-sub','เกินกำหนด '+apO+' · เร่งด่วน '+apU+' · ใกล้ถึง '+apUp);
+  hEl('ap-cov-val',apCov+' mo');
+  if(topAR){
+    hEl('top-ar-val','฿'+fmtN(topAR.amt));
+    var pct=arOutAmt>0?Math.round(topAR.amt/arOutAmt*100):0;
+    var custShort=topAR.customer.length>16?topAR.customer.substring(0,16)+'…':topAR.customer;
+    hEl('top-ar-sub',custShort+' ('+pct+'%)');
+  }
+
+  // ── financial status ──
+  var netM=1842864;
+  var st=netM>=5000000?'GO':netM>=2000000?'CAUTION':'STOP';
+  var stBadge=document.getElementById('fin-status-badge');
+  if(stBadge){stBadge.className='indicator ind-'+(st==='GO'?'green':st==='CAUTION'?'amber':'red');stBadge.textContent=st;}
+  var cgI=document.getElementById('cash-gap-inline');
+  if(cgI){cgI.textContent=fmtGap(cashGap);cgI.style.color=cashGap>=0?'var(--green)':'var(--red)';}
+  if(topAR){var tp=arOutAmt>0?Math.round(topAR.amt/arOutAmt*100):0;hEl('top1-cust-inline','Top1 Cust: '+tp+'%');}
+
+  // ── stress test default ──
+  runStress(document.getElementById('st-normal'),'normal');
+}
+
+function runStress(btn,mode){
+  ['st-normal','st-top1','st-top12','st-bignote'].forEach(function(id){
+    var b=document.getElementById(id);
+    if(b){b.style.background='';b.style.color='var(--text2)';b.style.borderColor='var(--border)';}
+  });
+  if(btn){btn.style.background='var(--blue)';btn.style.color='#fff';btn.style.borderColor='var(--blue)';}
+  var apThb=AP_UNPAID.reduce(function(s,r){return s+r.amt;},0);
+  var arOut=AR_DATA.filter(function(r){return r.status!=='Paid';});
+  var sorted=arOut.slice().sort(function(a,b){return b.amt-a.amt;});
+  var arUsed;
+  if(mode==='normal') arUsed=arOut.reduce(function(s,r){return s+r.amt;},0);
+  else if(mode==='top1') arUsed=arOut.reduce(function(s,r){return s+r.amt;},0)-(sorted[0]?sorted[0].amt:0);
+  else if(mode==='top12') arUsed=arOut.reduce(function(s,r){return s+r.amt;},0)-(sorted[0]?sorted[0].amt:0)-(sorted[1]?sorted[1].amt:0);
+  else if(mode==='bignote') arUsed=arOut.filter(function(r){return r.status!=='Billing Note';}).reduce(function(s,r){return s+r.amt;},0);
+  var gap=arUsed-apThb;
+  var el=document.getElementById('stress-result');
+  if(el){el.textContent=fmtGap(gap);el.style.color=gap>=0?'var(--green)':'var(--red)';}
+}
+
+// ════════════════════════════════════════
+// CHARTS
+// ════════════════════════════════════════
+var charts={};
+function destroyChart(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
+
+var peakPlugin={id:'peak',beforeDraw:function(ch){
+  var ctx=ch.ctx,xa=ch.scales.x,ya=ch.scales.y;
+  if(!xa||!ya)return;
+  var x1=xa.getPixelForValue(19),x2=xa.getPixelForValue(28);
+  ctx.save();
+  ctx.fillStyle='rgba(220,38,38,.1)';
+  ctx.fillRect(x1,ya.top,x2-x1,ya.bottom-ya.top);
+  var xd19=xa.getPixelForValue(18.5);
+  ctx.strokeStyle='rgba(217,119,6,.65)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(xd19,ya.top);ctx.lineTo(xd19,ya.bottom);ctx.stroke();
+  ctx.setLineDash([]);ctx.restore();
+}};
+
+function initOverviewCharts(){
+  initCashHealth();
+  destroyChart('cfChart');
+  var bal=[3500,3450,3380,3620,3800,3760,3910,4100,3960,3820,3600,3420,3700,3860,4010,3900,3760,3620,3180,2450,1850,1540,1260,1450,1640,1920,2250,2580,2750,2850];
+  var ctx=document.getElementById('cfChart').getContext('2d');
+  charts['cfChart']=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:Array.from({length:30},function(_,i){return i+1}),
+      datasets:[
+        {type:'line',label:'Balance',data:bal,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.08)',fill:true,tension:.3,pointRadius:0,borderWidth:2,order:1},
+        {type:'scatter',label:'AP Due',data:[{x:15,y:4010},{x:20,y:2450},{x:23,y:1850},{x:25,y:1640},{x:28,y:2580}],backgroundColor:'#dc2626',pointStyle:'triangle',radius:7,order:0},
+        {type:'scatter',label:'AR Recv',data:[{x:4,y:3620},{x:8,y:4100},{x:26,y:1920}],backgroundColor:'#16a34a',radius:6,order:0}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+    scales:{x:{ticks:{autoSkip:false,maxRotation:0,font:{size:9},callback:function(v,i){var d=i+1;return d%5===0||d===1||d===28?d:''}},grid:{display:false}},
+    y:{ticks:{font:{size:9},callback:function(v){return'฿'+(v/1000).toFixed(0)+'K'}},grid:{color:'rgba(0,0,0,.05)'}}}},
+    plugins:[peakPlugin]
+  });
+}
+
+function switchCF(btn,v){
+  document.querySelectorAll('.tog').forEach(function(b){if(b.parentElement===btn.parentElement)b.classList.remove('on')});
+  btn.classList.add('on');
+  initOverviewCharts();
+}
+
+function initStrategicCharts(){
+  destroyChart('donutChart');destroyChart('pieChart');destroyChart('waterfallChart');
+  var dc=document.getElementById('donutChart').getContext('2d');
+  charts['donutChart']=new Chart(dc,{type:'doughnut',data:{labels:["Lotus's FM",'Caster Wheels','Lubrication','Marine'],datasets:[{data:[95,3,1.5,.5],backgroundColor:['#2563eb','#16a34a','#d97706','#9333ea'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'65%'}});
+  var pc=document.getElementById('pieChart').getContext('2d');
+  charts['pieChart']=new Chart(pc,{type:'pie',data:{labels:['Fixed','Payroll','AP Unpaid','อื่นๆ'],datasets:[{data:[42,27,30,1],backgroundColor:['#2563eb','#dc2626','#d97706','#9ca3af'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+  var wc=document.getElementById('waterfallChart').getContext('2d');
+  charts['waterfallChart']=new Chart(wc,{type:'bar',
+    data:{labels:['Revenue','- Fixed','- Payroll','- AP ค้าง','Net'],
+    datasets:[
+      {label:'Base',data:[0,5100000-1384000,5100000-1384000-886749,5100000-1384000-886749-986087,0],backgroundColor:'rgba(0,0,0,0)',borderColor:'rgba(0,0,0,0)'},
+      {label:'Value',data:[5100000,1384000,886749,986087,1842864],backgroundColor:['#16a34a','#dc2626','#dc2626','#d97706','#2563eb'],borderRadius:4}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){if(c.datasetIndex===0)return'';return'฿'+Math.round(c.raw).toLocaleString('th-TH')}}}},
+    scales:{x:{stacked:true,ticks:{font:{size:11}}},y:{stacked:true,ticks:{font:{size:9},callback:function(v){return'฿'+(v/1000000).toFixed(1)+'M'}},grid:{color:'rgba(0,0,0,.05)'}}}}
+  });
+}
+
+function initCashFlowCharts(){
+  destroyChart('monthlyChart');destroyChart('apArBar');
+  var mc=document.getElementById('monthlyChart').getContext('2d');
+  charts['monthlyChart']=new Chart(mc,{type:'line',
+    data:{labels:['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.'],
+    datasets:[
+      {label:'Revenue',data:[4800000,4950000,5000000,5100000,null],borderColor:'#16a34a',backgroundColor:'rgba(22,163,74,.08)',fill:true,tension:.3,borderWidth:2},
+      {label:'Expenses',data:[3100000,3280000,3200000,3257136,null],borderColor:'#dc2626',backgroundColor:'rgba(220,38,38,.05)',fill:true,tension:.3,borderWidth:2},
+      {label:'Net',data:[1700000,1670000,1800000,1842864,null],borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.05)',fill:false,tension:.3,borderWidth:2,borderDash:[5,4]}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:12}}},
+    scales:{x:{ticks:{font:{size:11}}},y:{ticks:{font:{size:9},callback:function(v){return'฿'+(v/1000000).toFixed(1)+'M'}},grid:{color:'rgba(0,0,0,.05)'}}}}
+  });
+  var ac=document.getElementById('apArBar').getContext('2d');
+  charts['apArBar']=new Chart(ac,{type:'bar',
+    data:{labels:['ม.ค.','ก.พ.','มี.ค.','เม.ย.'],
+    datasets:[
+      {label:'AP',data:[750000,820000,900000,986087],backgroundColor:'rgba(220,38,38,.75)',borderRadius:4},
+      {label:'AR',data:[4800000,4950000,5000000,5100000],backgroundColor:'rgba(22,163,74,.75)',borderRadius:4}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:12}}},
+    scales:{x:{ticks:{font:{size:11}}},y:{ticks:{font:{size:9},callback:function(v){return'฿'+(v/1000000).toFixed(1)+'M'}}}}}
+  });
+}
+
+function switchMonthlyCF(btn,v){
+  document.querySelectorAll('.tog').forEach(function(b){if(b.parentElement===btn.parentElement)b.classList.remove('on')});
+  btn.classList.add('on');
+}
+
+function initRiskCharts(){
+  destroyChart('fxChart');
+  var fc=document.getElementById('fxChart').getContext('2d');
+  charts['fxChart']=new Chart(fc,{type:'bar',
+    data:{labels:['Suzhou USD\n(PO-P2604005)','Suzhou USD\n(PO-P2604004)','TRI FISCHE USD','Suzhou CNY\n(PO-P2604010)','Suzhou CNY\n(PO-P2604009)','DROPSA EUR','DROPSA EUR\n(อื่นๆ)'],
+    datasets:[{label:'THB Value',data:[9507910,4118769,2437131,5460421,3625985,1105315,1018447],backgroundColor:['#dc2626','#dc2626','#f97316','#d97706','#d97706','#eab308','#eab308'],borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return'฿'+Math.round(c.raw).toLocaleString('th-TH')}}}},
+    scales:{x:{ticks:{font:{size:9},callback:function(v){return'฿'+(v/1000000).toFixed(1)+'M'}},grid:{color:'rgba(0,0,0,.05)'}},y:{ticks:{font:{size:10}}}}}
+  });
+}
+
+// Init overview on load
+window.addEventListener('load',function(){
+  initOverviewCharts();
+  renderFIX();
+  showPreview('web');
+});
+
+// ════════════════════════════════════════
+// PRINT PREVIEW
+// ════════════════════════════════════════
+var previewSizes={web:'—',pdf:'~420 KB',xls:'~185 KB',csv:'~8 KB',md:'~3 KB'};
+function showPreview(mode,btn){
+  if(btn){document.querySelectorAll('.ptab').forEach(function(t){t.classList.remove('on')});btn.classList.add('on');}
+  var body=document.getElementById('preview-body');
+  var barTxt=document.getElementById('preview-bar-txt');
+  var sz=document.getElementById('preview-size');
+  sz.textContent='ขนาด: '+(previewSizes[mode]||'—');
+  if(mode==='web'){
+    barTxt.textContent='🌐 Web Preview — PT-Pulse-2026-04-v1.1';
+    body.innerHTML=getWebPreview();
+  } else if(mode==='pdf'){
+    barTxt.textContent='📄 PDF Preview — A4 Portrait + ลายน้ำ';
+    body.innerHTML='<div class="watermark">'+getWebPreview()+'<div style="text-align:center;font-size:9px;color:#aaa;margin-top:8px;border-top:1px solid #eee;padding-top:6px">— หน้า 1 / 2 — พิมพ์ด้วย PT Dashboard v1.1 — ห้ามเผยแพร่ภายนอก —</div></div>';
+  } else if(mode==='xls'){
+    barTxt.textContent='📊 Excel Preview — 4 Sheets';
+    body.innerHTML=getXLSPreview();
+  } else if(mode==='csv'){
+    barTxt.textContent='📝 CSV Raw Data — UTF-8';
+    body.innerHTML='<div style="font-family:monospace;font-size:11px;line-height:1.8;white-space:pre;overflow-x:auto;color:var(--text)">'+getCSVPreview()+'</div>';
+  } else if(mode==='md'){
+    barTxt.textContent='🔖 Markdown — Pulse Format';
+    body.innerHTML='<div style="font-family:monospace;font-size:11px;line-height:1.8;white-space:pre;color:var(--text)">'+getMDPreview()+'</div>';
+  }
+}
+function getWebPreview(){
+  return '<div class="preview-doc"><div class="doc-hdr"><div><div class="doc-co">PEO Tech Co., Ltd. (PT)</div><div class="doc-co2">5 ซอยรามอินทรา 87 คันนายาว กรุงเทพ | service.tech@peothailand.com</div></div><div class="doc-meta"><strong>PT-Pulse-2026-04-v1.1</strong>09 พ.ค. 2569 | Nack</div></div><div class="doc-title">Monthly Financial Pulse — เมษายน 2026</div><table class="doc-table"><thead><tr><th>Section</th><th>รายการ</th><th>฿</th><th>สถานะ</th></tr></thead><tbody><tr><td>Revenue</td><td>Lotus\'s FM</td><td>4,850,000</td><td style="color:#16a34a">✓ Paid</td></tr><tr><td></td><td>Caster + Lub</td><td>250,000</td><td style="color:#16a34a">✓ Paid</td></tr><tr><td>Expenses</td><td>Fixed</td><td>1,384,000</td><td style="color:#d97706">D20–28</td></tr><tr><td></td><td>Payroll</td><td>886,749</td><td style="color:#16a34a">✓ จ่ายแล้ว</td></tr><tr><td></td><td>AP Unpaid</td><td>986,087</td><td style="color:#d97706">รอจ่าย</td></tr><tr><td>Cash</td><td>Balance D19 est.</td><td>2,100,000</td><td style="color:#16a34a">🟢 GREEN</td></tr></tbody></table><div class="doc-foot"><div class="doc-total">Net: <strong style="color:#2563eb">฿1,842,864</strong> | Margin: 36%</div></div><div style="margin-top:8px;font-size:9px;color:#999;border-top:1px solid #eee;padding-top:5px">🔴 Michael decides: FX ~฿25.2M unhedged | Lotus\'s FM penalty ฿41,507/วัน (cap ฿2,964,820) | ภส.01-01 due 15 พ.ค.</div></div>';
+}
+function getXLSPreview(){
+  var rows=AP_UNPAID.slice(0,5).map(function(r){return '<tr><td style="padding:3px 7px">'+r.po+'</td><td style="padding:3px 7px">'+r.vendor+'</td><td style="padding:3px 7px;text-align:right;color:#dc2626">฿'+r.amt.toLocaleString('th-TH',{minimumFractionDigits:2})+'</td><td style="padding:3px 7px">'+r.due+'</td></tr>'}).join('');
+  return '<div style="font-size:11px"><div style="display:flex;gap:6px;margin-bottom:8px"><span style="padding:4px 10px;background:#2563eb;color:#fff;border-radius:4px 4px 0 0;font-size:10px;font-weight:600">Summary</span><span style="padding:4px 10px;background:#f0f0f0;border-radius:4px 4px 0 0;font-size:10px">AP Detail</span><span style="padding:4px 10px;background:#f0f0f0;border-radius:4px 4px 0 0;font-size:10px">AR Detail</span><span style="padding:4px 10px;background:#f0f0f0;border-radius:4px 4px 0 0;font-size:10px">FIX</span></div><table style="width:100%;border-collapse:collapse"><thead><tr style="background:#2563eb;color:#fff"><th style="padding:5px 7px;font-weight:600;font-size:10px;text-align:left">PO No.</th><th style="padding:5px 7px;font-weight:600;font-size:10px;text-align:left">Vendor</th><th style="padding:5px 7px;font-weight:600;font-size:10px;text-align:right">Amount</th><th style="padding:5px 7px;font-weight:600;font-size:10px">Due</th></tr></thead><tbody>'+rows+'</tbody></table><div style="font-size:9px;color:#888;margin-top:8px">แสดง 5 / 22 รายการ — เปิดใน Excel เพื่อดูครบทุกรายการ</div></div>';
+}
+function getCSVPreview(){
+  var lines=['month,section,item,amount_thb,status,due'];
+  lines.push('2026-04,Revenue,Lotus FM Billing,4850000,Paid,');
+  lines.push('2026-04,Revenue,Caster+Lub,250000,Paid,');
+  lines.push('2026-04,Expenses,Fixed Obligations,1384000,Pending,D20-28');
+  lines.push('2026-04,Expenses,Payroll,886749,Paid,2026-04-25');
+  lines.push('2026-04,AP,THB Unpaid,986087,Unpaid,');
+  lines.push('2026-04,Cash,D19 Balance est.,2100000,GREEN,2026-04-19');
+  lines.push('2026-04,Net,Monthly Net,1842864,36% margin,');
+  lines.push('2026-04,Risk,Lotus FM Penalty,41507,per_day,2026-05-31');
+  AP_UNPAID.slice(0,5).forEach(function(r){lines.push('2026-04,AP Detail,'+r.po+'|'+r.vendor+','+r.amt+',Unpaid,'+r.due)});
+  return lines.join('\n');
+}
+function getMDPreview(){
+  return '# PT-Pulse-2026-04-v1.1\n**PEO Tech Co., Ltd.** | 09 พ.ค. 2569 | Nack\n\n## Revenue\n| รายการ | ฿ | สถานะ |\n|---|---|---|\n| Lotus\'s FM | 4,850,000 | ✓ Paid |\n| Caster + Lub | 250,000 | ✓ Paid |\n| **รวม** | **5,100,000** | |\n\n## Expenses\n| รายการ | ฿ | สถานะ |\n|---|---|---|\n| Fixed | 1,384,000 | D20–28 |\n| Payroll | 886,749 | จ่ายแล้ว |\n| AP Unpaid | 986,087 | รอจ่าย |\n| **รวม** | **3,257,136** | |\n\n## Cash / OD Position\n- Balance D19 est.: ฿2,100,000\n- ภาระ D20–28: ฿1,584,949\n- Buffer: **+฿515,051** → 🟢 GREEN\n\n## Net\n- ฿1,842,864 (36% margin)\n\n## 🔴 Michael decides:\n- FX ~฿25.2M unhedged (USD/EUR/CNY)\n- Lotus\'s FM penalty ฿41,507/วัน cap ฿2,964,820\n- ภส.01-01 due 2026-05-15';
+}
+
+// ════════════════════════════════════════
+// CALENDAR
+// ════════════════════════════════════════
+var calOpen=false;
+// Default = first day to last day of current month
+(function(){
+  var now=new Date();
+  var y=now.getFullYear(), mo=now.getMonth()+1;
+  var last=new Date(y,mo,0).getDate();
+  function _p(n){return n<10?'0'+n:n;}
+  window._defStart=y+'-'+_p(mo)+'-01';
+  window._defEnd  =y+'-'+_p(mo)+'-'+_p(last);
+})();
+var selStart=window._defStart, selEnd=window._defEnd;
+var calViewYear=new Date().getFullYear(), calViewMonth=new Date().getMonth()+1;
+var thaiM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+var thaiMF=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+var dueDays=[15,20,23,24,25,28];
+
+function toggleCal(){
+  calOpen=!calOpen;
+  document.getElementById('cal-popup').style.display=calOpen?'block':'none';
+  document.getElementById('cal-overlay').style.display=calOpen?'block':'none';
+  if(calOpen)renderCalendar();
+}
+function ds(y,m,d){return y+'-'+(m<10?'0'+m:m)+'-'+(d<10?'0'+d:d);}
+function fmtD(s){if(!s)return'—';var p=s.split('-');return p[2]+' '+thaiM[parseInt(p[1])-1]+' '+p[0];}
+function renderCalendar(){
+  var grid=document.getElementById('cal-months');
+  grid.innerHTML='';
+  for(var mi=0;mi<2;mi++){
+    var mo=((calViewMonth-1+mi)%12)+1;
+    var yr=calViewYear+Math.floor((calViewMonth-1+mi)/12);
+    var first=new Date(yr,mo-1,1).getDay();
+    var days=new Date(yr,mo,0).getDate();
+    var prev=new Date(yr,mo-1,0).getDate();
+    var div=document.createElement('div');
+    var nav='<div class="cal-month-hdr">'+(mi===0?'<button class="cal-nav" onclick="calPrev()">‹</button>':'<span></span>')+'<span class="cal-month-name">'+thaiMF[mo-1]+' '+yr+'</span>'+(mi===1?'<button class="cal-nav" onclick="calNext()">›</button>':'<span></span>')+'</div>';
+    var dow='<div class="cal-dow">'+['อา','จ','อ','พ','พฤ','ศ','ส'].map(function(d){return'<div>'+d+'</div>'}).join('')+'</div>';
+    var dg='<div class="cal-days">';
+    for(var pd=first-1;pd>=0;pd--)dg+='<div class="cday other">'+(prev-pd)+'</div>';
+    for(var d=1;d<=days;d++){
+      var dstr=ds(yr,mo,d);
+      var cls='cday';
+      if(dstr===selStart)cls+=' s-start';
+      else if(dstr===selEnd)cls+=' s-end';
+      else if(selStart&&selEnd&&dstr>selStart&&dstr<selEnd)cls+=' in-range';
+      if(dstr==='2026-05-09')cls+=' today';
+      if(dueDays.indexOf(d)>=0)cls+=' has-ev';
+      dg+='<div class="'+cls+'" data-d="'+dstr+'" onclick="clickDay(this)">'+d+'</div>';
+    }
+    var rem=(7-(first+days)%7)%7;
+    for(var nd=1;nd<=rem;nd++)dg+='<div class="cday other">'+nd+'</div>';
+    dg+='</div>';
+    div.innerHTML=nav+dow+dg;
+    grid.appendChild(div);
+  }
+  updateRangeTxt();
+}
+function clickDay(el){
+  var d=el.dataset.d;
+  if(!selStart||selEnd){selStart=d;selEnd=null;}
+  else{selEnd=d<selStart?(function(){var t=selStart;selStart=d;return t;})():d;}
+  document.querySelectorAll('.cal-preset').forEach(function(b){b.classList.remove('on')});
+  renderCalendar();
+}
+function calPrev(){if(calViewMonth===1){calViewMonth=12;calViewYear--;}else calViewMonth--;renderCalendar();}
+function calNext(){if(calViewMonth===12){calViewMonth=1;calViewYear++;}else calViewMonth++;renderCalendar();}
+function updateRangeTxt(){document.getElementById('cal-range-txt').innerHTML='<strong>'+fmtD(selStart)+'</strong> — <strong>'+fmtD(selEnd)+'</strong>';}
+function _dstr(y,m,d){return y+'-'+(m<10?'0'+m:m)+'-'+(d<10?'0'+d:d);}
+function _curMonthRange(){
+  var n=new Date(); var y=n.getFullYear(),mo=n.getMonth()+1;
+  return {s:_dstr(y,mo,1), e:_dstr(y,mo,new Date(y,mo,0).getDate()), mo:mo, y:y};
+}
+function applyPreset(btn,p){
+  document.querySelectorAll('.cal-preset').forEach(function(b){b.classList.remove('on')});
+  if(btn) btn.classList.add('on');
+  var n=new Date(); var y=n.getFullYear(),mo=n.getMonth()+1;
+  var today=_dstr(y,mo,n.getDate());
+  if(p==='month'){
+    var r=_curMonthRange(); selStart=r.s; selEnd=r.e; calViewMonth=r.mo; calViewYear=r.y;
+  } else if(p==='30d'){
+    var d30=new Date(n-30*864e5); selStart=_dstr(d30.getFullYear(),d30.getMonth()+1,d30.getDate());
+    selEnd=today; calViewMonth=d30.getMonth()+1; calViewYear=d30.getFullYear();
+  } else if(p==='q1'){
+    selStart=_dstr(y,1,1); selEnd=_dstr(y,3,31); calViewMonth=1; calViewYear=y;
+  } else if(p==='q2'){
+    selStart=_dstr(y,4,1); selEnd=_dstr(y,6,30); calViewMonth=4; calViewYear=y;
+  } else if(p==='ytd'){
+    selStart=_dstr(y,1,1); selEnd=today; calViewMonth=1; calViewYear=y;
+  } else{selStart=null;selEnd=null;}
+  renderCalendar();
+}
+// ปุ่ม "เดือนนี้" บน topbar — apply ทันทีไม่ต้องเปิด popup
+function applyCurrentMonth(){
+  var r=_curMonthRange();
+  selStart=r.s; selEnd=r.e;
+  calViewMonth=r.mo; calViewYear=r.y;
+  _filterStart=new Date(selStart);
+  _filterEnd=new Date(selEnd); _filterEnd.setHours(23,59,59,999);
+  document.getElementById('cal-label').textContent=fmtD(selStart)+' — '+fmtD(selEnd);
+  document.querySelectorAll('.cal-preset').forEach(function(b){b.classList.remove('on')});
+  // highlight "เดือนนี้" preset ใน popup ด้วย
+  document.querySelectorAll('.cal-preset').forEach(function(b){ if(b.textContent.trim()==='เดือนนี้') b.classList.add('on'); });
+  if(_rawR3)  parseAndApplyR3(_rawR3);
+  if(_rawPO3) parseAndApplyPO3(_rawPO3);
+  if(_rawF4)  parseAndApplyF4(_rawF4);
+}
+function applyCalRange(){
+  if(selStart&&selEnd){
+    // set global date filter
+    _filterStart=new Date(selStart);
+    _filterEnd=new Date(selEnd); _filterEnd.setHours(23,59,59,999);
+    document.getElementById('cal-label').textContent=fmtD(selStart)+' — '+fmtD(selEnd);
+    toggleCal();
+    // re-filter sheet data if available
+    if(_rawR3)  parseAndApplyR3(_rawR3);
+    if(_rawPO3) parseAndApplyPO3(_rawPO3);
+    if(_rawF4)  parseAndApplyF4(_rawF4);
+  }
+}
+function clearRange(){
+  selStart=null;selEnd=null;
+  _filterStart=null;_filterEnd=null;
+  document.querySelectorAll('.cal-preset').forEach(function(b){b.classList.remove('on')});
+  var lbl=document.getElementById('cal-label');
+  if(lbl) lbl.textContent='ทั้งหมด (ไม่กรอง)';
+  renderCalendar();
+  // restore full data
+  if(_rawR3)  parseAndApplyR3(_rawR3);
+  if(_rawPO3) parseAndApplyPO3(_rawPO3);
+  if(_rawF4)  parseAndApplyF4(_rawF4);
+}
+function doPrint(){window.print();}
+
+// ════════════════════════════════════════
+// GOOGLE SHEETS LIVE via Apps Script v1.3
+// ════════════════════════════════════════
+// แหล่งข้อมูล: Google Apps Script Web App (SheetProxy.gs)
+// ไม่ต้องใช้ API Key — ใส่ Web App URL ครั้งแรกตอนกด Sync
+// URL hardcoded — ไม่ต้องกรอกเอง (deploy คงที่ URL เดิมแม้เปลี่ยน version)
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbxt98esR-LDG_A5h3ymD9vRNs3cVtzKkxNsxsDZdHUN1f4FweH5I3gve03FeCm2WxRxvQ/exec';
+var SYNC_DISPLAY_SEC = 5 * 60;   // countdown แสดง 5 นาที
+var AUTO_SYNC_MS     = 4 * 60 * 1000; // sync จริงทุก 4 นาที
+var _countdownTimer  = null;
+var _autoSyncTimer   = null;
+var _isSyncing       = false;
+
+// ── countdown (display only — ไม่ trigger sync) ──
+function getSecondsUntilNextSync() {
+  var last = parseInt(localStorage.getItem('pt_last_sync') || '0');
+  if (!last) return 0;
+  var elapsed = Math.floor((Date.now() - last) / 1000);
+  return Math.max(0, SYNC_DISPLAY_SEC - elapsed);
+}
+function startCountdown() {
+  if (_countdownTimer) clearInterval(_countdownTimer);
+  updateCountdownUI(getSecondsUntilNextSync());
+  _countdownTimer = setInterval(function() {
+    updateCountdownUI(getSecondsUntilNextSync());
+  }, 1000);
+}
+function updateCountdownUI(rem) {
+  var el = document.getElementById('countdown-display');
+  if (!el) return;
+  var m = Math.floor(rem / 60), s = rem % 60;
+  el.textContent = '⏱ ' + m + ':' + (s < 10 ? '0' : '') + s;
+  el.style.color  = rem < 60 ? 'var(--amber)' : 'var(--green)';
+}
+
+// ── auto-sync ทุก 4 นาที (silent) ──
+function startAutoSync() {
+  if (_autoSyncTimer) clearInterval(_autoSyncTimer);
+  _autoSyncTimer = setInterval(function() {
+    if (GAS_URL && !_isSyncing) syncSheets(false); // false = silent
+  }, AUTO_SYNC_MS);
+}
+
+// ── sync entry points ──
+function syncNow() {
+  // manual = กดปุ่ม Sync Sheet → แสดง popup
+  localStorage.setItem('pt_last_sync', '0');
+  syncSheets(true);
+}
+async function syncSheets(manual) {
+  if (!GAS_URL) { if (manual) showGASUrlPrompt(); return; }
+  if (_isSyncing) return;
+  _isSyncing = true;
+
+  // ── UI ตาม mode ──────────────────────────
+  var _hintTimer = null;
+  if (manual) {
+    setSyncBtnState('syncing');
+    showSyncLoading();
+    _hintTimer = setTimeout(function(){
+      var sub = document.getElementById('sl-sub-txt');
+      if(sub) sub.textContent = 'GAS กำลัง Wake up... รอสักครู่ (~10 วิ)';
+    }, 4000);
+  }
+
+  try {
+    var _ctrl = new AbortController();
+    var _timeout = setTimeout(function(){ _ctrl.abort(); }, 30000);
+    var res = await fetch(GAS_URL, { redirect: 'follow', signal: _ctrl.signal });
+    clearTimeout(_timeout);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var json = await res.json();
+    if (json.ok === false) throw new Error(json.error || 'Apps Script error');
+
+    // ── อัปเดตข้อมูล (ทั้ง manual & auto) ──
+    parseAndApplyR3 (json.r3  || []);
+    parseAndApplyPO3(json.po3 || []);
+    parseAndApplyF4 (json.f4  || []);
+    localStorage.setItem('pt_last_sync', Date.now().toString());
+    var t = new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+    setSyncMsg('✓ Sync แล้ว '+t, 'var(--green)');
+    _lastSyncISO = new Date().toISOString();
+    var ab=document.getElementById('audit-badge');if(ab)ab.textContent='✓';
+    var ad=document.getElementById('audit-dot');if(ad)ad.style.background='var(--green)';
+    hEl('audit-sync-txt','Sync สำเร็จ — '+t);
+    hEl('audit-sync-time',new Date().toLocaleDateString('th-TH'));
+    if (manual) setSyncBtnState('ok');
+
+  } catch(e) {
+    if (manual) {
+      setSyncBtnState('error');
+      setSyncMsg('⚠ '+e.message,'var(--red)');
+    } else {
+      // auto-sync fail — แสดงเงียบๆ ไม่เปลี่ยนปุ่ม
+      setSyncMsg('⚠ Auto-sync: '+e.message,'var(--amber)');
+    }
+    var ad2=document.getElementById('audit-dot');if(ad2)ad2.style.background='var(--red)';
+    hEl('audit-sync-txt','Sync ล้มเหลว: '+e.message);
+    console.error('[SheetsSync]',e);
+  } finally {
+    if (manual) {
+      if (_hintTimer) clearTimeout(_hintTimer);
+      var sub = document.getElementById('sl-sub-txt');
+      if(sub) sub.textContent = 'กำลังดึงข้อมูลจาก Google Sheets';
+      hideSyncLoading();
+    }
+  }
+  _isSyncing = false;
+  startCountdown(); // reset countdown หลัง sync ไม่ว่าจะ manual หรือ auto
+}
+function setSyncBtnState(state) {
+  var btn = document.getElementById('sync-btn');
+  var icon = btn ? btn.querySelector('i') : null;
+  if (!btn) return;
+  if (state === 'syncing') {
+    btn.disabled = true;
+    btn.style.background = 'var(--amber)';
+    btn.style.borderColor = 'var(--amber)';
+    if (icon) icon.classList.add('spinning');
+  } else if (state === 'error') {
+    btn.disabled = false;
+    btn.style.background = 'var(--red)';
+    btn.style.borderColor = 'var(--red)';
+    if (icon) icon.classList.remove('spinning');
+  } else {
+    btn.disabled = false;
+    btn.style.background = 'var(--green)';
+    btn.style.borderColor = 'var(--green)';
+    if (icon) icon.classList.remove('spinning');
+  }
+}
+function setSyncMsg(txt, color) {
+  var el = document.getElementById('sync-status-msg');
+  if (el) { el.textContent = txt; el.style.color = color || 'var(--text3)'; }
+}
+function showSyncLoading() {
+  document.getElementById('sync-loading-overlay').style.display = 'block';
+  document.getElementById('sync-loading-box').style.display = 'block';
+}
+function hideSyncLoading() {
+  document.getElementById('sync-loading-overlay').style.display = 'none';
+  document.getElementById('sync-loading-box').style.display = 'none';
+}
+function showGASUrlPrompt() {
+  var url = prompt(
+    'ใส่ Google Apps Script Web App URL:\n\n' +
+    'วิธีสร้าง (ครั้งแรกครั้งเดียว):\n' +
+    '1. เปิด Google Sheet → Extensions → Apps Script\n' +
+    '2. วาง code จากไฟล์ SheetProxy.gs\n' +
+    '3. Deploy → New deployment → Web app\n' +
+    '4. Execute as: Me\n' +
+    '5. Who has access: Anyone\n' +
+    '6. Copy "Web app URL" มาวางที่นี่\n\n' +
+    'URL ขึ้นต้นด้วย: https://script.google.com/macros/s/...'
+  );
+  if (url && url.trim().startsWith('https://')) {
+    GAS_URL = url.trim();
+    localStorage.setItem('pt_gas_url', GAS_URL);
+    syncSheets(true);
+  }
+}
+
+// ── parser: TRC-R3สรุป_ALL → Revenue + AR breakdown + DSO ──
+function parseAndApplyR3(rows) {
+  _rawR3=rows;
+  hEl('audit-r3-rows',rows.length>1?(rows.length-1)+' แถว':'—');
+  hEl('audit-r3-cols',rows[0]?rows[0].length+' คอลัมน์':'—');
+  if (!rows || rows.length < 2) return;
+  var hdr = (rows[0] || []).map(function(h){ return String(h).toLowerCase().trim(); });
+
+  // ── find columns ────────────────────────
+  // ── TRC-R3 confirmed column structure (from actual Sheet) ──
+  // col0=#  col1=วันที่เอกสาร  col2=เลขที่เอกสาร  col3=อ้างอิง  col4=empty
+  // col5=ลูกค้า  col6=สถานะ  col7=มูลค่า(pre-VAT)  col8=ภาษีมูลค่าเพิ่ม  col9=สุทธิ(net)
+  // col10=เครดิต  col11=ประมาณรับเงิน  col12=วันรับเงินจริง  col13=OverDue/Days ...
+  //
+  // NOTE: Thai encoding from GAS may differ from JS source → use positional detection
+  //       with keyword as optional override.
+
+  function colR3(keys){
+    var idx=-1;
+    keys.forEach(function(kw){ if(idx<0){ var i=hdr.indexOf(kw); if(i>=0) idx=i; }});
+    if(idx<0) keys.forEach(function(kw){
+      if(idx<0) hdr.forEach(function(h,i){ if(idx<0 && h.indexOf(kw)>=0) idx=i; });
+    });
+    return idx;
+  }
+
+  // Helper: keyword first, fallback to known position
+  function colPos(keys, pos) {
+    var kw = colR3(keys);
+    if (kw >= 0) return kw;
+    // Verify position exists in this sheet
+    if (pos >= 0 && rows[0] && pos < rows[0].length) return pos;
+    return -1;
+  }
+
+  var cDate   = colPos(['วันที่เอกสาร','วันที่ออกเอกสาร','document date','วันที่','date'], 1);
+  var cInv    = colPos(['เลขที่เอกสาร','เลขที่ใบแจ้งหนี้','invoice no','เลขที่'], 2);
+  var cRef    = colPos(['อ้างอิง','reference','so no','ref'], 3);
+  var cCust   = colPos(['ลูกค้า','ชื่อลูกค้า','customer','บริษัท','client'], 5);
+  var cStatus = colPos(['สถานะ','payment status','status'], 6);
+  // col9=สุทธิ(net) — MUST skip col7(มูลค่า=pre-VAT) and col8(VAT)
+  var cAmt    = colPos(['สุทธิ','ยอดสุทธิ','net amount','net total'], 9);
+  // Extra validation: if cAmt picked col 7 or 8 (VAT columns), override to 9
+  if (cAmt === 7 || cAmt === 8) cAmt = 9;
+  var cCredit = colPos(['เครดิต','credit','credit days'], 10);
+  var cDue    = colPos(['ประมาณรับเงิน','วันรับเงินจริง','วันนัดรับ','due date'], 11);
+
+  // ── normalize สถานะ → standard keys ────
+  function normalizeStatus(raw) {
+    var s = String(raw || '').toLowerCase().trim();
+    if (!s) return 'Pending';
+    if (/paid|ชำระแล้ว|รับแล้ว|จ่ายแล้ว|received/.test(s)) return 'Paid';
+    if (/billing.?note|รอเก็บ|รอรับ/.test(s)) return 'Billing Note';
+    if (/debtor|ค้างชำระ|เกินกำหนด|overdue/.test(s)) return 'Debtor';
+    return raw.trim() || 'Pending';
+  }
+
+  // ── filter by date ───────────────────────
+  var dataRows = rows.slice(1);
+  if (_filterStart && _filterEnd && cDate >= 0) {
+    dataRows = dataRows.filter(function(row){
+      var d = parseSheetDate(row[cDate]);
+      return d && d >= _filterStart && d <= _filterEnd;
+    });
+  }
+
+  // ── build AR_DATA + tally ────────────────
+  var total=0, billingAmt=0, debtorAmt=0, lotusAmt=0, outstandingAmt=0;
+  var newAR = [];
+  dataRows.forEach(function(row) {
+    if (!row || row.length === 0) return;
+    var amt = parseFloat(String(cAmt >= 0 ? row[cAmt] : '').replace(/,/g,''));
+    if (isNaN(amt) || amt === 0) return;
+    var status  = normalizeStatus(cStatus >= 0 ? row[cStatus] : '');
+    var cust    = cCust   >= 0 ? String(row[cCust]   || '').trim() || '—' : '—';
+    var inv     = cInv    >= 0 ? String(row[cInv]    || '').trim() || '—' : '—';
+    var ref     = cRef    >= 0 ? String(row[cRef]    || '').trim() : '';
+    // วันนัดรับ/ประมาณรับเงิน (col11) หรือ cDate (col1) — เก็บ raw ไว้ formatSerialDate() จัดการ display
+    var rawDue  = cDue >= 0 ? row[cDue] : (cDate >= 0 ? row[cDate] : '');
+    var dueStr  = (rawDue !== null && rawDue !== undefined) ? String(rawDue) : '';
+    // credit days → แสดงเป็น "เครดิต N วัน" ถ้ามี
+    var creditDays = cCredit >= 0 ? parseInt(String(row[cCredit]||'')) : NaN;
+
+    total += amt;
+    if (status !== 'Paid') outstandingAmt += amt;
+    if (status === 'Billing Note') billingAmt += amt;
+    if (status === 'Debtor')       debtorAmt  += amt;
+    if (/lotus|โลตัส/i.test(cust)) lotusAmt  += amt;
+
+    newAR.push({
+      inv: inv,
+      customer: cust,
+      status: status,
+      amt: amt,
+      due: dueStr,
+      ref: ref,
+      credit: isNaN(creditDays) ? '' : creditDays + ' วัน'
+    });
+  });
+
+  // ── update AR_DATA (replace only if has data) ──
+  if (newAR.length > 0) AR_DATA = newAR;
+
+  // ── update Revenue card ──────────────────
+  if (total > 0) {
+    MONTHLY_REV = total;
+    hEl('rev-val', '฿' + Math.round(total).toLocaleString('th-TH'));
+  }
+
+  // ── update cards + left panel from AR_DATA (always reflects current data) ──
+  updateARCards();
+
+  // ── re-render AR table + left panel if tab active ────
+  var arTab = document.getElementById('tab-ar');
+  if (arTab && arTab.classList.contains('active')) {
+    renderAR('all');
+    renderARInvList(_arlFilter || 'all');
+  }
+
+  initCashHealth();
+}
+
+// ── parser: TRC-PO3รายละเอียด → AP_UNPAID array ──
+function parseAndApplyPO3(rows) {
+  _rawPO3=rows;
+  hEl('audit-po3-rows',rows.length>1?(rows.length-1)+' แถว':'—');
+  hEl('audit-po3-cols',rows[0]?rows[0].length+' คอลัมน์':'—');
+  if (!rows || rows.length < 2) return;
+  var hdr = (rows[0] || []).map(function(h){ return String(h).toLowerCase().trim(); });
+  function col(keywords) {
+    var idx = -1;
+    keywords.forEach(function(kw){ if (idx < 0) { var i = hdr.indexOf(kw); if (i >= 0) idx = i; } });
+    if (idx < 0) { // partial match
+      keywords.forEach(function(kw){
+        if (idx < 0) hdr.forEach(function(h,i){ if (idx < 0 && h.indexOf(kw) >= 0) idx = i; });
+      });
+    }
+    return idx;
+  }
+  var cPo     = col(['po','po no','po no.','เลขที่ po','po number']);
+  var cVendor = col(['vendor','supplier','ผู้ขาย','บริษัท','ชื่อ']);
+  var cAmt    = col(['amount','มูลค่า','จำนวน','amt','ราคา','thb','บาท']);
+  var cDue    = col(['due','due date','กำหนดชำระ','วันครบกำหนด','วันที่ชำระ']);
+  var cWeek   = col(['week','สัปดาห์','wk']);
+  var cUrgent = col(['urgency','urgent','priority','ความเร่งด่วน','สถานะเร่งด่วน']);
+  var cStatus = col(['status','สถานะ','payment status']);
+  var newAP = [];
+  // find general date col (invoice date / posted date) for R3/F4 style filter
+  var cDateGeneral = findDateCol(hdr);
+  rows.slice(1).forEach(function(row) {
+    if (!row || row.length === 0) return;
+    var amt = parseFloat(String(cAmt >= 0 ? row[cAmt] : '').replace(/,/g,''));
+    if (isNaN(amt) || amt <= 0) return;
+    var status = cStatus >= 0 ? String(row[cStatus] || '').trim() : '';
+    // กรอง: เอาเฉพาะที่ยังไม่ชำระ
+    if (status && (status.indexOf('paid') >= 0 || status.indexOf('ชำระแล้ว') >= 0 || status.indexOf('จ่ายแล้ว') >= 0)) return;
+    // filter by date range (due date first, fallback to general date col)
+    if (_filterStart && _filterEnd) {
+      var filterCol = cDue >= 0 ? cDue : (cDateGeneral >= 0 ? cDateGeneral : -1);
+      if (filterCol >= 0) {
+        var d = parseSheetDate(row[filterCol]);
+        if (!d || d < _filterStart || d > _filterEnd) return;
+      }
+    }
+    var due = cDue >= 0 ? String(row[cDue] || '') : '';
+    var urgency = cUrgent >= 0 ? String(row[cUrgent] || '').toLowerCase() : 'normal';
+    if (!urgency || urgency === 'undefined') {
+      // คำนวณ urgency จาก due date
+      var dueDate = new Date(due);
+      if (!isNaN(dueDate)) {
+        var daysUntil = Math.ceil((dueDate - new Date()) / 86400000);
+        urgency = daysUntil < 0 ? 'overdue' : daysUntil <= 7 ? 'urgent' : daysUntil <= 21 ? 'upcoming' : 'normal';
+      } else urgency = 'normal';
+    }
+    newAP.push({
+      po:      cPo     >= 0 ? String(row[cPo]     || '').trim() : '—',
+      vendor:  cVendor >= 0 ? String(row[cVendor] || '').trim() : '—',
+      amt:     amt,
+      due:     due,
+      week:    cWeek   >= 0 ? String(row[cWeek]   || '').trim() : '',
+      urgency: urgency,
+      status:  status || 'ยังไม่ชำระ'
+    });
+  });
+  if (newAP.length > 0) {
+    AP_UNPAID = newAP;
+    document.getElementById('ap-badge').textContent = newAP.length;
+    if (document.getElementById('ap-tbody')) renderAP();
+    initCashHealth();
+  }
+}
+
+// ── parser: TRC_F4จ่าย → Expenses total + category breakdown ──
+function parseAndApplyF4(rows) {
+  _rawF4=rows;
+  hEl('audit-f4-rows',rows.length>1?(rows.length-1)+' แถว':'—');
+  hEl('audit-f4-cols',rows[0]?rows[0].length+' คอลัมน์':'—');
+  if (!rows || rows.length < 2) return;
+  var hdr = (rows[0] || []).map(function(h){ return String(h).toLowerCase().trim(); });
+  function colF4(keys){
+    var idx=-1;
+    keys.forEach(function(kw){ if(idx<0){ var i=hdr.indexOf(kw); if(i>=0) idx=i; }});
+    if(idx<0) keys.forEach(function(kw){
+      if(idx<0) hdr.forEach(function(h,i){ if(idx<0 && h.indexOf(kw)>=0) idx=i; });
+    });
+    return idx;
+  }
+  var cAmt  = colF4(['amount','จำนวน','มูลค่า','amt','ราคา','thb','บาท','ยอด']);
+  if (cAmt < 0) cAmt = 1;
+  var cDate = findDateCol(hdr);
+  var cCat  = colF4(['หมวด','ประเภท','category','ชนิด','type','รายการหมวด']);
+  var cDesc = colF4(['รายการ','description','desc','detail','ชื่อ']);
+
+  // ── filter by date ───────────────────────
+  var dataRows = rows.slice(1);
+  if (_filterStart && _filterEnd && cDate >= 0) {
+    dataRows = dataRows.filter(function(row){
+      var d = parseSheetDate(row[cDate]);
+      return d && d >= _filterStart && d <= _filterEnd;
+    });
+  }
+
+  // ── sum by category ──────────────────────
+  var catMap = { fixed:0, payroll:0, ap:0, other:0 };
+  var totalPaid = 0;
+  dataRows.forEach(function(row) {
+    if (!row || row.length === 0) return;
+    var v = parseFloat(String(row[cAmt] || '').replace(/,/g,''));
+    if (isNaN(v) || v <= 0) return;
+    totalPaid += v;
+
+    if (cCat >= 0) {
+      var cat = String(row[cCat] || '').toLowerCase().trim();
+      if (/fixed|คงที่|ค่าเช่า|ประจำ/.test(cat))        catMap.fixed   += v;
+      else if (/payroll|เงินเดือน|salary|ค่าจ้าง/.test(cat)) catMap.payroll += v;
+      else if (/ap|จ่ายเจ้าหนี้|vendor|purchase/.test(cat))  catMap.ap      += v;
+      else catMap.other += v;
+    }
+  });
+
+  if (totalPaid > 0) {
+    // ── Expenses card ────────────────────────
+    hEl('exp-val', '฿' + Math.round(totalPaid).toLocaleString('th-TH'));
+
+    // category breakdown (แสดงถ้ามี column หมวด ไม่งั้นแสดงรวม)
+    if (cCat >= 0) {
+      hEl('exp-fixed',   catMap.fixed   > 0 ? '฿'+Math.round(catMap.fixed).toLocaleString('th-TH')   : '—');
+      hEl('exp-payroll', catMap.payroll > 0 ? '฿'+Math.round(catMap.payroll).toLocaleString('th-TH') : '—');
+      hEl('exp-ap',      catMap.ap+catMap.other > 0 ? '฿'+Math.round(catMap.ap+catMap.other).toLocaleString('th-TH') : '—');
+    } else {
+      hEl('exp-fixed',   '—');
+      hEl('exp-payroll', '—');
+      hEl('exp-ap',      '(ไม่มี column หมวด ใน F4)');
+    }
+
+    // ── Net card ─────────────────────────────
+    var netVal = MONTHLY_REV - totalPaid;
+    var margin = MONTHLY_REV > 0 ? Math.round((netVal / MONTHLY_REV) * 100) : 0;
+    hEl('net-val', '฿' + Math.round(Math.abs(netVal)).toLocaleString('th-TH'));
+    hEl('net-margin-txt', margin + '% margin');
+    var bar = document.getElementById('net-bar');
+    if (bar) { bar.style.width = Math.min(100, Math.max(0, margin)) + '%';
+               bar.style.background = margin >= 30 ? 'var(--green)' : margin >= 15 ? 'var(--amber)' : 'var(--red)'; }
+  }
+  initCashHealth();
+}
+
+// ════════════════════════════════════════
+// RISK COUNTDOWN — อัปเดต realtime
+// ════════════════════════════════════════
+function updateRiskCountdowns() {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var thaiM = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+  function daysUntil(y,m,d) {
+    var dl = new Date(y, m-1, d); dl.setHours(0,0,0,0);
+    return Math.round((dl - today) / 86400000);
+  }
+  function thaiShort(dt) {
+    return dt.getDate() + ' ' + thaiM[dt.getMonth()] + ' ' + dt.getFullYear();
+  }
+
+  // ── ภส.01-01 Excise Tax — Deadline 15 พ.ค. 2026 ──
+  var exDays = daysUntil(2026, 5, 15);
+  var exEl   = document.getElementById('excise-countdown');
+  var exDesc = document.getElementById('excise-desc');
+  if (exEl) {
+    if (exDays > 0) {
+      exEl.textContent = '⏰ เหลือ ' + exDays + ' วัน — Deadline: 15 พ.ค. 2026';
+      exEl.style.background = exDays <= 2 ? '#7f1d1d' : '#dc2626';
+    } else if (exDays === 0) {
+      exEl.textContent = '🚨 วันนี้! Deadline: 15 พ.ค. 2026 — ดำเนินการทันที!';
+      exEl.style.background = '#7f1d1d';
+    } else {
+      exEl.textContent = '✓ ผ่าน Deadline แล้ว (' + Math.abs(exDays) + ' วันที่แล้ว)';
+      exEl.style.background = '#16a34a';
+    }
+  }
+  if (exDesc) {
+    var daysMsg = exDays > 0 ? ' (อีก ' + exDays + ' วัน)' : exDays === 0 ? ' (วันนี้!)' : ' (เกินกำหนด)';
+    exDesc.innerHTML = 'ภาษีสรรพสามิต ครบกำหนด — ยังไม่ได้รับการยืนยัน<br>ต้องดำเนินการก่อน 15 พ.ค. 2026' + daysMsg;
+  }
+
+  // ── FX Exposure — Deadline 31 พ.ค. 2026 ──
+  var fxDays = daysUntil(2026, 5, 31);
+  var fxEl   = document.getElementById('fx-days-left');
+  if (fxEl) {
+    if (fxDays > 0)      fxEl.textContent = 'เหลือ ' + fxDays + ' วัน';
+    else if (fxDays===0) fxEl.textContent = '🚨 วันนี้!';
+    else                 fxEl.textContent = '⚠ เกินกำหนด ' + Math.abs(fxDays) + ' วัน';
+  }
+
+  // ── Peak D20-28 — Next D19 check ──
+  var peakEl = document.getElementById('peak-next-date');
+  if (peakEl) {
+    var cy = today.getFullYear(), cm = today.getMonth()+1, cd = today.getDate();
+    var nextD19;
+    if (cd < 19) {
+      nextD19 = new Date(cy, cm-1, 19);
+    } else {
+      var nm = cm >= 12 ? 1 : cm + 1;
+      var ny = cm >= 12 ? cy + 1 : cy;
+      nextD19 = new Date(ny, nm-1, 19);
+    }
+    var d19days = Math.round((nextD19 - today) / 86400000);
+    peakEl.textContent = thaiShort(nextD19) + ' (อีก ' + d19days + ' วัน)';
+  }
+
+  // ── Lotus FM Delivery — End-May 2026 ──
+  var lotusEl = document.getElementById('lotus-days-left');
+  if (lotusEl) {
+    var ld = daysUntil(2026, 5, 31);
+    if (ld > 0)      lotusEl.textContent = 'เหลือ ' + ld + ' วัน';
+    else if (ld===0) lotusEl.textContent = '🚨 วันนี้!';
+    else             lotusEl.textContent = '⚠ เกิน Deadline ' + Math.abs(ld) + ' วัน';
+  }
+}
+
+// ── init on page load ──
+window.addEventListener('load', function() {
+  // ไม่ apply date filter ตอนเริ่มต้น — แสดงข้อมูลทั้งหมดก่อน
+  // _filterStart = null, _filterEnd = null (default) — user ต้อง click "นำไปใช้" เองถึงจะ filter
+  // calendar pill แสดง label เดือนปัจจุบันเพื่อ reference เท่านั้น
+  var lbl=document.getElementById('cal-label');
+  if(lbl) lbl.textContent='ทั้งหมด (ไม่กรอง)';
+  // GAS_URL hardcoded — ไม่ต้อง load จาก localStorage อีกต่อไป
+  startCountdown();
+  startAutoSync(); // เริ่ม auto-sync ทุก 4 นาที (silent)
+  updateRiskCountdowns(); // คำนวณ countdown ครั้งแรก
+  setInterval(updateRiskCountdowns, 60000); // อัปเดตทุก 1 นาที
+  updateARCards(); // แสดง AR cards จาก AR_DATA เริ่มต้น
+  renderARInvList('all'); // แสดง invoice list ทันที
+  if (GAS_URL) {
+    setSyncMsg('⟳ กำลัง Sync...', 'var(--amber)');
+    setTimeout(function(){ syncSheets(true); }, 800); // first load = popup
+  } else {
+    setSyncMsg('⚙ กด Sync Sheet → ใส่ Apps Script URL ครั้งแรก', 'var(--amber)');
+    hEl('audit-sync-txt', 'ยังไม่ได้ตั้งค่า Apps Script URL — กด Sync Sheet ในแถบบน');
+  }
+});
+
+// ════════════════════════════════════════
+// AUDIT TAB FUNCTIONS
+// ════════════════════════════════════════
+function renderAuditTab() {
+  // อัปเดต sync status
+  if (_lastSyncISO) {
+    var t = new Date(_lastSyncISO);
+    hEl('audit-sync-txt', 'Sync สำเร็จ — ' + t.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}));
+    hEl('audit-sync-time', t.toLocaleDateString('th-TH'));
+    var adot = document.getElementById('audit-dot');
+    if (adot) adot.style.background = 'var(--green)';
+  }
+}
+
+function openAuditModal(sheet) {
+  var modal = document.getElementById('audit-modal');
+  var overlay = document.getElementById('audit-overlay');
+  modal.classList.add('open');
+  overlay.style.display = 'block';
+  switchAuditTab(sheet, document.querySelector('.am-tab'));
+  // highlight correct tab
+  document.querySelectorAll('.am-tab').forEach(function(t,i){
+    t.classList.remove('on');
+    if ((sheet==='r3'&&i===0)||(sheet==='po3'&&i===1)||(sheet==='f4'&&i===2)) t.classList.add('on');
+  });
+  renderAuditBody(sheet);
+}
+
+function closeAuditModal() {
+  document.getElementById('audit-modal').classList.remove('open');
+  document.getElementById('audit-overlay').style.display = 'none';
+}
+
+function switchAuditTab(sheet, btn) {
+  document.querySelectorAll('.am-tab').forEach(function(t){ t.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+  renderAuditBody(sheet);
+}
+
+function renderAuditBody(sheet) {
+  var body = document.getElementById('am-body');
+  var sub = document.getElementById('am-sub');
+  var title = document.getElementById('am-title');
+  var raw = sheet==='r3' ? _rawR3 : sheet==='po3' ? _rawPO3 : _rawF4;
+  var labels = {
+    r3:  { name:'TRC-R3สรุป_ALL', use:'Revenue Card (Overview)', color:'var(--blue)' },
+    po3: { name:'TRC-PO3รายละเอียด', use:'AP Table · Cash Health · DSO', color:'var(--red)' },
+    f4:  { name:'TRC_F4จ่าย', use:'Expenses Card · Net Card', color:'var(--green)' }
+  };
+  var lbl = labels[sheet] || labels.r3;
+  title.textContent = 'Audit — ' + lbl.name;
+  if (!raw || raw.length === 0) {
+    sub.textContent = '';
+    body.innerHTML = '<div style="text-align:center;padding:50px;color:var(--text3)"><i class="ti ti-cloud-off" style="font-size:40px;display:block;margin-bottom:12px"></i>ยังไม่มีข้อมูล — กด Sync Sheet ก่อน</div>';
+    return;
+  }
+  sub.textContent = (raw.length-1) + ' แถว · ' + raw[0].length + ' คอลัมน์';
+  // mapping note
+  var mapNote = sheet==='r3'
+    ? 'ระบบหา column ชื่อ: revenue / รายรับ / รายได้ / total rev / ยอดรวม / amount แล้ว sum → Revenue Card'
+    : sheet==='po3'
+    ? 'ระบบหา po / vendor / amount / due date / urgency / status → AP Table, Cash Health, DSO (กรองรายการที่ยังไม่ชำระ)'
+    : 'ระบบหา amount / จำนวน / มูลค่า / ยอด (fallback col B) แล้ว sum → Expenses Card + Net';
+  // build table
+  var hdr = raw[0];
+  var rows = raw.slice(1);
+  var ths = hdr.map(function(h,i){ return '<th title="col '+i+'">'+(h||'('+i+')')+'</th>'; }).join('');
+  var trs = rows.slice(0, 200).map(function(row, ri) {
+    var tds = hdr.map(function(_,ci){
+      var v = row[ci] !== undefined && row[ci] !== null ? row[ci] : '';
+      return '<td title="'+String(v).replace(/"/g,'&quot;')+'">' + String(v).replace(/</g,'&lt;') + '</td>';
+    }).join('');
+    return '<tr>'+tds+'</tr>';
+  }).join('');
+  var truncNote = rows.length > 200 ? '<div style="font-size:10px;color:var(--text3);padding:8px 10px;text-align:center">แสดง 200 / '+rows.length+' แถว</div>' : '';
+  body.innerHTML =
+    '<div class="am-map-box"><strong>Field Mapping: '+lbl.name+' → '+lbl.use+'</strong>' + mapNote + '</div>' +
+    '<div class="am-meta">' +
+      '<div class="am-meta-card"><strong style="color:'+lbl.color+'">'+(raw.length-1)+'</strong><span>แถวข้อมูล</span></div>' +
+      '<div class="am-meta-card"><strong>'+raw[0].length+'</strong><span>คอลัมน์</span></div>' +
+      '<div class="am-meta-card"><strong style="color:var(--green)">' + (document.getElementById('audit-badge') && document.getElementById('audit-badge').textContent === '✓' ? 'Live' : '—') + '</strong><span>สถานะ</span></div>' +
+    '</div>' +
+    '<div class="am-raw-wrap"><table class="am-raw-tbl"><thead><tr><th>#</th>'+ths+'</tr></thead><tbody>' +
+    rows.slice(0,200).map(function(row,ri){
+      var tds = hdr.map(function(_,ci){ var v=row[ci]!==undefined&&row[ci]!==null?row[ci]:''; return '<td title="'+String(v).replace(/"/g,'&quot;')+'">'+String(v).replace(/</g,'&lt;')+'</td>'; }).join('');
+      return '<tr><td style="color:var(--text3);font-size:10px">'+(ri+1)+'</td>'+tds+'</tr>';
+    }).join('') +
+    '</tbody></table></div>' + truncNote;
+}
+</script>
+</body>
+</html>
