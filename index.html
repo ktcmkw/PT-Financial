@@ -648,12 +648,13 @@ table.dt tr:hover td{background:#fbfcff}
           <div class="progress-bar"><div class="progress-fill" style="width:36%;background:var(--blue)"></div></div>
           <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:6px">
             <div style="display:flex;align-items:baseline;gap:6px">
-              <div style="font-size:14px;font-weight:600;color:var(--text2)">0.3%</div>
+              <div id="ytd-margin-val" style="font-size:14px;font-weight:600;color:var(--text2)">—</div>
               <div style="font-size:10px;background:#f3f4f6;color:var(--text2);padding:1px 6px;border-radius:10px;font-weight:600">Annual YTD</div>
             </div>
-            <div style="font-size:10px;color:var(--text3);margin-top:2px">Revenue ฿61.8M / Net ฿190K — ต่างกับ Monthly เพราะคนละ timeframe</div>
+            <div id="ytd-rev-sub" style="font-size:10px;color:var(--text3);margin-top:2px">รอ Sync — คำนวณ dynamic จาก R3+F4</div>
+            <div class="progress-bar" style="margin-top:4px"><div id="ytd-margin-bar" class="progress-fill" style="width:0%;background:var(--text3)"></div></div>
           </div>
-          <span class="indicator ind-amber" style="margin-top:8px">⚠ YTD ต่ำกว่า target 5%</span>
+          <span id="ytd-indicator" class="indicator ind-amber" style="margin-top:8px">— รอ Sync</span>
         </div>
         <div class="chart-box" style="margin-bottom:0">
           <div style="font-size:11px;color:var(--text3);margin-bottom:6px">FX Exposure</div>
@@ -893,60 +894,41 @@ table.dt tr:hover td{background:#fbfcff}
     <!-- ═══ IMPORT/EXPORT ═══ -->
     <div id="tab-import" class="panel">
 
-      <!-- Import Admin — Password Protected -->
-      <div class="chart-box" style="margin-bottom:14px;position:relative;overflow:hidden">
+      <!-- Live Connection Status — Google Sheets -->
+      <div class="chart-box" style="margin-bottom:14px">
         <div class="chart-header" style="margin-bottom:12px">
           <div>
-            <div class="chart-title"><i class="ti ti-database" style="font-size:15px;vertical-align:-2px;margin-right:4px;color:var(--green)"></i>Import Admin — Google Sheets Live</div>
+            <div class="chart-title"><i class="ti ti-database" style="font-size:15px;vertical-align:-2px;margin-right:4px;color:var(--green)"></i>แหล่งข้อมูล — Google Sheets Live</div>
             <div class="chart-sub">ข้อมูลดึงตรงจาก Google Sheets ผ่าน Apps Script · Sync อัตโนมัติทุก 4 นาที</div>
           </div>
-          <div style="display:flex;gap:6px;align-items:center">
-            <span id="imp-lock-badge" style="font-size:10px;padding:3px 8px;border-radius:20px;background:var(--red-lt);color:var(--red);font-weight:600"><i class="ti ti-lock" style="font-size:11px;vertical-align:-1px"></i> ล็อค</span>
-            <button class="tb-btn" id="imp-unlock-btn" onclick="checkImportAccess(null)" style="font-size:11px;background:var(--amber);color:#fff;border-color:var(--amber)"><i class="ti ti-lock-open"></i> ปลดล็อค Import</button>
-            <button class="tb-btn" id="imp-sync-btn" onclick="syncNow()" style="display:none;background:var(--green);color:#fff;border-color:var(--green)"><i class="ti ti-refresh"></i> Sync ตอนนี้</button>
-          </div>
+          <button class="tb-btn" onclick="syncNow()" style="background:var(--green);color:#fff;border-color:var(--green)"><i class="ti ti-refresh"></i> Sync ตอนนี้</button>
         </div>
-
-        <!-- Locked overlay -->
-        <div id="imp-locked-view" style="padding:24px;text-align:center">
-          <div style="width:44px;height:44px;background:var(--amber-lt);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px"><i class="ti ti-lock" style="font-size:22px;color:var(--amber)"></i></div>
-          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px">Import Admin ถูกล็อค</div>
-          <div style="font-size:11px;color:var(--text3);margin-bottom:12px">กด "ปลดล็อค Import" แล้วกรอกรหัสผ่าน 6 หลักเพื่อดูสถานะการเชื่อมต่อและ Sync</div>
-          <div style="display:flex;gap:8px;justify-content:center;align-items:center;font-size:11px;color:var(--text3)">
-            <span class="sb-dot" id="imp-dot-mini" style="background:var(--text3)"></span>
-            <span id="imp-lock-sync-txt">สถานะ Sync: —</span>
+        <div class="live-conn-card">
+          <span class="live-conn-dot" id="imp-dot"></span>
+          <div class="live-conn-info">
+            <strong>TRC-R3สรุป_ALL</strong>
+            <span id="imp-r3-status" style="color:var(--text3)">ยังไม่ได้ Sync</span>
           </div>
+          <strong id="imp-r3-cnt" style="font-size:12px;color:var(--blue)">—</strong>
         </div>
-
-        <!-- Unlocked content (hidden until password) -->
-        <div id="imp-unlocked-view" style="display:none">
-          <div class="live-conn-card">
-            <span class="live-conn-dot" id="imp-dot"></span>
-            <div class="live-conn-info">
-              <strong>TRC-R3สรุป_ALL</strong>
-              <span id="imp-r3-status" style="color:var(--text3)">ยังไม่ได้ Sync</span>
-            </div>
-            <strong id="imp-r3-cnt" style="font-size:12px;color:var(--blue)">—</strong>
+        <div class="live-conn-card">
+          <span class="live-conn-dot" id="imp-dot2"></span>
+          <div class="live-conn-info">
+            <strong>TRC-PO3รายละเอียด</strong>
+            <span id="imp-po3-status" style="color:var(--text3)">ยังไม่ได้ Sync</span>
           </div>
-          <div class="live-conn-card">
-            <span class="live-conn-dot" id="imp-dot2"></span>
-            <div class="live-conn-info">
-              <strong>TRC-PO3รายละเอียด</strong>
-              <span id="imp-po3-status" style="color:var(--text3)">ยังไม่ได้ Sync</span>
-            </div>
-            <strong id="imp-po3-cnt" style="font-size:12px;color:var(--red)">—</strong>
+          <strong id="imp-po3-cnt" style="font-size:12px;color:var(--red)">—</strong>
+        </div>
+        <div class="live-conn-card">
+          <span class="live-conn-dot" id="imp-dot3"></span>
+          <div class="live-conn-info">
+            <strong>TRC_F4จ่าย</strong>
+            <span id="imp-f4-status" style="color:var(--text3)">ยังไม่ได้ Sync</span>
           </div>
-          <div class="live-conn-card">
-            <span class="live-conn-dot" id="imp-dot3"></span>
-            <div class="live-conn-info">
-              <strong>TRC_F4จ่าย</strong>
-              <span id="imp-f4-status" style="color:var(--text3)">ยังไม่ได้ Sync</span>
-            </div>
-            <strong id="imp-f4-cnt" style="font-size:12px;color:var(--green)">—</strong>
-          </div>
-          <div style="margin-top:10px;padding:9px 14px;background:var(--blue-lt);border-radius:8px;font-size:11px;color:var(--blue)">
-            <strong>GAS URL:</strong> <span style="font-family:monospace;font-size:10px;word-break:break-all" id="imp-gas-url">—</span>
-          </div>
+          <strong id="imp-f4-cnt" style="font-size:12px;color:var(--green)">—</strong>
+        </div>
+        <div style="margin-top:10px;padding:9px 14px;background:var(--blue-lt);border-radius:8px;font-size:11px;color:var(--blue)">
+          <strong>GAS URL:</strong> <span style="font-family:monospace;font-size:10px;word-break:break-all" id="imp-gas-url">—</span>
         </div>
       </div>
 
@@ -1264,7 +1246,7 @@ table.dt tr:hover td{background:#fbfcff}
         </div>
 
         <!-- ── 10. Date Filter ── -->
-        <div class="chart-box">
+        <div class="chart-box" style="margin-bottom:14px">
           <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-calendar-filter" style="font-size:14px;vertical-align:-2px;margin-right:5px;color:var(--blue)"></i>10. Date Filter (Calendar)</div>
           <table class="dt">
             <thead><tr><th>Section</th><th>Filter ตามวันที่ได้?</th><th>เงื่อนไข</th></tr></thead>
@@ -1279,6 +1261,61 @@ table.dt tr:hover td{background:#fbfcff}
           </table>
           <div style="margin-top:10px;padding:10px;background:var(--amber-lt);border-radius:8px;font-size:11px;color:var(--amber)">
             <strong>หมายเหตุ Date Parse:</strong> ระบบรองรับ ISO (2026-04-15), DD/MM/YYYY, YYYY/MM/DD และ Google Sheets serial number อัตโนมัติ
+          </div>
+        </div>
+
+        <!-- ── 11. YTD Margin ── -->
+        <div class="chart-box">
+          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-chart-pie" style="font-size:14px;vertical-align:-2px;margin-right:5px;color:var(--blue)"></i>11. YTD Margin — หลักการคำนวณ (Dynamic)</div>
+          <table class="dt" style="margin-bottom:12px">
+            <thead><tr><th>ตัวแปร</th><th>สูตร / แหล่งที่มา</th><th>หมายเหตุ</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>YTD Revenue</strong></td>
+                <td><code>SUM(R3.สุทธิ col9)</code><br><small style="color:var(--text3)">where วันที่ ∈ [1 ม.ค. ปีนี้ → วันนี้]</small></td>
+                <td>ไม่สนใจ calendar filter — ใช้ทุกแถวในปีปัจจุบัน</td>
+              </tr>
+              <tr>
+                <td><strong>YTD Expenses</strong></td>
+                <td><code>SUM(F4.จำนวน)</code><br><small style="color:var(--text3)">where วันที่ ∈ [1 ม.ค. ปีนี้ → วันนี้]</small></td>
+                <td>F4 ต้องมี column วันที่ จึงจะ filter ได้</td>
+              </tr>
+              <tr>
+                <td><strong>YTD Net</strong></td>
+                <td><code>YTD Revenue − YTD Expenses</code></td>
+                <td>ถ้า YTD_EXP = 0 (F4 ไม่มีวันที่) → Net = Revenue</td>
+              </tr>
+              <tr>
+                <td><strong>YTD Margin %</strong></td>
+                <td><code>YTD Net ÷ YTD Revenue × 100</code></td>
+                <td>แสดงใน Strategic tab · อัปเดตทุก Sync</td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- Live values box -->
+          <div style="padding:12px 14px;background:var(--blue-lt);border-radius:8px;font-size:11px">
+            <div style="font-weight:600;color:var(--blue);margin-bottom:8px"><i class="ti ti-calculator" style="font-size:13px;vertical-align:-2px;margin-right:4px"></i>ค่าปัจจุบัน (Live — อัปเดตหลัง Sync)</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div style="display:flex;justify-content:space-between;background:#fff;border-radius:6px;padding:6px 10px">
+                <span style="color:var(--text3)">YTD Revenue</span>
+                <strong id="howto-ytd-rev-val" style="color:var(--blue)">รอ Sync</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;background:#fff;border-radius:6px;padding:6px 10px">
+                <span style="color:var(--text3)">YTD Expenses</span>
+                <strong id="howto-ytd-exp-val" style="color:var(--red)">รอ Sync</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;background:#fff;border-radius:6px;padding:6px 10px">
+                <span style="color:var(--text3)">YTD Net</span>
+                <strong id="howto-ytd-net-val" style="color:var(--green)">รอ Sync</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;background:#fff;border-radius:6px;padding:6px 10px">
+                <span style="color:var(--text3)">YTD Margin</span>
+                <strong id="howto-ytd-pct-val" style="color:var(--text)">รอ Sync</strong>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:10px;padding:10px;background:var(--amber-lt);border-radius:8px;font-size:11px;color:var(--amber)">
+            <strong>เงื่อนไข:</strong> YTD คำนวณได้ก็ต่อเมื่อ R3 มี column <code>วันที่เอกสาร</code> (col1) — ถ้า F4 ไม่มี column วันที่ YTD_EXP จะเป็น 0 และ margin จะสูงผิดปกติ
           </div>
         </div>
 
@@ -1791,10 +1828,43 @@ function calcD19(){
 var OD_LIMIT = 0;  // วงเงิน OD รวม — ใส่ตัวเลขจริงที่นี่ หรือดึงจาก Google Sheet
 var OD_USED  = 0;  // ยอดที่ใช้ไปปัจจุบัน — ใส่ตัวเลขจริงที่นี่ หรือดึงจาก Google Sheet
 var MONTHLY_REV = 5100000; // Revenue รายเดือนอ้างอิง (เม.ย. 2026)
+var YTD_REV = 0;  // Revenue ตั้งแต่ต้นปี — คำนวณ dynamic จาก R3 (1 ม.ค. → วันนี้)
+var YTD_EXP = 0;  // Expenses ตั้งแต่ต้นปี — คำนวณ dynamic จาก F4 (1 ม.ค. → วันนี้)
 
 function hEl(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
 function fmtN(n){return Math.round(Math.abs(n)).toLocaleString('th-TH');}
 function fmtGap(n){return(n>=0?'+':'−')+'฿'+fmtN(n);}
+
+// ── YTD Margin — คำนวณ dynamic จาก GAS data (R3 + F4) ──
+function _updateYTDMargin() {
+  if (YTD_REV <= 0) return;
+  var ytdNet    = YTD_REV - YTD_EXP;
+  var ytdMargin = Math.round((ytdNet / YTD_REV) * 100);
+  // Strategic tab card
+  hEl('ytd-margin-val', ytdMargin + '%');
+  hEl('ytd-rev-sub', 'Revenue ฿' + Math.round(YTD_REV).toLocaleString('th-TH') +
+      ' / Net ฿' + Math.round(ytdNet).toLocaleString('th-TH'));
+  var bar = document.getElementById('ytd-margin-bar');
+  if (bar) {
+    bar.style.width   = Math.min(100, Math.max(0, ytdMargin)) + '%';
+    bar.style.background = ytdMargin >= 30 ? 'var(--green)' : ytdMargin >= 15 ? 'var(--amber)' : 'var(--red)';
+  }
+  var ind = document.getElementById('ytd-indicator');
+  if (ind) {
+    if (ytdMargin >= 5) {
+      ind.className = 'indicator ind-green'; ind.textContent = '● YTD On Target';
+    } else if (ytdMargin >= 0) {
+      ind.className = 'indicator ind-amber'; ind.textContent = '⚠ YTD ต่ำกว่า target 5%';
+    } else {
+      ind.className = 'indicator ind-red'; ind.textContent = '✗ YTD ติดลบ';
+    }
+  }
+  // How-to tab — live values
+  hEl('howto-ytd-rev-val', '฿' + Math.round(YTD_REV).toLocaleString('th-TH'));
+  hEl('howto-ytd-exp-val', '฿' + Math.round(YTD_EXP).toLocaleString('th-TH'));
+  hEl('howto-ytd-net-val', '฿' + Math.round(ytdNet).toLocaleString('th-TH'));
+  hEl('howto-ytd-pct-val', ytdMargin + '%');
+}
 
 function initCashHealth(){
   // AR
@@ -2716,6 +2786,19 @@ function parseAndApplyR3(rows) {
     hEl('rev-val', '฿' + Math.round(total).toLocaleString('th-TH'));
   }
 
+  // ── คำนวณ YTD Revenue (1 ม.ค. ปีนี้ → วันนี้, ไม่สนใจ calendar filter) ──
+  if (cDate >= 0 && cAmt >= 0) {
+    var _ytdS = new Date(new Date().getFullYear(), 0, 1);
+    var _ytdE = new Date(); _ytdE.setHours(23,59,59,999);
+    var _ytdRevSum = 0;
+    rows.slice(1).forEach(function(row) {
+      var d = parseSheetDate(row[cDate]);
+      var a = parseFloat(String(row[cAmt]||'').replace(/,/g,''));
+      if (d && d >= _ytdS && d <= _ytdE && !isNaN(a) && a > 0) _ytdRevSum += a;
+    });
+    if (_ytdRevSum > 0) { YTD_REV = _ytdRevSum; _updateYTDMargin(); }
+  }
+
   // ── update cards + left panel from AR_DATA (always reflects current data) ──
   updateARCards();
 
@@ -2870,6 +2953,18 @@ function parseAndApplyF4(rows) {
     var bar = document.getElementById('net-bar');
     if (bar) { bar.style.width = Math.min(100, Math.max(0, margin)) + '%';
                bar.style.background = margin >= 30 ? 'var(--green)' : margin >= 15 ? 'var(--amber)' : 'var(--red)'; }
+  }
+  // ── คำนวณ YTD Expenses (1 ม.ค. ปีนี้ → วันนี้, ไม่สนใจ calendar filter) ──
+  if (cDate >= 0) {
+    var _ytdSf = new Date(new Date().getFullYear(), 0, 1);
+    var _ytdEf = new Date(); _ytdEf.setHours(23,59,59,999);
+    var _ytdExpSum = 0;
+    rows.slice(1).forEach(function(row) {
+      var d = parseSheetDate(row[cDate]);
+      var a = parseFloat(String(row[cAmt]||'').replace(/,/g,''));
+      if (d && d >= _ytdSf && d <= _ytdEf && !isNaN(a) && a > 0) _ytdExpSum += a;
+    });
+    if (_ytdExpSum > 0) { YTD_EXP = _ytdExpSum; _updateYTDMargin(); }
   }
   initCashHealth();
 }
