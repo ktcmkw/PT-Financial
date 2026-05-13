@@ -268,6 +268,75 @@ table.dt tr:hover td{background:#fbfcff}
 .am-raw-tbl tr:hover td{background:var(--blue-lt)}
 .am-map-box{background:var(--amber-lt);border:1px solid #fcd34d;border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;font-size:11px;line-height:1.6}
 .am-map-box strong{color:var(--amber);display:block;margin-bottom:4px;font-size:12px}
+
+/* ── LIVE CONNECTION CARD ── */
+.live-conn-card{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:10px}
+.live-conn-dot{width:10px;height:10px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:background .3s}
+.live-conn-dot.ok{background:var(--green);box-shadow:0 0 0 3px rgba(22,163,74,.15)}
+.live-conn-dot.err{background:var(--red)}
+.live-conn-info{flex:1;font-size:11px}
+.live-conn-info strong{display:block;font-size:12px;font-weight:600;color:var(--text)}
+
+/* ── PRINT DIALOG ── */
+#print-overlay{display:none;position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.45);backdrop-filter:blur(2px)}
+#print-dialog{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3501;background:var(--surface);border-radius:14px;width:500px;max-width:96vw;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+#print-dialog.open{display:block}
+.pd-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:#f8f9fc;border-radius:14px 14px 0 0}
+.pd-hdr-title{font-size:14px;font-weight:700;flex:1}
+.pd-close{background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text2);padding:3px 9px;font-size:13px;font-family:inherit}
+.pd-close:hover{background:var(--red-lt);color:var(--red);border-color:var(--red)}
+.pd-body{padding:16px 18px}
+.pd-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.pd-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.pd-chip{padding:6px 13px;border:1px solid var(--border);border-radius:20px;background:#fff;cursor:pointer;font-size:11px;color:var(--text2);font-family:inherit;transition:all .15s}
+.pd-chip:hover{border-color:var(--blue);color:var(--blue)}
+.pd-chip.on{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
+.pd-row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pd-info-bar{background:var(--blue-lt);border:1px solid #bfcffe;border-radius:8px;padding:9px 14px;font-size:11px;color:var(--blue);font-weight:600;margin-top:4px;text-align:center}
+.pd-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+.pd-footer button{padding:7px 18px;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;font-weight:600}
+.pd-footer .pd-cancel{background:#fff;border:1px solid var(--border);color:var(--text2)}
+.pd-footer .pd-cancel:hover{background:var(--bg)}
+.pd-footer .pd-print{background:var(--blue);border:1px solid var(--blue);color:#fff}
+.pd-footer .pd-print:hover{background:#1d4ed8}
+
+/* ── PRINT HEADER (only visible when printing) ── */
+.print-only{display:none}
+@media print{
+  /* hide UI chrome */
+  #topbar,#sidebar,#statusbar,#cal-overlay,#cal-popup,
+  #sync-loading-overlay,#sync-loading-box,
+  #audit-overlay,#audit-modal,
+  #print-overlay,#print-dialog,
+  .tb-btn,.toggle-grp,.cal-preset{display:none!important}
+  /* reset layout */
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:#fff!important;font-size:10px}
+  #main{display:block!important;overflow:visible!important;height:auto!important}
+  #content{padding:8px 10px!important;overflow:visible!important;height:auto!important;display:block!important}
+  /* hide all panels */
+  .panel{display:none!important;page-break-after:always}
+  /* show only print-target */
+  .panel.print-target{display:block!important}
+  body.print-all .panel{display:block!important}
+  /* page elements */
+  .chart-box{break-inside:avoid;page-break-inside:avoid;box-shadow:none!important;border:1px solid #ddd!important;margin-bottom:8px!important}
+  .cards-row{break-inside:avoid;page-break-inside:avoid}
+  .grid2,.grid3{break-inside:avoid}
+  /* print header */
+  .print-only{display:flex!important;align-items:center;justify-content:space-between;padding:0 0 8px 0;margin-bottom:12px;border-bottom:2px solid #2563eb}
+  .print-only .pt-logo{font-size:15px;font-weight:700;color:#2563eb}
+  .print-only .pt-sub{font-size:9px;color:#666}
+  .print-only .pt-meta{text-align:right;font-size:9px;color:#666}
+  /* cards compact */
+  .card-val{font-size:16px!important}
+  .card-label{font-size:9px!important}
+  /* AR left panel hidden on print */
+  #ar-left{display:none!important}
+  #tab-ar > div > div:last-child{flex:1!important}
+  /* table font */
+  .dt th,.dt td,.am-raw-tbl th,.am-raw-tbl td{font-size:9px!important;padding:3px 6px!important}
+}
 </style>
 </head>
 <body>
@@ -328,7 +397,7 @@ table.dt tr:hover td{background:#fbfcff}
     <button class="tb-btn" id="sync-btn" onclick="syncNow()" style="background:var(--green);color:#fff;border-color:var(--green)"><i class="ti ti-refresh"></i> Sync Sheet</button>
     <div class="tb-divider"></div>
     <button class="tb-btn" onclick="showTab('import',document.querySelector('.sb-item:nth-child(10))'))"><i class="ti ti-upload"></i> Import</button>
-    <button class="tb-btn primary" onclick="doPrint()"><i class="ti ti-printer"></i> Print</button>
+    <button class="tb-btn primary" onclick="openPrintDialog()"><i class="ti ti-printer"></i> Print</button>
   </header>
 
   <!-- CONTENT -->
@@ -810,53 +879,112 @@ table.dt tr:hover td{background:#fbfcff}
 
     <!-- ═══ IMPORT/EXPORT ═══ -->
     <div id="tab-import" class="panel">
-      <div class="grid2" style="margin-bottom:16px">
-        <div class="chart-box" style="margin-bottom:0">
-          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-upload" style="font-size:15px;vertical-align:-2px;margin-right:4px;color:var(--blue)"></i>Import ข้อมูล</div>
-          <div class="upload-zone" onclick="alert('เลือกไฟล์เพื่อ Import')">
-            <i class="ti ti-cloud-upload"></i>
-            <p>ลากไฟล์วางที่นี่ หรือ <strong style="color:var(--blue)">เลือกไฟล์</strong></p>
-            <span>รองรับ .xlsx · .csv · .md · .json · FlowAccount</span>
+
+      <!-- Live Connection Status -->
+      <div class="chart-box" style="margin-bottom:14px">
+        <div class="chart-header" style="margin-bottom:12px">
+          <div>
+            <div class="chart-title"><i class="ti ti-database" style="font-size:15px;vertical-align:-2px;margin-right:4px;color:var(--green)"></i>แหล่งข้อมูล — Google Sheets Live</div>
+            <div class="chart-sub">ข้อมูลดึงตรงจาก Google Sheets ผ่าน Apps Script · Sync อัตโนมัติทุก 4 นาที</div>
           </div>
-          <div style="margin-top:12px;font-size:11px;color:var(--text3);margin-bottom:6px">Import ล่าสุด:</div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:11px;padding:7px 10px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:5px">
-            <i class="ti ti-file-spreadsheet" style="color:var(--green)"></i>
-            <span style="flex:1">PO-AP.md</span><span style="color:var(--text3)">09 พ.ค. 09:14</span>
-            <span class="badge b-paid">✓ OK</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:11px;padding:7px 10px;background:var(--bg);border-radius:var(--radius-sm)">
-            <i class="ti ti-file-text" style="color:#059669"></i>
-            <span style="flex:1">RE-MAIN.md</span><span style="color:var(--text3)">09 พ.ค. 09:14</span>
-            <span class="badge b-paid">✓ OK</span>
-          </div>
+          <button class="tb-btn" onclick="syncNow()" style="background:var(--green);color:#fff;border-color:var(--green)"><i class="ti ti-refresh"></i> Sync ตอนนี้</button>
         </div>
-        <div class="chart-box" style="margin-bottom:0">
-          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-download" style="font-size:15px;vertical-align:-2px;margin-right:4px;color:var(--green)"></i>Export รายงาน</div>
-          <div class="exp-opt" onclick="showPreview('web')"><div class="exp-icon ei-web"><i class="ti ti-browser"></i></div><div class="exp-info"><p>Print Preview (Web)</p><span>ดูตัวอย่างก่อนพิมพ์ • Ctrl+P</span></div><button class="tb-btn" style="font-size:10px;padding:3px 10px">ดูตัวอย่าง</button></div>
-          <div class="exp-opt" onclick="showPreview('pdf')"><div class="exp-icon ei-pdf"><i class="ti ti-file-type-pdf"></i></div><div class="exp-info"><p>PDF Report</p><span>A4 · รวม Charts · ลายน้ำ PT</span></div><button class="tb-btn" style="font-size:10px;padding:3px 10px">Export</button></div>
-          <div class="exp-opt" onclick="showPreview('xls')"><div class="exp-icon ei-xls"><i class="ti ti-file-spreadsheet"></i></div><div class="exp-info"><p>Excel (.xlsx)</p><span>AP · AR · Summary tabs</span></div><button class="tb-btn" style="font-size:10px;padding:3px 10px">Export</button></div>
-          <div class="exp-opt" onclick="showPreview('csv')"><div class="exp-icon ei-csv"><i class="ti ti-file-text"></i></div><div class="exp-info"><p>CSV (raw data)</p><span>UTF-8 · ใช้กับ FlowAccount</span></div><button class="tb-btn" style="font-size:10px;padding:3px 10px">Export</button></div>
-          <div class="exp-opt" onclick="showPreview('md')"><div class="exp-icon" style="background:#ede9fe;color:#7c3aed"><i class="ti ti-markdown"></i></div><div class="exp-info"><p>Markdown (.md)</p><span>ส่ง Michael · บันทึก Pulse</span></div><button class="tb-btn" style="font-size:10px;padding:3px 10px">Export</button></div>
+        <div class="live-conn-card">
+          <span class="live-conn-dot" id="imp-dot"></span>
+          <div class="live-conn-info">
+            <strong>TRC-R3สรุป_ALL</strong>
+            <span id="imp-r3-status" style="color:var(--text3)">ยังไม่ได้ Sync</span>
+          </div>
+          <strong id="imp-r3-cnt" style="font-size:12px;color:var(--blue)">—</strong>
+        </div>
+        <div class="live-conn-card">
+          <span class="live-conn-dot" id="imp-dot2"></span>
+          <div class="live-conn-info">
+            <strong>TRC-PO3รายละเอียด</strong>
+            <span id="imp-po3-status" style="color:var(--text3)">ยังไม่ได้ Sync</span>
+          </div>
+          <strong id="imp-po3-cnt" style="font-size:12px;color:var(--red)">—</strong>
+        </div>
+        <div class="live-conn-card">
+          <span class="live-conn-dot" id="imp-dot3"></span>
+          <div class="live-conn-info">
+            <strong>TRC_F4จ่าย</strong>
+            <span id="imp-f4-status" style="color:var(--text3)">ยังไม่ได้ Sync</span>
+          </div>
+          <strong id="imp-f4-cnt" style="font-size:12px;color:var(--green)">—</strong>
+        </div>
+        <div style="margin-top:10px;padding:9px 14px;background:var(--blue-lt);border-radius:8px;font-size:11px;color:var(--blue)">
+          <strong>GAS URL:</strong> <span style="font-family:monospace;font-size:10px;word-break:break-all" id="imp-gas-url">—</span>
         </div>
       </div>
 
-      <!-- Print Preview -->
-      <div class="chart-box">
-        <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-eye" style="font-size:15px;vertical-align:-2px;margin-right:4px"></i>Print Preview</div>
-        <div class="preview-tabs">
-          <button class="ptab on" onclick="showPreview('web',this)">🌐 Web</button>
-          <button class="ptab" onclick="showPreview('pdf',this)">📄 PDF</button>
-          <button class="ptab" onclick="showPreview('xls',this)">📊 Excel</button>
-          <button class="ptab" onclick="showPreview('csv',this)">📝 CSV</button>
-          <button class="ptab" onclick="showPreview('md',this)">🔖 MD</button>
-          <div style="margin-left:auto;display:flex;gap:6px;padding-bottom:6px">
-            <button class="tb-btn" onclick="window.print()"><i class="ti ti-printer"></i> Print</button>
-            <button class="tb-btn primary" id="dl-btn"><i class="ti ti-download"></i> ดาวน์โหลด</button>
+      <!-- Export -->
+      <div class="grid2" style="align-items:flex-start">
+        <div class="chart-box" style="margin-bottom:0">
+          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-printer" style="font-size:15px;vertical-align:-2px;margin-right:4px;color:var(--blue)"></i>พิมพ์รายงาน</div>
+          <div class="exp-opt" onclick="openPrintDialog('overview')">
+            <div class="exp-icon ei-web"><i class="ti ti-layout-dashboard"></i></div>
+            <div class="exp-info"><p>Overview — Cards หลัก</p><span>Revenue · Expenses · Cash Health · OD</span></div>
+            <button class="tb-btn" style="font-size:10px;padding:3px 10px">Print</button>
+          </div>
+          <div class="exp-opt" onclick="openPrintDialog('ar')">
+            <div class="exp-icon" style="background:var(--green-lt);color:var(--green)"><i class="ti ti-coin"></i></div>
+            <div class="exp-info"><p>AR ลูกหนี้การค้า</p><span>Billing Note · Debtor · AR Table ทั้งหมด</span></div>
+            <button class="tb-btn" style="font-size:10px;padding:3px 10px">Print</button>
+          </div>
+          <div class="exp-opt" onclick="openPrintDialog('ap')">
+            <div class="exp-icon" style="background:var(--red-lt);color:var(--red)"><i class="ti ti-receipt"></i></div>
+            <div class="exp-info"><p>AP เจ้าหนี้การค้า</p><span>AP Table · AP ค้างชำระ · FX</span></div>
+            <button class="tb-btn" style="font-size:10px;padding:3px 10px">Print</button>
+          </div>
+          <div class="exp-opt" onclick="openPrintDialog('risks')">
+            <div class="exp-icon" style="background:#fef3c7;color:#d97706"><i class="ti ti-alert-triangle"></i></div>
+            <div class="exp-info"><p>Risk Monitor</p><span>Active · Urgent · Recurring risks</span></div>
+            <button class="tb-btn" style="font-size:10px;padding:3px 10px">Print</button>
+          </div>
+          <div class="exp-opt" onclick="openPrintDialog('pulse')">
+            <div class="exp-icon" style="background:#ede9fe;color:#7c3aed"><i class="ti ti-file-report"></i></div>
+            <div class="exp-info"><p>PT-Pulse Report</p><span>Monthly summary · Michael briefing</span></div>
+            <button class="tb-btn" style="font-size:10px;padding:3px 10px">Print</button>
+          </div>
+          <div class="exp-opt" onclick="openPrintDialog('all')">
+            <div class="exp-icon" style="background:#f8f9fc;color:var(--text2)"><i class="ti ti-layout-2"></i></div>
+            <div class="exp-info"><p>พิมพ์ทั้งหมด</p><span>ทุก Tab รวมเป็น Report เดียว</span></div>
+            <button class="tb-btn primary" style="font-size:10px;padding:3px 10px">Print All</button>
           </div>
         </div>
-        <div class="preview-content">
-          <div class="preview-bar" id="preview-bar"><i class="ti ti-file-report"></i> <span id="preview-bar-txt">Web Preview — PT-Pulse-2026-04-v1.1</span> <span style="margin-left:auto" id="preview-size">ขนาด: —</span></div>
-          <div class="preview-body" id="preview-body"></div>
+
+        <div class="chart-box" style="margin-bottom:0">
+          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-download" style="font-size:15px;vertical-align:-2px;margin-right:4px;color:var(--green)"></i>Export ข้อมูล</div>
+          <div class="exp-opt" onclick="showPreview('xls')">
+            <div class="exp-icon ei-xls"><i class="ti ti-file-spreadsheet"></i></div>
+            <div class="exp-info"><p>Excel Preview (.xlsx)</p><span>AP · AR · Summary sheets</span></div>
+            <button class="tb-btn" style="font-size:10px;padding:3px 10px">Preview</button>
+          </div>
+          <div class="exp-opt" onclick="showPreview('csv')">
+            <div class="exp-icon ei-csv"><i class="ti ti-file-text"></i></div>
+            <div class="exp-info"><p>CSV Raw Data</p><span>UTF-8 · ใช้กับ FlowAccount</span></div>
+            <button class="tb-btn" style="font-size:10px;padding:3px 10px">Preview</button>
+          </div>
+          <div class="exp-opt" onclick="showPreview('md')">
+            <div class="exp-icon" style="background:#ede9fe;color:#7c3aed"><i class="ti ti-markdown"></i></div>
+            <div class="exp-info"><p>Markdown (.md)</p><span>Pulse format · ส่ง Michael</span></div>
+            <button class="tb-btn" style="font-size:10px;padding:3px 10px">Preview</button>
+          </div>
+          <!-- Data preview area -->
+          <div class="chart-box" style="margin-top:12px;padding:12px;background:var(--bg);margin-bottom:0;border:none">
+            <div class="chart-title" style="margin-bottom:8px;font-size:11px"><i class="ti ti-eye" style="font-size:13px;vertical-align:-2px;margin-right:4px"></i>Preview</div>
+            <div class="preview-tabs" style="margin-bottom:10px">
+              <button class="ptab on" onclick="showPreview('xls',this)">📊 Excel</button>
+              <button class="ptab" onclick="showPreview('csv',this)">📝 CSV</button>
+              <button class="ptab" onclick="showPreview('md',this)">🔖 MD</button>
+              <span style="margin-left:auto;font-size:10px;color:var(--text3);padding-bottom:6px" id="preview-size">—</span>
+            </div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden">
+              <div class="preview-bar" id="preview-bar"><i class="ti ti-file-report"></i> <span id="preview-bar-txt">เลือก format ด้านบน</span></div>
+              <div class="preview-body" id="preview-body" style="max-height:280px;overflow:auto"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div><!-- end import -->
@@ -914,7 +1042,7 @@ table.dt tr:hover td{background:#fbfcff}
         <table class="dt">
           <thead><tr><th>Sheet Tab</th><th>คอลัมน์ที่ระบบหา</th><th>แสดงใน Dashboard</th><th>Fallback</th></tr></thead>
           <tbody>
-            <tr><td><span class="badge b-bn">R3</span></td><td>revenue / รายรับ / รายได้ / total rev / ยอดรวม / amount</td><td>Revenue Card (Overview)</td><td>฿5,100,000</td></tr>
+            <tr><td><span class="badge b-bn">R3</span></td><td><strong>col9 = สุทธิ</strong> (net after VAT) — positional detection, ไม่ใช่ keyword<br><small style="color:var(--text3)">col0=#, col1=วันที่, col2=เลขที่, col3=อ้างอิง, col5=ลูกค้า, col6=สถานะ, col7=มูลค่า, col8=VAT, col9=สุทธิ, col10=เครดิต, col11=ประมาณรับเงิน</small></td><td>Revenue Card · AR Cards · AR Table · DSO</td><td>—</td></tr>
             <tr><td><span class="badge b-debt">PO3</span></td><td>po / vendor / amount / due date / urgency / status</td><td>AP Table · Cash Health · DSO</td><td>22 รายการ hardcoded</td></tr>
             <tr><td><span class="badge b-paid">F4</span></td><td>amount / จำนวน / มูลค่า / ยอด (col B fallback)</td><td>Expenses Card · Net Card</td><td>฿3,257,136</td></tr>
           </tbody>
@@ -956,7 +1084,7 @@ table.dt tr:hover td{background:#fbfcff}
           <table class="dt">
             <thead><tr><th>Card</th><th>สูตร / ที่มา</th><th>Filter วันที่</th></tr></thead>
             <tbody>
-              <tr><td><strong>Revenue</strong></td><td><code>SUM(R3.จำนวน)</code> ทุกแถวในช่วงวันที่</td><td>✓ ตาม column วันที่ใน R3</td></tr>
+              <tr><td><strong>Revenue</strong></td><td><code>SUM(R3.สุทธิ col9)</code> ทุกแถวในช่วงวันที่ (ยอดสุทธิหลัง VAT)</td><td>✓ ตาม column วันที่ใน R3</td></tr>
               <tr><td><strong>Expenses</strong></td><td><code>SUM(F4.จำนวน)</code> ทุกแถวในช่วงวันที่</td><td>✓ ตาม column วันที่ใน F4</td></tr>
               <tr><td><strong>Fixed / Payroll / AP</strong></td><td><code>SUM(F4.จำนวน)</code> group by column <code>หมวด</code></td><td>✓</td></tr>
               <tr><td><strong>Net</strong></td><td><code>Revenue − Expenses</code></td><td>✓ (คำนวณจาก 2 ค่าข้างต้น)</td></tr>
@@ -972,8 +1100,8 @@ table.dt tr:hover td{background:#fbfcff}
           <table class="dt">
             <thead><tr><th>Metric</th><th>สูตร</th><th>เงื่อนไขสี</th></tr></thead>
             <tbody>
-              <tr><td><strong>AR Invoice รวม</strong></td><td><code>SUM(R3.จำนวน)</code> ทุกสถานะ</td><td>—</td></tr>
-              <tr><td><strong>AR คงค้าง</strong></td><td><code>SUM(R3.จำนวน)</code> where status ≠ Paid</td><td>—</td></tr>
+              <tr><td><strong>AR Invoice รวม</strong></td><td><code>SUM(R3.สุทธิ col9)</code> ทุกสถานะ</td><td>—</td></tr>
+              <tr><td><strong>AR คงค้าง</strong></td><td><code>SUM(R3.สุทธิ col9)</code> where status ≠ Paid</td><td>—</td></tr>
               <tr><td><strong>AP ค้างจ่าย</strong></td><td><code>SUM(PO3.amount)</code> ที่ยังไม่ชำระ (THB)</td><td>—</td></tr>
               <tr><td><strong>NET CASH GAP</strong></td><td><code>AR คงค้าง − AP ค้างจ่าย (THB)</code></td><td>เขียว = บวก, แดง = ติดลบ</td></tr>
               <tr><td><strong>Collections Risk</strong></td><td><code>SUM(AR.amt)</code> where due date &lt; วันนี้</td><td>แดง = มี overdue</td></tr>
@@ -991,9 +1119,9 @@ table.dt tr:hover td{background:#fbfcff}
           <table class="dt">
             <thead><tr><th>Card</th><th>สูตร</th><th>เงื่อนไข</th></tr></thead>
             <tbody>
-              <tr><td><strong>Billing Note ค้าง</strong></td><td><code>SUM(R3.จำนวน)</code> where สถานะ ~ "Billing Note" หรือ "รอเก็บ"</td><td>—</td></tr>
-              <tr><td><strong>Debtor ค้างชำระ</strong></td><td><code>SUM(R3.จำนวน)</code> where สถานะ ~ "Debtor" หรือ "ค้างชำระ"</td><td>—</td></tr>
-              <tr><td><strong>Lotus's AR</strong></td><td><code>SUM(R3.จำนวน)</code> where ลูกค้า contains "Lotus" หรือ "โลตัส"</td><td>—</td></tr>
+              <tr><td><strong>Billing Note ค้าง</strong></td><td><code>SUM(R3.สุทธิ col9)</code> where สถานะ ~ "Billing Note" หรือ "รอเก็บ"</td><td>—</td></tr>
+              <tr><td><strong>Debtor ค้างชำระ</strong></td><td><code>SUM(R3.สุทธิ col9)</code> where สถานะ ~ "Debtor" หรือ "ค้างชำระ"</td><td>—</td></tr>
+              <tr><td><strong>Lotus's AR</strong></td><td><code>SUM(R3.สุทธิ col9)</code> where ลูกค้า contains "Lotus" หรือ "โลตัส"</td><td>—</td></tr>
               <tr><td><strong>DSO (AR tab)</strong></td><td><code>AR คงค้าง ÷ (Revenue ÷ จำนวนวันที่เลือก)</code></td><td>ใช้ช่วงวันที่ calendar</td></tr>
               <tr><td><strong>AR Table</strong></td><td>แสดงทุกแถวจาก R3 (filter ได้: ทั้งหมด / Debtor / Billing Note / Paid)</td><td>—</td></tr>
             </tbody>
@@ -1107,18 +1235,72 @@ table.dt tr:hover td{background:#fbfcff}
 
   <!-- STATUS BAR -->
   <div id="statusbar">
-    <span class="sb-dot"></span>
-    <span>ข้อมูลอัปเดต: 09 พ.ค. 2569 09:14</span>
+    <span class="sb-dot" id="sb-main-dot" style="background:var(--text3)"></span>
+    <span>ข้อมูลอัปเดต: <strong id="sb-sync-time">—</strong></span>
     <span>|</span>
-    <span>AP ยังไม่ชำระ: <strong style="color:var(--red)">฿986,087</strong></span>
+    <span>AP ยังไม่ชำระ: <strong id="sb-ap-val" style="color:var(--red)">—</strong></span>
     <span>|</span>
-    <span>AR Debtor: <strong style="color:var(--red)">฿191,830</strong></span>
+    <span>AR Debtor: <strong id="sb-ar-debtor-val" style="color:var(--red)">—</strong></span>
     <span>|</span>
-    <span>D19 Check: <strong style="color:var(--green)">🟢 GREEN</strong></span>
+    <span>D19 Check: <strong id="sb-d19-val" style="color:var(--text3)">รอ Sync</strong></span>
     <span id="sync-status-msg" style="color:var(--text3)">แหล่งข้อมูล: Google Sheets (live)</span>
     <span style="margin-left:auto">PT Dashboard v1.2 — PEO Tech Co., Ltd. | Google Sheets Live Integration</span>
   </div>
 </div><!-- end main -->
+
+<!-- PRINT DIALOG -->
+<div id="print-overlay" onclick="closePrintDialog()"></div>
+<div id="print-dialog">
+  <div class="pd-hdr">
+    <span class="pd-hdr-title"><i class="ti ti-printer" style="margin-right:6px;color:var(--blue)"></i>พิมพ์รายงาน</span>
+    <button class="pd-close" onclick="closePrintDialog()">✕ ปิด</button>
+  </div>
+  <div class="pd-body">
+    <div class="pd-label">เลือกส่วนที่พิมพ์</div>
+    <div class="pd-chips" id="pd-sections">
+      <button class="pd-chip" onclick="pdSection(this,'all')">📋 ทั้งหมด</button>
+      <button class="pd-chip" onclick="pdSection(this,'overview')">📊 Overview</button>
+      <button class="pd-chip" onclick="pdSection(this,'ar')">💰 AR ลูกหนี้</button>
+      <button class="pd-chip" onclick="pdSection(this,'ap')">🧾 AP เจ้าหนี้</button>
+      <button class="pd-chip" onclick="pdSection(this,'risks')">⚠ Risk Monitor</button>
+      <button class="pd-chip" onclick="pdSection(this,'pulse')">📄 PT-Pulse</button>
+      <button class="pd-chip" onclick="pdSection(this,'cashflow')">💧 Cash Flow</button>
+    </div>
+    <div class="pd-row2">
+      <div>
+        <div class="pd-label">แนวกระดาษ</div>
+        <div class="pd-chips">
+          <button class="pd-chip" id="pd-portrait" onclick="pdOrient(this,'portrait')">📄 แนวตั้ง</button>
+          <button class="pd-chip" id="pd-landscape" onclick="pdOrient(this,'landscape')">📋 แนวนอน</button>
+        </div>
+      </div>
+      <div>
+        <div class="pd-label">ขนาดกระดาษ</div>
+        <div class="pd-chips">
+          <button class="pd-chip" id="pd-a4" onclick="pdSize(this,'a4')">A4</button>
+          <button class="pd-chip" id="pd-a3" onclick="pdSize(this,'a3')">A3</button>
+        </div>
+      </div>
+    </div>
+    <div class="pd-info-bar" id="pd-info">กรุณาเลือกส่วนที่ต้องการพิมพ์</div>
+  </div>
+  <div class="pd-footer">
+    <button class="pd-cancel" onclick="closePrintDialog()">ยกเลิก</button>
+    <button class="pd-print" onclick="execPrint()"><i class="ti ti-printer"></i> พิมพ์</button>
+  </div>
+</div>
+
+<!-- PRINT HEADER (injected before print) -->
+<div class="print-only" id="print-hdr-tpl" style="display:none">
+  <div>
+    <div class="pt-logo">PEO Tech Co., Ltd. (PT)</div>
+    <div class="pt-sub">5 ซอยรามอินทรา 87 · คันนายาว · กรุงเทพฯ | service.tech@peothailand.com</div>
+  </div>
+  <div class="pt-meta">
+    <span id="phdr-section">รายงานการเงิน</span><br>
+    <span id="phdr-date">—</span>
+  </div>
+</div>
 
 <!-- AUDIT MODAL -->
 <div id="audit-overlay" onclick="closeAuditModal()"></div>
@@ -1364,6 +1546,42 @@ function updateARCards() {
   hEl('arl-bn-amt', '฿'+fmtN(bnAmt));  hEl('arl-bn-cnt',  bnCnt+' รายการ');
   hEl('arl-dt-amt', '฿'+fmtN(dtAmt));  hEl('arl-dt-cnt',  dtCnt+' รายการ');
   hEl('arl-pd-amt', '฿'+fmtN(pdAmt));  hEl('arl-pd-cnt',  pdCnt+' รายการ');
+}
+function updateStatusBar() {
+  // ── Sync time ──
+  var t = _lastSyncISO ? new Date(_lastSyncISO) : null;
+  var dot = document.getElementById('sb-main-dot');
+  if (t) {
+    var thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    var timeStr = t.getDate()+' '+thM[t.getMonth()]+' '+t.getFullYear()+' '+
+      String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');
+    hEl('sb-sync-time', timeStr);
+    if (dot) dot.style.background = 'var(--green)';
+  } else {
+    hEl('sb-sync-time', '—');
+    if (dot) dot.style.background = 'var(--text3)';
+  }
+  // ── AP ค้างชำระ ──
+  var apThb = AP_UNPAID.reduce(function(s,r){return s+r.amt;},0);
+  hEl('sb-ap-val', apThb > 0 ? '฿'+Math.round(apThb).toLocaleString('th-TH') : '—');
+  // ── AR Debtor ──
+  var dtAmt2 = AR_DATA.reduce(function(s,r){return s+(r.status==='Debtor'?r.amt:0);},0);
+  hEl('sb-ar-debtor-val', dtAmt2 > 0 ? '฿'+Math.round(dtAmt2).toLocaleString('th-TH') : '—');
+  // ── D19 Check ──
+  var D19_OBL = 1584949;
+  var d19El = document.getElementById('sb-d19-val');
+  if (d19El) {
+    var bInput = document.getElementById('d19-balance');
+    var bal = bInput ? parseFloat(bInput.value.replace(/,/g,'')) : NaN;
+    if (!isNaN(bal)) {
+      var gap = bal - D19_OBL;
+      if (gap >= 300000) { d19El.textContent='🟢 GREEN'; d19El.style.color='var(--green)'; }
+      else if (gap >= 0) { d19El.textContent='🟡 AMBER'; d19El.style.color='var(--amber)'; }
+      else { d19El.textContent='🔴 RED'; d19El.style.color='var(--red)'; }
+    } else {
+      d19El.textContent='รอกรอก Balance'; d19El.style.color='var(--text3)';
+    }
+  }
 }
 function renderARInvList(filter) {
   var q = '';
@@ -1744,24 +1962,102 @@ function getWebPreview(){
   return '<div class="preview-doc"><div class="doc-hdr"><div><div class="doc-co">PEO Tech Co., Ltd. (PT)</div><div class="doc-co2">5 ซอยรามอินทรา 87 คันนายาว กรุงเทพ | service.tech@peothailand.com</div></div><div class="doc-meta"><strong>PT-Pulse-2026-04-v1.1</strong>09 พ.ค. 2569 | Nack</div></div><div class="doc-title">Monthly Financial Pulse — เมษายน 2026</div><table class="doc-table"><thead><tr><th>Section</th><th>รายการ</th><th>฿</th><th>สถานะ</th></tr></thead><tbody><tr><td>Revenue</td><td>Lotus\'s FM</td><td>4,850,000</td><td style="color:#16a34a">✓ Paid</td></tr><tr><td></td><td>Caster + Lub</td><td>250,000</td><td style="color:#16a34a">✓ Paid</td></tr><tr><td>Expenses</td><td>Fixed</td><td>1,384,000</td><td style="color:#d97706">D20–28</td></tr><tr><td></td><td>Payroll</td><td>886,749</td><td style="color:#16a34a">✓ จ่ายแล้ว</td></tr><tr><td></td><td>AP Unpaid</td><td>986,087</td><td style="color:#d97706">รอจ่าย</td></tr><tr><td>Cash</td><td>Balance D19 est.</td><td>2,100,000</td><td style="color:#16a34a">🟢 GREEN</td></tr></tbody></table><div class="doc-foot"><div class="doc-total">Net: <strong style="color:#2563eb">฿1,842,864</strong> | Margin: 36%</div></div><div style="margin-top:8px;font-size:9px;color:#999;border-top:1px solid #eee;padding-top:5px">🔴 Michael decides: FX ~฿25.2M unhedged | Lotus\'s FM penalty ฿41,507/วัน (cap ฿2,964,820) | ภส.01-01 due 15 พ.ค.</div></div>';
 }
 function getXLSPreview(){
-  var rows=AP_UNPAID.slice(0,5).map(function(r){return '<tr><td style="padding:3px 7px">'+r.po+'</td><td style="padding:3px 7px">'+r.vendor+'</td><td style="padding:3px 7px;text-align:right;color:#dc2626">฿'+r.amt.toLocaleString('th-TH',{minimumFractionDigits:2})+'</td><td style="padding:3px 7px">'+r.due+'</td></tr>'}).join('');
-  return '<div style="font-size:11px"><div style="display:flex;gap:6px;margin-bottom:8px"><span style="padding:4px 10px;background:#2563eb;color:#fff;border-radius:4px 4px 0 0;font-size:10px;font-weight:600">Summary</span><span style="padding:4px 10px;background:#f0f0f0;border-radius:4px 4px 0 0;font-size:10px">AP Detail</span><span style="padding:4px 10px;background:#f0f0f0;border-radius:4px 4px 0 0;font-size:10px">AR Detail</span><span style="padding:4px 10px;background:#f0f0f0;border-radius:4px 4px 0 0;font-size:10px">FIX</span></div><table style="width:100%;border-collapse:collapse"><thead><tr style="background:#2563eb;color:#fff"><th style="padding:5px 7px;font-weight:600;font-size:10px;text-align:left">PO No.</th><th style="padding:5px 7px;font-weight:600;font-size:10px;text-align:left">Vendor</th><th style="padding:5px 7px;font-weight:600;font-size:10px;text-align:right">Amount</th><th style="padding:5px 7px;font-weight:600;font-size:10px">Due</th></tr></thead><tbody>'+rows+'</tbody></table><div style="font-size:9px;color:#888;margin-top:8px">แสดง 5 / 22 รายการ — เปิดใน Excel เพื่อดูครบทุกรายการ</div></div>';
+  // AP rows from live data
+  var apRows = AP_UNPAID.length > 0
+    ? AP_UNPAID.slice(0,8).map(function(r){
+        return '<tr><td style="padding:3px 7px;font-family:monospace;font-size:10px">'+r.po+'</td>'
+          +'<td style="padding:3px 7px">'+r.vendor+'</td>'
+          +'<td style="padding:3px 7px;text-align:right;color:#dc2626">฿'+r.amt.toLocaleString('th-TH',{minimumFractionDigits:2})+'</td>'
+          +'<td style="padding:3px 7px;font-size:10px">'+r.due+'</td>'
+          +'<td style="padding:3px 7px"><span style="font-size:9px;padding:1px 6px;border-radius:10px;background:#fef2f2;color:#dc2626">'+r.urgency+'</span></td></tr>';
+      }).join('')
+    : '<tr><td colspan="5" style="padding:10px;text-align:center;color:#aaa">Sync ก่อนเพื่อดูข้อมูล</td></tr>';
+  // AR top rows
+  var arRows = AR_DATA.length > 0
+    ? AR_DATA.slice(0,5).map(function(r){
+        var sc=r.status==='Paid'?'#16a34a':r.status==='Billing Note'?'#2563eb':'#dc2626';
+        return '<tr><td style="padding:3px 7px;font-family:monospace;font-size:10px">'+r.inv+'</td>'
+          +'<td style="padding:3px 7px">'+r.customer+'</td>'
+          +'<td style="padding:3px 7px;text-align:right;color:'+sc+'">฿'+Math.round(r.amt).toLocaleString('th-TH')+'</td>'
+          +'<td style="padding:3px 7px;font-size:10px;color:'+sc+'">'+r.status+'</td></tr>';
+      }).join('')
+    : '<tr><td colspan="4" style="padding:10px;text-align:center;color:#aaa">Sync ก่อนเพื่อดูข้อมูล</td></tr>';
+  var apTotal = AP_UNPAID.reduce(function(s,r){return s+r.amt;},0);
+  var arTotal = AR_DATA.reduce(function(s,r){return s+(r.status!=='Paid'?r.amt:0);},0);
+  return '<div style="font-size:11px">'
+    +'<div style="display:flex;gap:4px;margin-bottom:10px">'
+    +'<span style="padding:4px 10px;background:#2563eb;color:#fff;border-radius:4px 4px 0 0;font-size:10px;font-weight:600">AP รายละเอียด ('+AP_UNPAID.length+' รายการ)</span>'
+    +'<span style="padding:4px 10px;background:#f0f0f0;border-radius:4px 4px 0 0;font-size:10px">AR ลูกหนี้ ('+AR_DATA.length+' รายการ)</span>'
+    +'</div>'
+    +'<div style="margin-bottom:6px;padding:6px 10px;background:#fef2f2;border-radius:4px;font-size:10px;color:#dc2626;font-weight:600">AP ค้างรวม: ฿'+Math.round(apTotal).toLocaleString('th-TH')+'&nbsp;&nbsp;|&nbsp;&nbsp;AR คงค้าง: ฿'+Math.round(arTotal).toLocaleString('th-TH')+'</div>'
+    +'<table style="width:100%;border-collapse:collapse;margin-bottom:12px"><thead><tr style="background:#2563eb;color:#fff">'
+    +'<th style="padding:5px 7px;font-weight:600;font-size:10px;text-align:left">PO No.</th>'
+    +'<th style="padding:5px 7px;font-weight:600;font-size:10px;text-align:left">Vendor</th>'
+    +'<th style="padding:5px 7px;font-weight:600;font-size:10px;text-align:right">Amount</th>'
+    +'<th style="padding:5px 7px;font-weight:600;font-size:10px">Due</th>'
+    +'<th style="padding:5px 7px;font-weight:600;font-size:10px">Urgency</th>'
+    +'</tr></thead><tbody>'+apRows+'</tbody></table>'
+    +'<div style="font-size:10px;font-weight:600;color:var(--text);margin-bottom:6px">AR ลูกหนี้ (5 รายการแรก)</div>'
+    +'<table style="width:100%;border-collapse:collapse"><thead><tr style="background:#16a34a;color:#fff">'
+    +'<th style="padding:5px 7px;font-weight:600;font-size:10px;text-align:left">Invoice</th>'
+    +'<th style="padding:5px 7px;font-weight:600;font-size:10px;text-align:left">ลูกค้า</th>'
+    +'<th style="padding:5px 7px;font-weight:600;font-size:10px;text-align:right">สุทธิ</th>'
+    +'<th style="padding:5px 7px;font-weight:600;font-size:10px">สถานะ</th>'
+    +'</tr></thead><tbody>'+arRows+'</tbody></table>'
+    +'<div style="font-size:9px;color:#888;margin-top:8px">ข้อมูล live จาก Google Sheets — Sync: '+((_lastSyncISO)?new Date(_lastSyncISO).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}):'ยังไม่ได้ Sync')+'</div>'
+    +'</div>';
 }
 function getCSVPreview(){
-  var lines=['month,section,item,amount_thb,status,due'];
-  lines.push('2026-04,Revenue,Lotus FM Billing,4850000,Paid,');
-  lines.push('2026-04,Revenue,Caster+Lub,250000,Paid,');
-  lines.push('2026-04,Expenses,Fixed Obligations,1384000,Pending,D20-28');
-  lines.push('2026-04,Expenses,Payroll,886749,Paid,2026-04-25');
-  lines.push('2026-04,AP,THB Unpaid,986087,Unpaid,');
-  lines.push('2026-04,Cash,D19 Balance est.,2100000,GREEN,2026-04-19');
-  lines.push('2026-04,Net,Monthly Net,1842864,36% margin,');
-  lines.push('2026-04,Risk,Lotus FM Penalty,41507,per_day,2026-05-31');
-  AP_UNPAID.slice(0,5).forEach(function(r){lines.push('2026-04,AP Detail,'+r.po+'|'+r.vendor+','+r.amt+',Unpaid,'+r.due)});
+  var thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var now=new Date();
+  var mth=now.getFullYear()+'-'+(now.getMonth()<9?'0':'')+(now.getMonth()+1);
+  var lines=['date,section,invoice_no,customer,status,amount_thb,due_date'];
+  // AR rows from live data
+  AR_DATA.forEach(function(r){
+    lines.push(mth+',AR,'+r.inv+','+r.customer.replace(/,/g,' ')+','+r.status+','+Math.round(r.amt)+','+r.due);
+  });
+  // AP rows
+  AP_UNPAID.forEach(function(r){
+    lines.push(mth+',AP,'+r.po+','+r.vendor.replace(/,/g,' ')+','+r.urgency+','+Math.round(r.amt)+','+r.due);
+  });
+  if(lines.length===1) {
+    lines.push(mth+',AR,(Sync ก่อนเพื่อดูข้อมูลจริง),,—,0,');
+  }
   return lines.join('\n');
 }
 function getMDPreview(){
-  return '# PT-Pulse-2026-04-v1.1\n**PEO Tech Co., Ltd.** | 09 พ.ค. 2569 | Nack\n\n## Revenue\n| รายการ | ฿ | สถานะ |\n|---|---|---|\n| Lotus\'s FM | 4,850,000 | ✓ Paid |\n| Caster + Lub | 250,000 | ✓ Paid |\n| **รวม** | **5,100,000** | |\n\n## Expenses\n| รายการ | ฿ | สถานะ |\n|---|---|---|\n| Fixed | 1,384,000 | D20–28 |\n| Payroll | 886,749 | จ่ายแล้ว |\n| AP Unpaid | 986,087 | รอจ่าย |\n| **รวม** | **3,257,136** | |\n\n## Cash / OD Position\n- Balance D19 est.: ฿2,100,000\n- ภาระ D20–28: ฿1,584,949\n- Buffer: **+฿515,051** → 🟢 GREEN\n\n## Net\n- ฿1,842,864 (36% margin)\n\n## 🔴 Michael decides:\n- FX ~฿25.2M unhedged (USD/EUR/CNY)\n- Lotus\'s FM penalty ฿41,507/วัน cap ฿2,964,820\n- ภส.01-01 due 2026-05-15';
+  var thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var now=new Date();
+  var dateStr=now.getDate()+' '+thM[now.getMonth()]+' '+now.getFullYear();
+  // Calculate totals from live data
+  var bnAmt=0,dtAmt=0,pdAmt=0;
+  AR_DATA.forEach(function(r){
+    if(r.status==='Billing Note') bnAmt+=r.amt;
+    else if(r.status==='Debtor') dtAmt+=r.amt;
+    else if(r.status==='Paid') pdAmt+=r.amt;
+  });
+  var arTotal=bnAmt+dtAmt;
+  var apTotal=AP_UNPAID.reduce(function(s,r){return s+r.amt;},0);
+  var revEl=document.getElementById('rev-val');
+  var rev=revEl?revEl.textContent:'—';
+  var netEl=document.getElementById('net-val');
+  var net=netEl?netEl.textContent:'—';
+  var synced=_lastSyncISO?new Date(_lastSyncISO).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}):'ยังไม่ได้ Sync';
+  // Top AR customers
+  var topAR=AR_DATA.filter(function(r){return r.status!=='Paid';}).sort(function(a,b){return b.amt-a.amt;}).slice(0,3);
+  var arLines=topAR.map(function(r){return '| '+r.inv+' | '+r.customer+' | ฿'+Math.round(r.amt).toLocaleString('th-TH')+' | '+r.status+' |';}).join('\n');
+  var apLines=AP_UNPAID.slice(0,3).map(function(r){return '| '+r.po+' | '+r.vendor+' | ฿'+Math.round(r.amt).toLocaleString('th-TH')+' | '+r.due+' |';}).join('\n');
+  return '# PT Financial Pulse\n**PEO Tech Co., Ltd.** | '+dateStr+' | Sync: '+synced+'\n\n'
+    +'## 📊 AR ลูกหนี้การค้า\n| Invoice | ลูกค้า | ฿ | สถานะ |\n|---|---|---|---|\n'+(arLines||'| — | Sync ก่อน | — | — |')
+    +'\n\n**Billing Note:** ฿'+Math.round(bnAmt).toLocaleString('th-TH')
+    +' | **Debtor:** ฿'+Math.round(dtAmt).toLocaleString('th-TH')
+    +' | **AR คงค้างรวม:** ฿'+Math.round(arTotal).toLocaleString('th-TH')
+    +'\n\n## 🧾 AP เจ้าหนี้\n| PO | Vendor | ฿ | Due |\n|---|---|---|---|\n'+(apLines||'| — | Sync ก่อน | — | — |')
+    +'\n\n**AP ค้างรวม:** ฿'+Math.round(apTotal).toLocaleString('th-TH')
+    +'\n\n## 💰 Overview\n- Revenue: '+rev
+    +'\n- Net: '+net
+    +'\n- NET CASH GAP: ฿'+Math.round(arTotal-apTotal).toLocaleString('th-TH')+(arTotal-apTotal>=0?' 🟢':' 🔴')
+    +'\n\n---\n*PT Dashboard — Google Sheets Live — ห้ามเผยแพร่ภายนอก*';
 }
 
 // ════════════════════════════════════════
@@ -1897,7 +2193,153 @@ function clearRange(){
   if(_rawPO3) parseAndApplyPO3(_rawPO3);
   if(_rawF4)  parseAndApplyF4(_rawF4);
 }
-function doPrint(){window.print();}
+// ════════════════════════════════════════
+// PRINT DIALOG
+// ════════════════════════════════════════
+var _printSection = '';
+var _printOrient  = 'portrait';
+var _printSize    = 'a4';
+var _printSectionLabel = '';
+
+var _printLabels = {
+  all:'ทั้งหมด', overview:'Overview', ar:'AR ลูกหนี้',
+  ap:'AP เจ้าหนี้', risks:'Risk Monitor', pulse:'PT-Pulse', cashflow:'Cash Flow'
+};
+
+function openPrintDialog(section) {
+  // reset chips
+  document.querySelectorAll('#pd-sections .pd-chip').forEach(function(c){ c.classList.remove('on'); });
+  document.querySelectorAll('#pd-portrait,#pd-landscape').forEach(function(c){ c.classList.remove('on'); });
+  document.querySelectorAll('#pd-a4,#pd-a3').forEach(function(c){ c.classList.remove('on'); });
+  // default selections
+  _printSection = section || '';
+  _printOrient  = 'portrait';
+  _printSize    = 'a4';
+  document.getElementById('pd-portrait').classList.add('on');
+  document.getElementById('pd-a4').classList.add('on');
+  // pre-select section if passed
+  if (_printSection) {
+    var chip = document.querySelector('#pd-sections .pd-chip[onclick*="\''+_printSection+'\'"]');
+    if (chip) chip.classList.add('on');
+  }
+  _updatePDInfo();
+  document.getElementById('print-overlay').style.display = 'block';
+  document.getElementById('print-dialog').classList.add('open');
+}
+function closePrintDialog() {
+  document.getElementById('print-overlay').style.display = 'none';
+  document.getElementById('print-dialog').classList.remove('open');
+}
+function pdSection(btn, sec) {
+  document.querySelectorAll('#pd-sections .pd-chip').forEach(function(c){ c.classList.remove('on'); });
+  btn.classList.add('on');
+  _printSection = sec;
+  _updatePDInfo();
+}
+function pdOrient(btn, orient) {
+  document.getElementById('pd-portrait').classList.remove('on');
+  document.getElementById('pd-landscape').classList.remove('on');
+  btn.classList.add('on');
+  _printOrient = orient;
+  _updatePDInfo();
+}
+function pdSize(btn, size) {
+  document.getElementById('pd-a4').classList.remove('on');
+  document.getElementById('pd-a3').classList.remove('on');
+  btn.classList.add('on');
+  _printSize = size;
+  _updatePDInfo();
+}
+function _updatePDInfo() {
+  var info = document.getElementById('pd-info');
+  if (!info) return;
+  if (!_printSection) {
+    info.textContent = 'กรุณาเลือกส่วนที่ต้องการพิมพ์';
+    return;
+  }
+  var secLbl = _printLabels[_printSection] || _printSection;
+  var orientLbl = _printOrient === 'portrait' ? 'แนวตั้ง' : 'แนวนอน';
+  var sizeLbl   = _printSize.toUpperCase();
+  info.textContent = '🖨 พิมพ์: ' + secLbl + ' · ' + sizeLbl + ' · ' + orientLbl;
+}
+function execPrint() {
+  if (!_printSection) {
+    alert('กรุณาเลือกส่วนที่ต้องการพิมพ์ก่อน');
+    return;
+  }
+  closePrintDialog();
+  // Inject @page size/orientation
+  var ps = document.getElementById('print-page-style') || document.createElement('style');
+  ps.id = 'print-page-style';
+  ps.textContent = '@page { size: '+ _printSize.toUpperCase() +' '+ _printOrient +'; margin: 14mm 12mm 12mm 12mm; }';
+  document.head.appendChild(ps);
+  // Clear previous print state
+  document.body.classList.remove('print-all','print-mode');
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('print-target'); });
+  var hdrOld = document.getElementById('print-hdr-inject');
+  if (hdrOld) hdrOld.remove();
+  // Inject print header at top of content
+  var hdrTpl = document.getElementById('print-hdr-tpl');
+  var hdr = document.createElement('div');
+  hdr.id = 'print-hdr-inject';
+  hdr.className = 'print-only';
+  var thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var now=new Date();
+  var dateStr=now.getDate()+' '+thM[now.getMonth()]+' '+now.getFullYear()+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  hdr.innerHTML = '<div><div class="pt-logo">PEO Tech Co., Ltd. (PT)</div><div class="pt-sub">5 ซอยรามอินทรา 87 · คันนายาว · กรุงเทพฯ | service.tech@peothailand.com</div></div>'
+    + '<div class="pt-meta"><strong>'+(_printLabels[_printSection]||'รายงาน')+'</strong><span>'+dateStr+'</span></div>';
+  var content = document.getElementById('content');
+  if (content) content.insertBefore(hdr, content.firstChild);
+  // Set print mode
+  if (_printSection === 'all') {
+    document.body.classList.add('print-all','print-mode');
+  } else {
+    document.body.classList.add('print-mode');
+    var tabId = 'tab-' + _printSection;
+    var target = document.getElementById(tabId);
+    if (target) { target.classList.add('print-target'); }
+  }
+  // Trigger print
+  requestAnimationFrame(function(){
+    window.print();
+    // Cleanup after print dialog closes
+    setTimeout(function(){
+      document.body.classList.remove('print-all','print-mode');
+      document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('print-target'); });
+      var h = document.getElementById('print-hdr-inject');
+      if (h) h.remove();
+    }, 800);
+  });
+}
+
+// ════════════════════════════════════════
+// IMPORT TAB LIVE STATUS UPDATER
+// ════════════════════════════════════════
+function updateImportTab() {
+  // GAS URL display
+  hEl('imp-gas-url', GAS_URL ? GAS_URL.substring(0,72)+'...' : 'ยังไม่ได้ตั้งค่า');
+  // R3 status
+  var r3ok = AR_DATA && AR_DATA.length > 0;
+  ['imp-dot'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.className='live-conn-dot '+(r3ok?'ok':'');
+  });
+  hEl('imp-r3-status', r3ok ? 'เชื่อมต่อแล้ว — '+AR_DATA.length+' rows' : 'รอ Sync');
+  hEl('imp-r3-cnt', r3ok ? AR_DATA.length+' แถว' : '—');
+  // PO3 status
+  var po3ok = AP_UNPAID && AP_UNPAID.length > 0;
+  var dot2=document.getElementById('imp-dot2');
+  if(dot2) dot2.className='live-conn-dot '+(po3ok?'ok':'');
+  hEl('imp-po3-status', po3ok ? 'เชื่อมต่อแล้ว — '+AP_UNPAID.length+' รายการ' : 'รอ Sync');
+  hEl('imp-po3-cnt', po3ok ? AP_UNPAID.length+' แถว' : '—');
+  // F4 — check via revenue card proxy (F4_DATA not stored separately, check rev)
+  var revEl=document.getElementById('rev-val');
+  var f4ok = revEl && revEl.textContent && revEl.textContent!=='฿—' && revEl.textContent!=='—';
+  var dot3=document.getElementById('imp-dot3');
+  if(dot3) dot3.className='live-conn-dot '+(f4ok?'ok':'');
+  hEl('imp-f4-status', f4ok ? 'เชื่อมต่อแล้ว' : 'รอ Sync');
+  hEl('imp-f4-cnt', f4ok ? '✓' : '—');
+}
 
 // ════════════════════════════════════════
 // GOOGLE SHEETS LIVE via Apps Script v1.3
@@ -1985,6 +2427,8 @@ async function syncSheets(manual) {
     var ad=document.getElementById('audit-dot');if(ad)ad.style.background='var(--green)';
     hEl('audit-sync-txt','Sync สำเร็จ — '+t);
     hEl('audit-sync-time',new Date().toLocaleDateString('th-TH'));
+    updateStatusBar();   // อัปเดต status bar ล่างหน้าจากข้อมูลล่าสุด
+    updateImportTab();   // อัปเดต Live Connection status ใน Import tab
     if (manual) setSyncBtnState('ok');
 
   } catch(e) {
@@ -2413,6 +2857,8 @@ window.addEventListener('load', function() {
   setInterval(updateRiskCountdowns, 60000); // อัปเดตทุก 1 นาที
   updateARCards(); // แสดง AR cards จาก AR_DATA เริ่มต้น
   renderARInvList('all'); // แสดง invoice list ทันที
+  updateStatusBar();  // อัปเดต status bar ล่าง
+  updateImportTab();  // อัปเดต Live Connection status
   if (GAS_URL) {
     setSyncMsg('⟳ กำลัง Sync...', 'var(--amber)');
     setTimeout(function(){ syncSheets(true); }, 800); // first load = popup
