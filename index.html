@@ -303,39 +303,27 @@ table.dt tr:hover td{background:#fbfcff}
 /* ── PRINT HEADER (only visible when printing) ── */
 .print-only{display:none}
 @media print{
-  /* hide UI chrome */
-  #topbar,#sidebar,#statusbar,#cal-overlay,#cal-popup,
-  #sync-loading-overlay,#sync-loading-box,
-  #audit-overlay,#audit-modal,
-  #print-overlay,#print-dialog,
-  .tb-btn,.toggle-grp,.cal-preset{display:none!important}
-  /* reset body flex → block so sidebar disappears cleanly */
-  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  html,body{background:#fff!important;font-size:10px;display:block!important;height:auto!important;overflow:visible!important}
-  #main{display:block!important;overflow:visible!important;height:auto!important;width:100%!important}
-  #content{padding:10px 12px!important;overflow:visible!important;height:auto!important;display:block!important;width:100%!important;box-sizing:border-box!important}
-  /* hide all panels */
-  .panel{display:none!important;page-break-after:always}
-  /* show only print-target */
-  .panel.print-target{display:block!important}
-  body.print-all .panel{display:block!important}
-  /* page elements */
-  .chart-box{break-inside:avoid;page-break-inside:avoid;box-shadow:none!important;border:1px solid #ddd!important;margin-bottom:8px!important}
-  .cards-row{break-inside:avoid;page-break-inside:avoid}
-  .grid2,.grid3{break-inside:avoid}
-  /* print header */
-  .print-only{display:flex!important;align-items:center;justify-content:space-between;padding:0 0 8px 0;margin-bottom:12px;border-bottom:2px solid #2563eb}
-  .print-only .pt-logo{font-size:15px;font-weight:700;color:#2563eb}
-  .print-only .pt-sub{font-size:9px;color:#666}
-  .print-only .pt-meta{text-align:right;font-size:9px;color:#666}
-  /* cards compact */
-  .card-val{font-size:16px!important}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}
+  html{height:auto!important;overflow:visible!important}
+  body{display:block!important;height:auto!important;overflow:visible!important;background:#fff!important;font-size:10px!important;margin:0!important;padding:0!important}
+  #topbar,#sidebar,#statusbar,#cal-overlay,#cal-popup,#sync-loading-overlay,#sync-loading-box,#audit-overlay,#audit-modal,#print-overlay,#print-dialog,#print-hdr-tpl,.tb-btn,.toggle-grp,.cal-preset,#ar-left,.chart-header button,#cal-pill,#btn-cur-month,#countdown-display,#sync-btn{display:none!important}
+  #main{display:block!important;width:100%!important;height:auto!important;overflow:visible!important;flex:none!important}
+  #content{display:block!important;width:100%!important;max-width:none!important;height:auto!important;overflow:visible!important;padding:0!important;flex:none!important}
+  #print-page-hdr{display:flex!important}
+  .panel{display:none!important}
+  .panel.print-target{display:block!important;page-break-after:always}
+  body.print-all .panel{display:block!important;page-break-after:always}
+  body.print-all .panel:last-of-type{page-break-after:avoid}
+  .cards-row{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:8px!important}
+  .card{padding:10px 12px!important;break-inside:avoid;border:1px solid #ddd!important;box-shadow:none!important}
+  .card-val{font-size:15px!important}
   .card-label{font-size:9px!important}
-  /* AR left panel hidden on print */
-  #ar-left{display:none!important}
-  #tab-ar > div > div:last-child{flex:1!important}
-  /* table font */
-  .dt th,.dt td,.am-raw-tbl th,.am-raw-tbl td{font-size:9px!important;padding:3px 6px!important}
+  .chart-box{break-inside:avoid;page-break-inside:avoid;box-shadow:none!important;border:1px solid #ddd!important;margin-bottom:8px!important}
+  .grid2,.grid3{break-inside:avoid}
+  #tab-ar > div{flex-direction:column!important}
+  #tab-ar > div > div:last-child{width:100%!important;flex:1!important}
+  .dt th,.dt td{font-size:9px!important;padding:3px 6px!important}
+  .print-only{display:none!important}
 }
 </style>
 </head>
@@ -402,6 +390,18 @@ table.dt tr:hover td{background:#fbfcff}
 
   <!-- CONTENT -->
   <div id="content">
+
+    <!-- PRINT HEADER — hidden normally, visible only @media print -->
+    <div id="print-page-hdr" style="display:none;width:100%;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:14px;border-bottom:2.5px solid #2563eb;box-sizing:border-box">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#2563eb">PEO Tech Co., Ltd. (PT)</div>
+        <div style="font-size:9px;color:#666;margin-top:2px">5 ซอยรามอินทรา 87 · คันนายาว · กรุงเทพฯ | service.tech@peothailand.com</div>
+      </div>
+      <div style="text-align:right">
+        <div id="phdr-section-lbl" style="font-size:12px;font-weight:700;color:#1e293b">รายงานการเงิน</div>
+        <div id="phdr-date-lbl" style="font-size:9px;color:#666;margin-top:2px">—</div>
+      </div>
+    </div>
 
     <!-- ═══ OVERVIEW ═══ -->
     <div id="tab-overview" class="panel active">
@@ -2279,46 +2279,31 @@ function execPrint() {
     return;
   }
   closePrintDialog();
-  // Inject @page size/orientation
   var ps = document.getElementById('print-page-style') || document.createElement('style');
   ps.id = 'print-page-style';
   ps.textContent = '@page { size: '+ _printSize.toUpperCase() +' '+ _printOrient +'; margin: 14mm 12mm 12mm 12mm; }';
   document.head.appendChild(ps);
-  // Clear previous print state
+  var thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var now = new Date();
+  var dateStr = now.getDate()+' '+thM[now.getMonth()]+' '+now.getFullYear()+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  hEl('phdr-section-lbl', _printLabels[_printSection] || 'รายงานการเงิน');
+  hEl('phdr-date-lbl', dateStr);
   document.body.classList.remove('print-all','print-mode');
   document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('print-target'); });
   var hdrOld = document.getElementById('print-hdr-inject');
   if (hdrOld) hdrOld.remove();
-  // Inject print header at top of content
-  var hdrTpl = document.getElementById('print-hdr-tpl');
-  var hdr = document.createElement('div');
-  hdr.id = 'print-hdr-inject';
-  hdr.className = 'print-only';
-  var thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-  var now=new Date();
-  var dateStr=now.getDate()+' '+thM[now.getMonth()]+' '+now.getFullYear()+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-  hdr.innerHTML = '<div><div class="pt-logo">PEO Tech Co., Ltd. (PT)</div><div class="pt-sub">5 ซอยรามอินทรา 87 · คันนายาว · กรุงเทพฯ | service.tech@peothailand.com</div></div>'
-    + '<div class="pt-meta"><strong>'+(_printLabels[_printSection]||'รายงาน')+'</strong><span>'+dateStr+'</span></div>';
-  var content = document.getElementById('content');
-  if (content) content.insertBefore(hdr, content.firstChild);
-  // Set print mode
   if (_printSection === 'all') {
     document.body.classList.add('print-all','print-mode');
   } else {
     document.body.classList.add('print-mode');
-    var tabId = 'tab-' + _printSection;
-    var target = document.getElementById(tabId);
-    if (target) { target.classList.add('print-target'); }
+    var target = document.getElementById('tab-' + _printSection);
+    if (target) target.classList.add('print-target');
   }
-  // Trigger print
   requestAnimationFrame(function(){
     window.print();
-    // Cleanup after print dialog closes
     setTimeout(function(){
       document.body.classList.remove('print-all','print-mode');
       document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('print-target'); });
-      var h = document.getElementById('print-hdr-inject');
-      if (h) h.remove();
     }, 800);
   });
 }
