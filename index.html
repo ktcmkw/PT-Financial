@@ -300,6 +300,19 @@ table.dt tr:hover td{background:#fbfcff}
 .pd-footer .pd-print{background:var(--blue);border:1px solid var(--blue);color:#fff}
 .pd-footer .pd-print:hover{background:#1d4ed8}
 
+/* ── EXPORT RANGE CHIPS ── */
+.exp-range-chip{padding:3px 10px;border:1px solid var(--border);border-radius:20px;background:#fff;cursor:pointer;font-size:10px;color:var(--text3);font-family:inherit;transition:all .15s}
+.exp-range-chip:hover{border-color:var(--blue);color:var(--blue)}
+.exp-range-chip.on{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
+
+/* ── IMPORT PASSWORD MODAL ── */
+#impw-overlay{display:none;position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.5)}
+#impw-modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4001;background:#fff;border-radius:14px;width:380px;max-width:94vw;box-shadow:0 20px 60px rgba(0,0,0,.25);text-align:center;padding:28px 24px}
+#impw-input{width:180px;font-size:22px;letter-spacing:10px;text-align:center;border:2px solid var(--border);border-radius:8px;padding:9px 12px;outline:none;font-family:monospace;transition:border-color .2s}
+#impw-input:focus{border-color:var(--blue)}
+#impw-input.err{border-color:var(--red);animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
 /* ── PRINT HEADER (only visible when printing) ── */
 .print-only{display:none}
 @media print{
@@ -351,7 +364,7 @@ table.dt tr:hover td{background:#fbfcff}
     <button class="sb-item" onclick="showTab('risks',this)"><i class="ti ti-alert-triangle"></i> Risks <span class="sb-badge">4</span></button>
     <button class="sb-item" onclick="showTab('pulse',this)"><i class="ti ti-file-report"></i> Monthly Pulse</button>
     <div class="sb-section">จัดการ</div>
-    <button class="sb-item" onclick="showTab('import',this)"><i class="ti ti-arrows-exchange"></i> Import / Export</button>
+    <button class="sb-item" onclick="checkImportAccess(this)"><i class="ti ti-arrows-exchange"></i> Import / Export</button>
     <div class="sb-section">ตรวจสอบ</div>
     <button class="sb-item" onclick="showTab('audit',this)"><i class="ti ti-table-inspect"></i> Audit Data <span class="sb-badge amber" id="audit-badge">—</span></button>
     <button class="sb-item" onclick="showTab('howto',this)"><i class="ti ti-book-2"></i> หลักการคำนวณ</button>
@@ -384,7 +397,7 @@ table.dt tr:hover td{background:#fbfcff}
     <span id="countdown-display" style="color:var(--green)">⏱ 5:00</span>
     <button class="tb-btn" id="sync-btn" onclick="syncNow()" style="background:var(--green);color:#fff;border-color:var(--green)"><i class="ti ti-refresh"></i> Sync Sheet</button>
     <div class="tb-divider"></div>
-    <button class="tb-btn" onclick="showTab('import',document.querySelector('.sb-item:nth-child(10))'))"><i class="ti ti-upload"></i> Import</button>
+    <button class="tb-btn" onclick="checkImportAccess(null)"><i class="ti ti-upload"></i> Import</button>
     <button class="tb-btn primary" onclick="openPrintDialog()"><i class="ti ti-printer"></i> Print</button>
   </header>
 
@@ -700,7 +713,7 @@ table.dt tr:hover td{background:#fbfcff}
         <div class="tbl-wrap">
           <table class="dt">
             <thead><tr><th>PO No.</th><th>Vendor</th><th>สถานะ</th><th class="num">มูลค่า (฿)</th><th>ครบกำหนด</th></tr></thead>
-            <tbody id="ap-tbody"></tbody>
+            <tbody id="ap-tbody"><tr><td colspan="5" style="text-align:center;padding:18px;color:var(--text3);font-size:11px">คลิกแท็บเพื่อโหลดข้อมูล...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -783,7 +796,7 @@ table.dt tr:hover td{background:#fbfcff}
             <div class="tbl-wrap">
               <table class="dt">
                 <thead><tr><th>Invoice No.</th><th>ลูกค้า</th><th>สถานะ</th><th class="num">สุทธิ (฿)</th><th>วันที่</th></tr></thead>
-                <tbody id="ar-tbody"></tbody>
+                <tbody id="ar-tbody"><tr><td colspan="5" style="text-align:center;padding:18px;color:var(--text3);font-size:11px">คลิกแท็บเพื่อโหลดข้อมูล...</td></tr></tbody>
               </table>
             </div>
           </div>
@@ -955,21 +968,38 @@ table.dt tr:hover td{background:#fbfcff}
         </div>
 
         <div class="chart-box" style="margin-bottom:0">
-          <div class="chart-title" style="margin-bottom:12px"><i class="ti ti-download" style="font-size:15px;vertical-align:-2px;margin-right:4px;color:var(--green)"></i>Export ข้อมูล</div>
-          <div class="exp-opt" onclick="showPreview('xls')">
-            <div class="exp-icon ei-xls"><i class="ti ti-file-spreadsheet"></i></div>
-            <div class="exp-info"><p>Excel Preview (.xlsx)</p><span>AP · AR · Summary sheets</span></div>
-            <button class="tb-btn" style="font-size:10px;padding:3px 10px">Preview</button>
+          <div class="chart-title" style="margin-bottom:10px"><i class="ti ti-download" style="font-size:15px;vertical-align:-2px;margin-right:4px;color:var(--green)"></i>Export ข้อมูล</div>
+          <!-- Date range selector -->
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+            <span style="font-size:10px;color:var(--text3);font-weight:600">ช่วงเวลา:</span>
+            <button class="exp-range-chip on" onclick="setExportRange(this,'all')">ทั้งหมด</button>
+            <button class="exp-range-chip" onclick="setExportRange(this,'month')">เดือนนี้</button>
+            <button class="exp-range-chip" onclick="setExportRange(this,'3m')">3 เดือนล่าสุด</button>
+            <span id="exp-range-info" style="font-size:10px;color:var(--blue);margin-left:auto">AR: <strong id="exp-ar-cnt">—</strong> | AP: <strong id="exp-ap-cnt">—</strong></span>
           </div>
-          <div class="exp-opt" onclick="showPreview('csv')">
+          <div class="exp-opt" onclick="showPreview('xls',null)">
+            <div class="exp-icon ei-xls"><i class="ti ti-file-spreadsheet"></i></div>
+            <div class="exp-info"><p>Excel (.xls)</p><span>AP · AR · เปิดใน Excel ได้ทันที</span></div>
+            <div style="display:flex;gap:4px;align-items:center">
+              <button class="tb-btn" style="font-size:10px;padding:3px 10px" onclick="event.stopPropagation();showPreview('xls')">Preview</button>
+              <button class="tb-btn primary" style="font-size:10px;padding:3px 10px" onclick="event.stopPropagation();downloadXLS()"><i class="ti ti-download" style="font-size:12px"></i> ดาวน์โหลด</button>
+            </div>
+          </div>
+          <div class="exp-opt" onclick="showPreview('csv',null)">
             <div class="exp-icon ei-csv"><i class="ti ti-file-text"></i></div>
             <div class="exp-info"><p>CSV Raw Data</p><span>UTF-8 · ใช้กับ FlowAccount</span></div>
-            <button class="tb-btn" style="font-size:10px;padding:3px 10px">Preview</button>
+            <div style="display:flex;gap:4px;align-items:center">
+              <button class="tb-btn" style="font-size:10px;padding:3px 10px" onclick="event.stopPropagation();showPreview('csv')">Preview</button>
+              <button class="tb-btn primary" style="font-size:10px;padding:3px 10px" onclick="event.stopPropagation();downloadCSV()"><i class="ti ti-download" style="font-size:12px"></i> ดาวน์โหลด</button>
+            </div>
           </div>
-          <div class="exp-opt" onclick="showPreview('md')">
+          <div class="exp-opt" onclick="showPreview('md',null)">
             <div class="exp-icon" style="background:#ede9fe;color:#7c3aed"><i class="ti ti-markdown"></i></div>
             <div class="exp-info"><p>Markdown (.md)</p><span>Pulse format · ส่ง Michael</span></div>
-            <button class="tb-btn" style="font-size:10px;padding:3px 10px">Preview</button>
+            <div style="display:flex;gap:4px;align-items:center">
+              <button class="tb-btn" style="font-size:10px;padding:3px 10px" onclick="event.stopPropagation();showPreview('md')">Preview</button>
+              <button class="tb-btn primary" style="font-size:10px;padding:3px 10px" onclick="event.stopPropagation();downloadMD()"><i class="ti ti-download" style="font-size:12px"></i> ดาวน์โหลด</button>
+            </div>
           </div>
           <!-- Data preview area -->
           <div class="chart-box" style="margin-top:12px;padding:12px;background:var(--bg);margin-bottom:0;border:none">
@@ -1349,6 +1379,33 @@ table.dt tr:hover td{background:#fbfcff}
   </div>
 </div>
 
+<!-- ═══ IMPORT PASSWORD MODAL ═══ -->
+<div id="impw-overlay" onclick="closeImportPW()"></div>
+<div id="impw-modal">
+  <div style="width:52px;height:52px;background:var(--blue-lt);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+    <i class="ti ti-lock" style="font-size:26px;color:var(--blue)"></i>
+  </div>
+  <div style="font-size:16px;font-weight:700;margin-bottom:4px;color:var(--text)">ยืนยันตัวตน</div>
+  <div style="font-size:11px;color:var(--text3);margin-bottom:20px">ป้อนรหัสผ่าน 6 หลักเพื่อเข้า Import / Export</div>
+  <div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px" id="impw-dots">
+    <div style="width:11px;height:11px;border-radius:50%;background:var(--border);transition:background .15s"></div>
+    <div style="width:11px;height:11px;border-radius:50%;background:var(--border);transition:background .15s"></div>
+    <div style="width:11px;height:11px;border-radius:50%;background:var(--border);transition:background .15s"></div>
+    <div style="width:11px;height:11px;border-radius:50%;background:var(--border);transition:background .15s"></div>
+    <div style="width:11px;height:11px;border-radius:50%;background:var(--border);transition:background .15s"></div>
+    <div style="width:11px;height:11px;border-radius:50%;background:var(--border);transition:background .15s"></div>
+  </div>
+  <input type="password" id="impw-input" maxlength="6" inputmode="numeric" pattern="[0-9]*"
+    placeholder="● ● ● ● ● ●"
+    oninput="impwCheck(this.value)"
+    onkeydown="if(event.key==='Escape')closeImportPW();if(event.key==='Enter')submitImportPW()">
+  <div id="impw-err" style="color:var(--red);font-size:11px;margin-top:10px;font-weight:600;min-height:18px"></div>
+  <div style="display:flex;gap:8px;justify-content:center;margin-top:16px">
+    <button onclick="closeImportPW()" style="padding:8px 22px;border-radius:8px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:12px;font-family:inherit;color:var(--text2)">ยกเลิก</button>
+    <button onclick="submitImportPW()" style="padding:8px 22px;border-radius:8px;border:none;background:var(--blue);color:#fff;cursor:pointer;font-size:12px;font-family:inherit;font-weight:600">เข้าสู่ระบบ</button>
+  </div>
+</div>
+
 <script>
 // ════════════════════════════════════════
 // DATA
@@ -1489,12 +1546,12 @@ function showTab(id,btn){
   if(btn)btn.classList.add('active');
   if(id==='overview')initOverviewCharts();
   if(id==='strategic')initStrategicCharts();
-  if(id==='cashflow')initCashFlowCharts();
+  if(id==='cashflow') setTimeout(function(){ initCashFlowCharts(); }, 60);
   if(id==='ap')renderAP();
   if(id==='ar'){renderAR('all'); renderARInvList('all');}
   if(id==='fix')renderFIX();
   if(id==='risks')initRiskCharts();
-  if(id==='import')showPreview('web');
+  if(id==='import'){ showPreview('web'); updateImportTab(); }
   if(id==='audit')renderAuditTab();
 }
 
@@ -1947,7 +2004,17 @@ window.addEventListener('load',function(){
 // ════════════════════════════════════════
 var previewSizes={web:'—',pdf:'~420 KB',xls:'~185 KB',csv:'~8 KB',md:'~3 KB'};
 function showPreview(mode,btn){
-  if(btn){document.querySelectorAll('.ptab').forEach(function(t){t.classList.remove('on')});btn.classList.add('on');}
+  // sync the preview tab buttons
+  if(btn && btn.classList){
+    document.querySelectorAll('.ptab').forEach(function(t){t.classList.remove('on')});
+    btn.classList.add('on');
+  } else {
+    // sync by mode if no button passed
+    document.querySelectorAll('.ptab').forEach(function(t){
+      var m = t.textContent.indexOf('Excel')>=0?'xls':t.textContent.indexOf('CSV')>=0?'csv':t.textContent.indexOf('MD')>=0?'md':'web';
+      t.classList.toggle('on', m===mode);
+    });
+  }
   var body=document.getElementById('preview-body');
   var barTxt=document.getElementById('preview-bar-txt');
   var sz=document.getElementById('preview-size');
@@ -2335,6 +2402,7 @@ function updateImportTab() {
   if(dot3) dot3.className='live-conn-dot '+(f4ok?'ok':'');
   hEl('imp-f4-status', f4ok ? 'เชื่อมต่อแล้ว' : 'รอ Sync');
   hEl('imp-f4-cnt', f4ok ? '✓' : '—');
+  updateExpRangeInfo();
 }
 
 // ════════════════════════════════════════
@@ -2853,6 +2921,7 @@ window.addEventListener('load', function() {
   setInterval(updateRiskCountdowns, 60000); // อัปเดตทุก 1 นาที
   updateARCards(); // แสดง AR cards จาก AR_DATA เริ่มต้น
   renderARInvList('all'); // แสดง invoice list ทันที
+  renderAP(); // แสดง AP table ทันที (ไม่รอ tab click)
   updateStatusBar();  // อัปเดต status bar ล่าง
   updateImportTab();  // อัปเดต Live Connection status
   if (GAS_URL) {
@@ -2901,6 +2970,177 @@ function switchAuditTab(sheet, btn) {
   document.querySelectorAll('.am-tab').forEach(function(t){ t.classList.remove('on'); });
   if (btn) btn.classList.add('on');
   renderAuditBody(sheet);
+}
+
+// ════════════════════════════════════════
+// IMPORT PASSWORD GATE
+// ════════════════════════════════════════
+var _importUnlocked = false;
+var _IMPORT_PASS = '248635';
+var _pendingImportBtn = null;
+
+function checkImportAccess(btn) {
+  if (_importUnlocked) {
+    showTab('import', btn);
+    return;
+  }
+  _pendingImportBtn = btn;
+  openImportPW();
+}
+
+function openImportPW() {
+  document.getElementById('impw-overlay').style.display = 'block';
+  document.getElementById('impw-modal').style.display = 'block';
+  var inp = document.getElementById('impw-input');
+  inp.value = '';
+  inp.className = '';
+  document.getElementById('impw-err').textContent = '';
+  updateImpwDots(0);
+  setTimeout(function(){ inp.focus(); }, 150);
+}
+
+function closeImportPW() {
+  document.getElementById('impw-overlay').style.display = 'none';
+  document.getElementById('impw-modal').style.display = 'none';
+}
+
+function updateImpwDots(n) {
+  var dots = document.querySelectorAll('#impw-dots div');
+  dots.forEach(function(d, i) {
+    d.style.background = i < n ? 'var(--blue)' : 'var(--border)';
+  });
+}
+
+function impwCheck(val) {
+  updateImpwDots(val.length);
+  document.getElementById('impw-err').textContent = '';
+  document.getElementById('impw-input').className = '';
+  if (val.length === 6) {
+    setTimeout(function(){ submitImportPW(); }, 120); // slight delay for visual feedback
+  }
+}
+
+function submitImportPW() {
+  var val = document.getElementById('impw-input').value;
+  if (val === _IMPORT_PASS) {
+    _importUnlocked = true;
+    closeImportPW();
+    var btn = _pendingImportBtn;
+    _pendingImportBtn = null;
+    showTab('import', btn);
+    // highlight sidebar button
+    document.querySelectorAll('.sb-item').forEach(function(b){
+      if(b.textContent.indexOf('Import')>=0) b.classList.add('active');
+    });
+  } else {
+    document.getElementById('impw-err').textContent = '⛔ รหัสผ่านไม่ถูกต้อง — ไม่อนุญาต';
+    var inp = document.getElementById('impw-input');
+    inp.className = 'err';
+    inp.value = '';
+    updateImpwDots(0);
+    setTimeout(function(){ inp.className = ''; inp.focus(); }, 600);
+  }
+}
+
+// ════════════════════════════════════════
+// EXPORT DOWNLOADS
+// ════════════════════════════════════════
+var _exportRange = 'all';
+
+function setExportRange(btn, range) {
+  document.querySelectorAll('.exp-range-chip').forEach(function(c){ c.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+  _exportRange = range;
+  // update count display
+  updateExpRangeInfo();
+}
+
+function updateExpRangeInfo() {
+  hEl('exp-ar-cnt', AR_DATA.length + ' รายการ');
+  hEl('exp-ap-cnt', AP_UNPAID.length + ' รายการ');
+}
+
+function _triggerDownload(content, filename, mimeType) {
+  var bom = mimeType.indexOf('csv') >= 0 ? '﻿' : ''; // UTF-8 BOM for CSV (Excel compat)
+  var blob = new Blob([bom + content], { type: mimeType + ';charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+}
+
+function _expFilename(prefix, ext) {
+  var now = new Date();
+  var m = String(now.getMonth()+1).padStart(2,'0');
+  var d = String(now.getDate()).padStart(2,'0');
+  return prefix + '_' + now.getFullYear() + m + d + '.' + ext;
+}
+
+function downloadCSV() {
+  var content = getCSVPreview();
+  _triggerDownload(content, _expFilename('PT_Export', 'csv'), 'text/csv');
+  showPreview('csv'); // refresh preview
+}
+
+function downloadMD() {
+  var content = getMDPreview();
+  _triggerDownload(content, _expFilename('PT_Pulse', 'md'), 'text/markdown');
+  showPreview('md');
+}
+
+function downloadXLS() {
+  var thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var now = new Date();
+  var dateStr = now.getDate()+' '+thM[now.getMonth()]+' '+now.getFullYear();
+  var synced = _lastSyncISO ? new Date(_lastSyncISO).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}) : 'ยังไม่ได้ Sync';
+  var apTotal = AP_UNPAID.reduce(function(s,r){return s+r.amt;},0);
+  var arTotal = AR_DATA.reduce(function(s,r){return s+(r.status!=='Paid'?r.amt:0);},0);
+
+  var apRows = AP_UNPAID.map(function(r){
+    return '<tr><td>'+r.po+'</td><td>'+r.vendor+'</td>'
+      +'<td style="text-align:right;color:#dc2626">'+r.amt.toLocaleString('th-TH',{minimumFractionDigits:2})+'</td>'
+      +'<td>'+r.due+'</td><td>'+r.urgency+'</td><td>'+r.status+'</td></tr>';
+  }).join('');
+  var arRows = AR_DATA.map(function(r){
+    var sc = r.status==='Paid'?'#16a34a':r.status==='Billing Note'?'#2563eb':'#dc2626';
+    return '<tr><td>'+r.inv+'</td><td>'+r.customer+'</td>'
+      +'<td style="color:'+sc+'">'+r.status+'</td>'
+      +'<td style="text-align:right;color:'+sc+'">'+Math.round(r.amt).toLocaleString('th-TH')+'</td>'
+      +'<td>'+(r.due||'')+'</td></tr>';
+  }).join('');
+
+  var html = '<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" '
+    +'xmlns:x="urn:schemas-microsoft-com:office:excel">'
+    +'<head><meta charset="UTF-8">'
+    +'<style>body{font-family:Tahoma,sans-serif;font-size:11px}'
+    +'table{border-collapse:collapse;width:100%;margin-bottom:20px}'
+    +'th{background:#2563eb;color:#fff;padding:6px 8px;text-align:left;font-size:10px}'
+    +'td{padding:4px 8px;border:1px solid #e0e0e0;font-size:11px}'
+    +'tr:nth-child(even) td{background:#f9f9fb}'
+    +'h2{color:#1e293b;font-size:14px;margin:20px 0 6px}'
+    +'h3{color:#374151;font-size:12px;margin:16px 0 4px}'
+    +'.total{background:#eff4ff;padding:6px 12px;border-radius:4px;font-weight:700;color:#2563eb;font-size:12px}'
+    +'</style></head><body>'
+    +'<h2>PEO Tech Co., Ltd. (PT) — Financial Export</h2>'
+    +'<p style="font-size:10px;color:#888">วันที่: '+dateStr+' | Sync: '+synced+' | ห้ามเผยแพร่ภายนอก</p>'
+    +'<hr>'
+    +'<h3>📋 AP ยังไม่ชำระ ('+AP_UNPAID.length+' รายการ)</h3>'
+    +'<p class="total">รวม AP: ฿'+Math.round(apTotal).toLocaleString('th-TH')+'</p>'
+    +'<table><thead><tr><th>PO No.</th><th>Vendor / ผู้ขาย</th><th>มูลค่า (฿)</th><th>ครบกำหนด</th><th>Urgency</th><th>สถานะ</th></tr></thead>'
+    +'<tbody>'+apRows+'</tbody></table>'
+    +'<h3>🧾 AR ลูกหนี้การค้า ('+AR_DATA.length+' รายการ)</h3>'
+    +'<p class="total">คงค้าง: ฿'+Math.round(arTotal).toLocaleString('th-TH')+'</p>'
+    +'<table><thead><tr><th>Invoice No.</th><th>ลูกค้า</th><th>สถานะ</th><th>สุทธิ (฿)</th><th>วันที่</th></tr></thead>'
+    +'<tbody>'+arRows+'</tbody></table>'
+    +'<p style="font-size:9px;color:#aaa;margin-top:20px">Generated by PT Dashboard — PEO Tech Co., Ltd.</p>'
+    +'</body></html>';
+
+  _triggerDownload(html, _expFilename('PT_Export', 'xls'), 'application/vnd.ms-excel');
+  showPreview('xls');
 }
 
 function renderAuditBody(sheet) {
