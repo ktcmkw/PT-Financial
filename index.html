@@ -2973,45 +2973,95 @@ function parseAndApplyF4(rows) {
 // RISK COUNTDOWN — อัปเดต realtime
 // ════════════════════════════════════════
 function updateRiskCountdowns() {
+  var now   = new Date();
   var today = new Date(); today.setHours(0,0,0,0);
   var thaiM = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 
-  function daysUntil(y,m,d) {
-    var dl = new Date(y, m-1, d); dl.setHours(0,0,0,0);
-    return Math.round((dl - today) / 86400000);
+  // คำนวณเวลาคงเหลือถึง end-of-day (23:59:59) ของ deadline
+  function timeUntil(y, m, d) {
+    var deadline = new Date(y, m-1, d, 23, 59, 59, 999);
+    var diff = deadline - now;
+    if (diff <= 0) {
+      return { overdue: true, days: Math.ceil(-diff / 86400000), hours:0, mins:0, secs:0 };
+    }
+    var totalSecs = Math.floor(diff / 1000);
+    return {
+      overdue: false,
+      days:  Math.floor(totalSecs / 86400),
+      hours: Math.floor((totalSecs % 86400) / 3600),
+      mins:  Math.floor((totalSecs % 3600) / 60),
+      secs:  totalSecs % 60,
+      total: diff
+    };
   }
+  function pad2(n) { return n < 10 ? '0' + n : '' + n; }
   function thaiShort(dt) {
     return dt.getDate() + ' ' + thaiM[dt.getMonth()] + ' ' + dt.getFullYear();
   }
 
   // ── ภส.01-01 Excise Tax — Deadline 15 พ.ค. 2026 ──
-  var exDays = daysUntil(2026, 5, 15);
-  var exEl   = document.getElementById('excise-countdown');
+  var exT  = timeUntil(2026, 5, 15);
+  var exEl = document.getElementById('excise-countdown');
   var exDesc = document.getElementById('excise-desc');
   if (exEl) {
-    if (exDays > 0) {
-      exEl.textContent = '⏰ เหลือ ' + exDays + ' วัน — Deadline: 15 พ.ค. 2026';
-      exEl.style.background = exDays <= 2 ? '#7f1d1d' : '#dc2626';
-    } else if (exDays === 0) {
-      exEl.textContent = '🚨 วันนี้! Deadline: 15 พ.ค. 2026 — ดำเนินการทันที!';
+    if (exT.overdue) {
+      exEl.innerHTML = '✓ ผ่าน Deadline แล้ว (' + exT.days + ' วันที่แล้ว)';
+      exEl.style.background = '#16a34a';
+    } else if (exT.days === 0 && exT.hours === 0 && exT.mins < 10) {
+      // วาระสุดท้าย < 10 นาที — แสดงวินาที
+      exEl.innerHTML = '🚨 เหลือ <strong style="font-size:14px;letter-spacing:2px">' +
+        pad2(exT.mins) + ':' + pad2(exT.secs) + '</strong> — ดำเนินการทันที!';
       exEl.style.background = '#7f1d1d';
     } else {
-      exEl.textContent = '✓ ผ่าน Deadline แล้ว (' + Math.abs(exDays) + ' วันที่แล้ว)';
-      exEl.style.background = '#16a34a';
+      // ≥ 10 นาที — แสดง วัน ชม. นาที วิ
+      var timeStr;
+      if (exT.days > 0) {
+        // มีหลายวัน: "2 วัน 06:30:25"
+        timeStr = exT.days + ' วัน&nbsp;' +
+                  pad2(exT.hours) + ':' + pad2(exT.mins) +
+                  (exT.days <= 2 ? ':' + pad2(exT.secs) : '');
+      } else {
+        // วันสุดท้าย: "14:23:55"
+        timeStr = pad2(exT.hours) + ':' + pad2(exT.mins) + ':' + pad2(exT.secs);
+      }
+      exEl.innerHTML = '⏰ เหลือ <strong style="font-size:13px;letter-spacing:1px;font-family:monospace">' +
+        timeStr + '</strong>&nbsp;— Deadline: 15 พ.ค. 2026';
+      exEl.style.background = exT.days <= 1 ? '#7f1d1d' : exT.days <= 3 ? '#dc2626' : '#b45309';
     }
   }
   if (exDesc) {
-    var daysMsg = exDays > 0 ? ' (อีก ' + exDays + ' วัน)' : exDays === 0 ? ' (วันนี้!)' : ' (เกินกำหนด)';
-    exDesc.innerHTML = 'ภาษีสรรพสามิต ครบกำหนด — ยังไม่ได้รับการยืนยัน<br>ต้องดำเนินการก่อน 15 พ.ค. 2026' + daysMsg;
+    var dMsg = exT.overdue
+      ? ' (เกินกำหนดแล้ว)'
+      : exT.days === 0
+        ? ' (วันนี้! เหลือ ' + pad2(exT.hours) + ':' + pad2(exT.mins) + ':' + pad2(exT.secs) + ')'
+        : ' (อีก ' + exT.days + ' วัน ' + pad2(exT.hours) + ' ชม. ' + pad2(exT.mins) + ' นาที)';
+    exDesc.innerHTML = 'ภาษีสรรพสามิต ครบกำหนด — ยังไม่ได้รับการยืนยัน<br>ต้องดำเนินการก่อน 15 พ.ค. 2026' + dMsg;
   }
 
   // ── FX Exposure — Deadline 31 พ.ค. 2026 ──
-  var fxDays = daysUntil(2026, 5, 31);
-  var fxEl   = document.getElementById('fx-days-left');
+  var fxT  = timeUntil(2026, 5, 31);
+  var fxEl = document.getElementById('fx-days-left');
   if (fxEl) {
-    if (fxDays > 0)      fxEl.textContent = 'เหลือ ' + fxDays + ' วัน';
-    else if (fxDays===0) fxEl.textContent = '🚨 วันนี้!';
-    else                 fxEl.textContent = '⚠ เกินกำหนด ' + Math.abs(fxDays) + ' วัน';
+    if (fxT.overdue) {
+      fxEl.textContent = '⚠ เกินกำหนด ' + fxT.days + ' วัน';
+    } else if (fxT.days <= 3) {
+      fxEl.textContent = 'เหลือ ' + fxT.days + ' วัน ' + pad2(fxT.hours) + ':' + pad2(fxT.mins) + ':' + pad2(fxT.secs);
+    } else {
+      fxEl.textContent = 'เหลือ ' + fxT.days + ' วัน ' + pad2(fxT.hours) + ' ชม.';
+    }
+  }
+
+  // ── Lotus FM Delivery — End-May 2026 ──
+  var lotusEl = document.getElementById('lotus-days-left');
+  if (lotusEl) {
+    var lt = timeUntil(2026, 5, 31);
+    if (lt.overdue) {
+      lotusEl.textContent = '⚠ เกิน Deadline ' + lt.days + ' วัน';
+    } else if (lt.days <= 3) {
+      lotusEl.textContent = 'เหลือ ' + lt.days + ' วัน ' + pad2(lt.hours) + ':' + pad2(lt.mins) + ':' + pad2(lt.secs);
+    } else {
+      lotusEl.textContent = 'เหลือ ' + lt.days + ' วัน ' + pad2(lt.hours) + ' ชม.';
+    }
   }
 
   // ── Peak D20-28 — Next D19 check ──
@@ -3029,15 +3079,6 @@ function updateRiskCountdowns() {
     var d19days = Math.round((nextD19 - today) / 86400000);
     peakEl.textContent = thaiShort(nextD19) + ' (อีก ' + d19days + ' วัน)';
   }
-
-  // ── Lotus FM Delivery — End-May 2026 ──
-  var lotusEl = document.getElementById('lotus-days-left');
-  if (lotusEl) {
-    var ld = daysUntil(2026, 5, 31);
-    if (ld > 0)      lotusEl.textContent = 'เหลือ ' + ld + ' วัน';
-    else if (ld===0) lotusEl.textContent = '🚨 วันนี้!';
-    else             lotusEl.textContent = '⚠ เกิน Deadline ' + Math.abs(ld) + ' วัน';
-  }
 }
 
 // ── init on page load ──
@@ -3051,7 +3092,7 @@ window.addEventListener('load', function() {
   startCountdown();
   startAutoSync(); // เริ่ม auto-sync ทุก 4 นาที (silent)
   updateRiskCountdowns(); // คำนวณ countdown ครั้งแรก
-  setInterval(updateRiskCountdowns, 60000); // อัปเดตทุก 1 นาที
+  setInterval(updateRiskCountdowns, 1000); // อัปเดตทุก 1 วินาที — live HH:MM:SS
   updateARCards(); // แสดง AR cards จาก AR_DATA เริ่มต้น
   renderARInvList('all'); // แสดง invoice list ทันที
   renderAP(); // แสดง AP table ทันที (ไม่รอ tab click)
