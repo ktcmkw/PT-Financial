@@ -2581,7 +2581,9 @@ async function syncSheets(manual) {
   try {
     var _ctrl = new AbortController();
     var _timeout = setTimeout(function(){ _ctrl.abort(); }, 30000);
-    var res = await fetch(GAS_URL, { redirect: 'follow', signal: _ctrl.signal });
+    // manual sync → ส่ง nocache=1 เพื่อข้าม GAS CacheService ให้ดึง Sheet จริงทันที
+    var fetchURL = GAS_URL + (manual ? '?nocache=1&t=' + Date.now() : '?t=' + Date.now());
+    var res = await fetch(fetchURL, { redirect: 'follow', signal: _ctrl.signal });
     clearTimeout(_timeout);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     var json = await res.json();
