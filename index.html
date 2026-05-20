@@ -2486,6 +2486,77 @@ html,body{
 
 
   <div class="pg" id="p-e304">
+    <!-- Top Bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--t1)">บันทึกจ่ายจริง (304)</div>
+        <div style="font-size:11px;color:var(--t3)">Budget vs Actual · Exp PT 304</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid rgba(100,116,139,.35)">
+          <div id="e304-status-dot" style="width:6px;height:6px;border-radius:50%;background:#64748b;flex-shrink:0"></div>
+          <span id="e304-status-text" style="color:var(--t2)">โหลด...</span>
+        </div>
+        <button onclick="load304Data(true)" style="font-size:11px;padding:3px 10px;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:6px;color:#818cf8;cursor:pointer">🔄 Sync</button>
+        <button onclick="toggle304Debug()" style="font-size:10px;padding:3px 8px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:6px;color:#fbbf24;cursor:pointer">🔧</button>
+      </div>
+    </div>
+
+    <!-- KPI Row: 3 cards -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+      <div class="kc cb" onclick="show304Modal('total')">
+        <div class="kl">งบปีทั้งหมด</div>
+        <div class="kv" id="e304-bud-ytd">—</div>
+        <div class="ks">Total budget 2026</div>
+      </div>
+      <div class="kc cb" onclick="show304Modal('total')">
+        <div class="kl">จ่ายจริง YTD</div>
+        <div class="kv" id="e304-act-ytd">—</div>
+        <div class="ks" id="e304-asof">ม.ค.–ปัจจุบัน</div>
+      </div>
+      <div class="kc cb" onclick="show304Modal('total')">
+        <div class="kl">งบคงเหลือ</div>
+        <div class="kv" id="e304-usage-pct">—</div>
+        <div class="ks" id="e304-diff-label">ยังไม่ใช้</div>
+      </div>
+    </div>
+
+    <!-- Dept breakdown header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em">แยกตามแผนก</span>
+      <div style="display:flex;gap:10px">
+        <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3)"><span style="width:8px;height:8px;border-radius:2px;background:#1D9E75;display:inline-block"></span>จ่ายจริง</span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3)"><span style="width:8px;height:8px;border-radius:2px;background:rgba(99,102,241,.25);display:inline-block"></span>งบ</span>
+      </div>
+    </div>
+
+    <!-- Dept Cards — JS renders here -->
+    <div id="e304-dept-cards" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+      <div style="padding:20px;text-align:center;color:var(--t3);font-size:12px">กำลังโหลด...</div>
+    </div>
+
+    <!-- Monthly Chart -->
+    <div style="background:var(--card);border-radius:10px;padding:14px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:11px;font-weight:700;color:var(--t2)">จ่ายจริงรายเดือน (YTD)</span>
+        <span style="font-size:10px;color:var(--t3)" id="e304-month-count"></span>
+      </div>
+      <div id="e304-chart-wrap" style="display:flex;align-items:flex-end;gap:6px;height:90px;padding:0 4px">
+        <div style="color:var(--t3);font-size:11px;align-self:center">กำลังโหลด...</div>
+      </div>
+      <div id="e304-chart-labels" style="display:flex;gap:6px;margin-top:4px;padding:0 4px"></div>
+    </div>
+
+    <!-- Debug Panel -->
+    <div id="e304-debug-panel" style="display:none;background:rgba(0,0,0,.4);border:1px solid #fbbf2466;border-radius:8px;padding:12px;margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:#fbbf24;margin-bottom:8px">🔧 Debug Info — GAS Response</div>
+      <pre id="e304-debug-text" style="font-size:10px;color:var(--t2);overflow-x:auto;max-height:320px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;margin:0"></pre>
+    </div>
+
+    <!-- Hidden diff element (used by modal logic) -->
+    <span id="e304-diff-ytd" style="display:none"></span>
+
+    <!-- Detail tabs (below tabs bar injected via tbar / pn-304) -->
     <div class="tbar" id="tb-304">
       <div class="tt on" onclick="sw('tb-304',0,'pn-304')">📊 ภาพรวม</div>
       <div class="tt" onclick="sw('tb-304',1,'pn-304')">🛒 ฝ่ายขาย</div>
@@ -2494,97 +2565,25 @@ html,body{
     </div>
     <div id="pn-304">
 
-      <!-- TAB 0 — Overview ──────────────────────────────────────────── -->
-      <div>
-        <!-- KPI Cards Row -->
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
-          <div class="kc cb" style="flex:1;min-width:130px" onclick="show304Modal('budget-ytd')">
-            <div class="kl">งบประมาณ YTD</div>
-            <div class="kv" id="e304-bud-ytd">—</div>
-            <div class="ks">ค่าใช้จ่ายตามแผน</div>
-          </div>
-          <div class="kc cb" style="flex:1;min-width:130px" onclick="show304Modal('actual-ytd')">
-            <div class="kl">ค่าใช้จ่ายจริง YTD</div>
-            <div class="kv" id="e304-act-ytd">—</div>
-            <div class="ks">ยอดรวมทุกแผนก</div>
-          </div>
-          <div class="kc cb" style="flex:1;min-width:130px" onclick="show304Modal('budget-usage')">
-            <div class="kl">ใช้งบแล้ว</div>
-            <div class="kv" id="e304-usage-pct">—</div>
-            <div class="ks">% ของงบ YTD</div>
-          </div>
-          <div class="kc cb" style="flex:1;min-width:130px" onclick="show304Modal('diff-ytd')">
-            <div class="kl">ส่วนต่าง YTD</div>
-            <div class="kv" id="e304-diff-ytd">—</div>
-            <div class="ks" id="e304-diff-label">vs งบประมาณ</div>
-          </div>
-        </div>
+      <!-- TAB 0: Overview (all content above, this tab panel is intentionally empty) -->
+      <div></div>
 
-        <!-- Status + Last Updated -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-          <div id="e304-status-dot" style="width:8px;height:8px;border-radius:50%;background:#64748b;flex-shrink:0"></div>
-          <span id="e304-status-text" style="font-size:11px;color:var(--t3)">กำลังโหลดข้อมูล...</span>
-          <button onclick="load304Data(true)" style="margin-left:auto;font-size:10px;padding:3px 10px;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:5px;color:#818cf8;cursor:pointer">🔄 Refresh</button>
-          <button onclick="toggle304Debug()" style="font-size:10px;padding:3px 8px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:5px;color:#fbbf24;cursor:pointer">🔧 Debug</button>
-        </div>
-
-        <!-- Department Summary Table -->
-        <div style="background:var(--card);border-radius:10px;overflow:hidden;margin-bottom:14px">
-          <div style="padding:12px 14px;border-bottom:1px solid var(--b2);display:flex;align-items:center;justify-content:space-between">
-            <span style="font-size:12px;font-weight:700;color:var(--t1)">สรุปค่าใช้จ่ายตามหมวด</span>
-            <span style="font-size:10px;color:var(--t3)" id="e304-asof">—</span>
-          </div>
-          <div style="overflow-x:auto">
-            <table style="width:100%;border-collapse:collapse;font-size:11px">
-              <thead>
-                <tr style="background:var(--b2)">
-                  <th style="padding:8px 12px;text-align:left;color:var(--t2);font-weight:600">หมวด</th>
-                  <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">งบ YTD</th>
-                  <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">จริง YTD</th>
-                  <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">ส่วนต่าง</th>
-                  <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">% ใช้</th>
-                </tr>
-              </thead>
-              <tbody id="e304-summary-tbody">
-                <tr><td colspan="5" style="padding:20px;text-align:center;color:var(--t3)">กำลังโหลด...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Monthly Trend Bar Chart (Jan–current) -->
-        <div style="background:var(--card);border-radius:10px;padding:14px;margin-bottom:14px">
-          <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:12px">📈 แนวโน้มค่าใช้จ่ายรายเดือน (YTD)</div>
-          <div id="e304-chart-wrap" style="display:flex;align-items:flex-end;gap:6px;height:90px;padding:0 4px">
-            <div style="color:var(--t3);font-size:11px;align-self:center">กำลังโหลด...</div>
-          </div>
-          <div id="e304-chart-labels" style="display:flex;gap:6px;margin-top:4px;padding:0 4px"></div>
-        </div>
-
-        <!-- Debug Panel (hidden by default) -->
-        <div id="e304-debug-panel" style="display:none;background:rgba(0,0,0,.4);border:1px solid #fbbf2466;border-radius:8px;padding:12px;margin-bottom:14px">
-          <div style="font-size:11px;font-weight:700;color:#fbbf24;margin-bottom:8px">🔧 Debug Info — GAS Response</div>
-          <pre id="e304-debug-text" style="font-size:10px;color:var(--t2);overflow-x:auto;max-height:320px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;margin:0"></pre>
-        </div>
-      </div>
-
-      <!-- TAB 1 — ฝ่ายขาย Detail ──────────────────────────────────── -->
+      <!-- TAB 1 — ฝ่ายขาย Detail -->
       <div style="display:none">
         <div style="background:var(--card);border-radius:10px;overflow:hidden;margin-bottom:14px">
-          <div style="padding:12px 14px;border-bottom:1px solid var(--b2)">
-            <span style="font-size:12px;font-weight:700;color:var(--t1)">🛒 รายละเอียดค่าใช้จ่าย — ฝ่ายขาย</span>
+          <div style="padding:12px 14px;border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:8px">
+            <span style="width:24px;height:24px;border-radius:6px;background:#0F6E5630;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:#5DCAA5"><i class="ti ti-trending-up"></i></span>
+            <span style="font-size:12px;font-weight:700;color:var(--t1)">รายละเอียดค่าใช้จ่าย — ฝ่ายขาย</span>
           </div>
           <div id="e304-detail-sales-wrap" style="overflow-x:auto">
             <table style="width:100%;border-collapse:collapse;font-size:11px">
-              <thead>
-                <tr style="background:var(--b2)">
-                  <th style="padding:8px 10px;text-align:left;color:var(--t2);font-weight:600">รายการ</th>
-                  <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">Code</th>
-                  <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">งบ/เดือน</th>
-                  <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">จริง MTD</th>
-                  <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">ส่วนต่าง</th>
-                </tr>
-              </thead>
+              <thead><tr style="background:var(--b2)">
+                <th style="padding:8px 10px;text-align:left;color:var(--t2);font-weight:600">รายการ</th>
+                <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">Code</th>
+                <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">งบ/เดือน</th>
+                <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">จริง MTD</th>
+                <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">ส่วนต่าง</th>
+              </tr></thead>
               <tbody id="e304-detail-sales-tbody">
                 <tr><td colspan="5" style="padding:20px;text-align:center;color:var(--t3)">กำลังโหลด...</td></tr>
               </tbody>
@@ -2593,23 +2592,22 @@ html,body{
         </div>
       </div>
 
-      <!-- TAB 2 — Service Detail ──────────────────────────────────── -->
+      <!-- TAB 2 — Service Detail -->
       <div style="display:none">
         <div style="background:var(--card);border-radius:10px;overflow:hidden;margin-bottom:14px">
-          <div style="padding:12px 14px;border-bottom:1px solid var(--b2)">
-            <span style="font-size:12px;font-weight:700;color:var(--t1)">🔧 รายละเอียดค่าใช้จ่าย — Service</span>
+          <div style="padding:12px 14px;border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:8px">
+            <span style="width:24px;height:24px;border-radius:6px;background:#185FA530;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:#85B7EB"><i class="ti ti-tool"></i></span>
+            <span style="font-size:12px;font-weight:700;color:var(--t1)">รายละเอียดค่าใช้จ่าย — Service</span>
           </div>
           <div id="e304-detail-service-wrap" style="overflow-x:auto">
             <table style="width:100%;border-collapse:collapse;font-size:11px">
-              <thead>
-                <tr style="background:var(--b2)">
-                  <th style="padding:8px 10px;text-align:left;color:var(--t2);font-weight:600">รายการ</th>
-                  <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">Code</th>
-                  <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">งบ/เดือน</th>
-                  <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">จริง MTD</th>
-                  <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">ส่วนต่าง</th>
-                </tr>
-              </thead>
+              <thead><tr style="background:var(--b2)">
+                <th style="padding:8px 10px;text-align:left;color:var(--t2);font-weight:600">รายการ</th>
+                <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">Code</th>
+                <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">งบ/เดือน</th>
+                <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">จริง MTD</th>
+                <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">ส่วนต่าง</th>
+              </tr></thead>
               <tbody id="e304-detail-service-tbody">
                 <tr><td colspan="5" style="padding:20px;text-align:center;color:var(--t3)">กำลังโหลด...</td></tr>
               </tbody>
@@ -2618,23 +2616,22 @@ html,body{
         </div>
       </div>
 
-      <!-- TAB 3 — Logistic Detail ─────────────────────────────────── -->
+      <!-- TAB 3 — Logistic Detail -->
       <div style="display:none">
         <div style="background:var(--card);border-radius:10px;overflow:hidden;margin-bottom:14px">
-          <div style="padding:12px 14px;border-bottom:1px solid var(--b2)">
-            <span style="font-size:12px;font-weight:700;color:var(--t1)">🚚 รายละเอียดค่าใช้จ่าย — Logistic</span>
+          <div style="padding:12px 14px;border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:8px">
+            <span style="width:24px;height:24px;border-radius:6px;background:#854F0B30;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:#FAC775"><i class="ti ti-truck"></i></span>
+            <span style="font-size:12px;font-weight:700;color:var(--t1)">รายละเอียดค่าใช้จ่าย — Logistic</span>
           </div>
           <div id="e304-detail-logistic-wrap" style="overflow-x:auto">
             <table style="width:100%;border-collapse:collapse;font-size:11px">
-              <thead>
-                <tr style="background:var(--b2)">
-                  <th style="padding:8px 10px;text-align:left;color:var(--t2);font-weight:600">รายการ</th>
-                  <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">Code</th>
-                  <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">งบ/เดือน</th>
-                  <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">จริง MTD</th>
-                  <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">ส่วนต่าง</th>
-                </tr>
-              </thead>
+              <thead><tr style="background:var(--b2)">
+                <th style="padding:8px 10px;text-align:left;color:var(--t2);font-weight:600">รายการ</th>
+                <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">Code</th>
+                <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">งบ/เดือน</th>
+                <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">จริง MTD</th>
+                <th style="padding:8px 8px;text-align:right;color:var(--t2);font-weight:600">ส่วนต่าง</th>
+              </tr></thead>
               <tbody id="e304-detail-logistic-tbody">
                 <tr><td colspan="5" style="padding:20px;text-align:center;color:var(--t3)">กำลังโหลด...</td></tr>
               </tbody>
@@ -9555,76 +9552,105 @@ function update304Module(data) {
     set304Status('error', 'ไม่มีข้อมูล summary');
     return;
   }
-  var s  = data.summary;
+  var s   = data.summary;
   var tot = s.total || {};
-
-  // Current month index (0-based) — use current month or latest available
   var now    = new Date();
-  var curMo  = now.getMonth(); // 0=Jan
-  var curKey = _MK304[curMo];
+  var curMo  = now.getMonth();
 
-  // ── KPI Cards ──────────────────────────────────────────────
-  var budYtd = (tot.budget && tot.budget.total) || 0;
-  var actYtd = (tot.actual && tot.actual.ytd)   || 0;
-  var diff   = actYtd - budYtd;
+  /* ── KPI Cards ────────────────────────────────────────────── */
+  var budYtd   = (tot.budget && tot.budget.total) || 0;
+  var actYtd   = (tot.actual && tot.actual.ytd)   || 0;
+  var remBud   = budYtd - actYtd;
   var usagePct = budYtd > 0 ? (actYtd / budYtd * 100) : 0;
+  var remPct   = 100 - usagePct;
 
   var elBudYtd  = document.getElementById('e304-bud-ytd');
   var elActYtd  = document.getElementById('e304-act-ytd');
   var elUsage   = document.getElementById('e304-usage-pct');
-  var elDiff    = document.getElementById('e304-diff-ytd');
   var elDiffLbl = document.getElementById('e304-diff-label');
+  var elDiff    = document.getElementById('e304-diff-ytd');
 
-  if (elBudYtd)  elBudYtd.textContent  = _b304(budYtd);
-  if (elActYtd)  elActYtd.textContent  = _b304(actYtd);
+  if (elBudYtd) elBudYtd.textContent = _b304(budYtd);
+  if (elActYtd) elActYtd.textContent = _b304(actYtd);
   if (elUsage) {
-    elUsage.textContent  = _pct304(usagePct);
-    elUsage.style.color  = usagePct > 110 ? '#f87171' : usagePct > 95 ? '#fbbf24' : '#34d399';
+    elUsage.textContent = _b304(remBud);
+    elUsage.style.color = remBud < 0 ? '#f87171' : '#34d399';
   }
-  if (elDiff) {
-    elDiff.textContent = _b304(diff);
-    elDiff.style.color = diff > 0 ? '#f87171' : diff < 0 ? '#34d399' : 'var(--t2)';
+  if (elDiffLbl) {
+    elDiffLbl.textContent = remBud < 0
+      ? ('⚠️ เกินงบ ' + _pct304(Math.abs(remPct)))
+      : (_pct304(remPct) + ' ยังไม่ใช้');
+    elDiffLbl.style.color = remBud < 0 ? '#f87171' : 'var(--t3)';
   }
-  if (elDiffLbl) elDiffLbl.textContent = diff > 0 ? '⚠️ เกินงบ' : diff < 0 ? '✅ ต่ำกว่างบ' : 'vs งบประมาณ';
+  if (elDiff) elDiff.textContent = _b304(actYtd - budYtd);
 
-  // ── As-of date ──────────────────────────────────────────────
+  /* ── As-of date ──────────────────────────────────────────── */
   var elAsof = document.getElementById('e304-asof');
   if (elAsof && data.asOf) {
-    var d = new Date(data.asOf);
-    elAsof.textContent = 'อัปเดต: ' + d.toLocaleDateString('th-TH', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    var asofD = new Date(data.asOf);
+    elAsof.textContent = 'อัปเดต: ' + asofD.toLocaleDateString('th-TH',
+      {day:'2-digit',month:'short',year:'numeric'});
   }
 
-  // ── Department Summary Table ────────────────────────────────
-  var tbody = document.getElementById('e304-summary-tbody');
-  if (tbody) {
-    var rows = '';
-    var depts = ['salary','sales','service','logistic','saimai','interest','admin','total'];
-    depts.forEach(function(key) {
-      var d = s[key];
-      if (!d) return;
-      var dBud = (d.budget && d.budget.total) || 0;
-      var dAct = (d.actual && d.actual.ytd)   || 0;
-      var dDiff = dAct - dBud;
-      var dPct  = dBud > 0 ? (dAct / dBud * 100) : 0;
-      var isTotal = key === 'total';
-      var rowStyle = isTotal ? 'font-weight:800;border-top:2px solid var(--b2)' : '';
-      var diffColor = dDiff > 0 ? '#f87171' : dDiff < 0 ? '#34d399' : 'var(--t2)';
-      var pctColor  = dPct > 110 ? '#f87171' : dPct > 95 ? '#fbbf24' : '#34d399';
-      rows += '<tr style="border-bottom:1px solid var(--b2);cursor:pointer;" ' + rowStyle + ' onclick="show304Modal(\'' + key + '\')">'
-            + '<td style="padding:8px 12px;color:var(--t1)">' + (_DEPT_LABELS[key] || key) + '</td>'
-            + '<td style="padding:8px 8px;text-align:right;color:var(--t2)">' + _b304(dBud) + '</td>'
-            + '<td style="padding:8px 8px;text-align:right;color:var(--t1)">' + _b304(dAct) + '</td>'
-            + '<td style="padding:8px 8px;text-align:right;color:' + diffColor + '">' + _b304(dDiff) + '</td>'
-            + '<td style="padding:8px 8px;text-align:right;color:' + pctColor + '">' + _pct304(dPct) + '</td>'
-            + '</tr>';
+  /* ── Month count label ──────────────────────────────────────── */
+  var elMoCount = document.getElementById('e304-month-count');
+  if (elMoCount) elMoCount.textContent = (curMo + 1) + ' เดือน (ม.ค.–' + _M304[curMo] + ')';
+
+  /* ── Dept Cards ─────────────────────────────────────────────── */
+  var deptWrap = document.getElementById('e304-dept-cards');
+  if (deptWrap) {
+    var DEPT_CFG = [
+      {key:'salary',  label:'เงินเดือน + สวัสดิการ', sub:'Salary & Welfare',  icon:'ti-users',       bg:'rgba(60,52,137,.18)',  ic:'#AFA9EC', bar:'#7F77DD'},
+      {key:'sales',   label:'ฝ่ายขาย',               sub:'Sales',              icon:'ti-trending-up', bg:'rgba(15,110,86,.18)',  ic:'#5DCAA5', bar:'#1D9E75'},
+      {key:'service', label:'ฝ่าย Service',           sub:'Service',            icon:'ti-tool',        bg:'rgba(24,95,165,.18)',  ic:'#85B7EB', bar:'#378ADD'},
+      {key:'logistic',label:'ฝ่าย Logistic',          sub:'Logistic',           icon:'ti-truck',       bg:'rgba(133,79,11,.18)', ic:'#FAC775', bar:'#EF9F27'}
+    ];
+    var cardsHtml = '';
+    DEPT_CFG.forEach(function(cfg) {
+      var d2  = s[cfg.key];
+      if (!d2) return;
+      var dBud     = (d2.budget && d2.budget.total) || 0;
+      var dAct     = (d2.actual && d2.actual.ytd)   || 0;
+      var pctReal  = dBud > 0 ? (dAct / dBud * 100) : 0;
+      var pctBar   = Math.min(pctReal, 100);
+      var over     = pctReal > 100;
+      var warn     = pctReal > 90;
+      var badgeBg  = over ? 'rgba(248,113,113,.18)' : warn ? 'rgba(251,191,36,.18)' : 'rgba(52,211,153,.12)';
+      var badgeCol = over ? '#f87171' : warn ? '#fbbf24' : cfg.bar;
+      var barCol   = over ? '#f87171' : warn ? '#fbbf24' : cfg.bar;
+      var dRem     = dBud - dAct;
+      var remLabel = dRem >= 0
+        ? ('เหลือ ' + _b304(dRem))
+        : ('<span style="color:#f87171">⚠ เกิน ' + _b304(-dRem) + '</span>');
+      cardsHtml += '<div style="background:var(--card);border:1px solid var(--b2);border-radius:10px;padding:12px 14px;cursor:pointer" onclick="show304Modal(\'' + cfg.key + '\')">'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">'
+        +   '<div style="display:flex;align-items:center;gap:9px">'
+        +     '<div style="width:30px;height:30px;border-radius:7px;background:' + cfg.bg + ';display:flex;align-items:center;justify-content:center;color:' + cfg.ic + ';font-size:15px;flex-shrink:0"><i class="ti ' + cfg.icon + '"></i></div>'
+        +     '<div><div style="font-size:13px;font-weight:700;color:var(--t1)">' + cfg.label + '</div>'
+        +       '<div style="font-size:10px;color:var(--t3)">' + cfg.sub + '</div></div>'
+        +   '</div>'
+        +   '<div style="text-align:right">'
+        +     '<div style="font-size:14px;font-weight:700;color:var(--t1)">' + _b304(dAct)
+        +       '<span style="font-size:10px;padding:1px 6px;border-radius:20px;margin-left:5px;background:' + badgeBg + ';color:' + badgeCol + '">' + _pct304(pctReal) + '</span>'
+        +     '</div>'
+        +     '<div style="font-size:10px;color:var(--t3)">งบ ' + _b304(dBud) + '</div>'
+        +   '</div>'
+        + '</div>'
+        + '<div style="height:5px;background:var(--b2);border-radius:3px;overflow:hidden;margin-bottom:5px">'
+        +   '<div style="height:100%;border-radius:3px;background:' + barCol + ';width:' + pctBar.toFixed(1) + '%"></div>'
+        + '</div>'
+        + '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3)">'
+        +   '<span>ใช้ไป ' + _b304(dAct) + '</span><span>' + remLabel + '</span>'
+        + '</div>'
+        + '</div>';
     });
-    tbody.innerHTML = rows || '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--t3)">ไม่มีข้อมูล</td></tr>';
+    deptWrap.innerHTML = cardsHtml || '<div style="padding:20px;text-align:center;color:var(--t3)">ไม่มีข้อมูลแผนก</div>';
   }
 
-  // ── Monthly Bar Chart ────────────────────────────────────────
+  /* ── Monthly Chart ──────────────────────────────────────────── */
   build304Chart(s);
 
-  // ── Detail Tables ────────────────────────────────────────────
+  /* ── Detail Tables ──────────────────────────────────────────── */
   var detail = data.detail || {};
   build304DetailTable('e304-detail-sales-tbody',    detail.sales    || []);
   build304DetailTable('e304-detail-service-tbody',  detail.service  || []);
@@ -9632,6 +9658,7 @@ function update304Module(data) {
 
   set304Status('ok', 'ข้อมูลล่าสุด · Live จาก Google Sheets');
 }
+
 
 /* ── BAR CHART ───────────────────────────────────────────────── */
 function build304Chart(summary) {
