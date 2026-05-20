@@ -233,6 +233,15 @@ html,body{
 .rbt-md {background:rgba(139,92,246,.18);color:#c4b5fd;border:1px solid rgba(139,92,246,.3)}
 .rbt-xls{background:rgba(16,185,129,.18);color:#34d399;border:1px solid rgba(16,185,129,.3)}
 .rbt-csv{background:rgba(59,130,246,.18);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
+.rpt-kpis{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.rpt-kpi-pill{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);color:#c4b5fd;white-space:nowrap}
+.rpt-kpi-pill.gn{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.25);color:#34d399}
+.rpt-kpi-pill.bl{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.25);color:#60a5fa}
+.rpt-kpi-pill.rd{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.25);color:#f87171}
+.rpt-kpi-pill.yw{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.25);color:#fbbf24}
+.rpt-featured{border:1.5px solid rgba(139,92,246,.5)!important;background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(59,130,246,.04))!important}
+.rpt-featured .rpt-name{font-size:13px;color:#a78bfa}
+.rpt-featured .rpt-icon{font-size:28px}
 
 /* ── DATE RANGE PICKER ── */
 .drp{position:fixed;top:48px;left:50%;transform:translateX(-50%);background:#1a1f2e;border:1px solid rgba(139,92,246,.35);border-radius:12px;box-shadow:0 10px 48px rgba(0,0,0,.7),0 0 0 1px rgba(139,92,246,.1);z-index:1001;display:none;padding:18px 20px 16px;min-width:320px}
@@ -749,8 +758,8 @@ html,body{
     <div class="ni has-danger" id="n-ar" onclick="go('finance',1)"><span class="ic">💰</span>Invoicing / AR<span class="nb nb-r pulse">3</span></div>
     <div class="ni has-warning" id="n-aging" onclick="go('finance',2)"><span class="ic">⏳</span>ค้างรับ / Aging<span class="nb nb-a pulse">2</span></div>
     <div class="ni has-warning" id="n-exp" onclick="go('finance',3)"><span class="ic">🧾</span>Expenses / AP<span class="nb nb-a pulse">1</span></div>
-    <div class="ni" id="n-fix" onclick="go('finance',4)"><span class="ic">🏠</span>Fixed Expenses<span class="nb nb-g pulse">✓</span></div>
-    <div class="ni has-warning" id="n-tax" onclick="go('finance',5)"><span class="ic">🏛</span>ภาษี / Tax<span class="nb nb-a pulse">!</span></div>
+    <div class="ni" id="n-fix" onclick="go('finance',5)"><span class="ic">🏠</span>Fixed Expenses (คงที่)<span class="nb nb-g pulse">✓</span></div>
+    <div class="ni has-warning" id="n-tax" onclick="go('finance',6)"><span class="ic">🏛</span>Tax (ภาษี)<span class="nb nb-a pulse">!</span></div>
     <div class="ndv"></div>
     <div class="ng">Purchasing</div>
     <div class="ni has-warning" id="n-po" onclick="go('po',0)"><span class="ic">🛒</span>Purchase Orders<span class="nb nb-a pulse">3</span></div>
@@ -762,6 +771,9 @@ html,body{
     <div class="ni" id="n-bank" onclick="go('mgmt',0)"><span class="ic">🏦</span>Bank / OD / วงเงิน<span class="nb nb-dot nb-g"></span></div>
     <div class="ni has-warning" id="n-risk" onclick="go('mgmt',2)"><span class="ic">⚠️</span>Risk Center<span class="nb nb-a pulse">!</span></div>
     <div class="ni" id="n-rpt" onclick="go('mgmt',3)"><span class="ic">📊</span>Reports<span class="nb nb-g pulse">NEW</span></div>
+    <div class="ndv"></div>
+    <div class="ng">Executive</div>
+    <div class="ni" id="n-audit" onclick="go('audit',0)"><span class="ic">🔍</span>Data Audit<span class="nb nb-g">NEW</span></div>
     <div class="ndv"></div>
     <div class="ng">System</div>
     <div class="ni" id="n-usr" onclick="go('admin',0)"><span class="ic">🛡</span>Admin / Users<span class="nb nb-g pulse">4</span></div>
@@ -1104,7 +1116,7 @@ html,body{
         <div class="kc cc" onclick="showModuleKpi('finance','fixed-cost')"><div class="kl">🏢 Fixed Cost/เดือน <span style="font-size:9px;opacity:.5">↗ คลิก</span></div><div class="kv" id="fin-fix">—</div><div class="ks"><span class="tag tg">8 รายการ</span></div></div>
       </div>
       <div class="cd">
-        <div class="tbar" id="tb-f"><div class="tt on" onclick="sw('tb-f',0,'pn-f')">📊 P&L รายเดือน</div><div class="tt" onclick="sw('tb-f',1,'pn-f')">AR / ลูกหนี้</div><div class="tt" onclick="sw('tb-f',2,'pn-f')">Aging</div><div class="tt" onclick="sw('tb-f',3,'pn-f')">Expenses / AP</div><div class="tt" onclick="sw('tb-f',4,'pn-f')">Fixed Expenses</div><div class="tt" onclick="sw('tb-f',5,'pn-f')">ภาษี / Tax</div></div>
+        <div class="tbar" id="tb-f"><div class="tt on" onclick="sw('tb-f',0,'pn-f')">📊 P&L (กำไรขาดทุน)</div><div class="tt" onclick="sw('tb-f',1,'pn-f')">AR (ลูกหนี้)</div><div class="tt" onclick="sw('tb-f',2,'pn-f')">Aging (อายุหนี้)</div><div class="tt" onclick="sw('tb-f',3,'pn-f')">Expenses (ค่าใช้จ่าย)</div><div class="tt" onclick="sw('tb-f',4,'pn-f')">AP (เจ้าหนี้)</div><div class="tt" onclick="sw('tb-f',5,'pn-f')">Fixed Expenses (คงที่)</div><div class="tt" onclick="sw('tb-f',6,'pn-f')">Tax (ภาษี)</div></div>
         <div id="pn-f">
           <!-- ══ PANE 0: MONTHLY SNAPSHOT ══ -->
           <div>
@@ -1136,7 +1148,7 @@ html,body{
               <div style="background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:14px">
                 <div style="font-size:11px;font-weight:700;color:var(--t1);margin-bottom:10px;display:flex;align-items:center;gap:6px">
                   <span style="width:3px;height:14px;background:#ef4444;border-radius:2px;display:inline-block"></span>
-                  รายจ่ายแยกตามหมวด · Expense Breakdown — พ.ค. 2026
+                  รายจ่ายแยกตามหมวด · Expense Breakdown — <span id="fin-exp-bkd-period">MTD</span>
                 </div>
                 <table style="width:100%;border-collapse:collapse;font-size:12px">
                   <thead><tr style="border-bottom:1px solid var(--b1)">
@@ -1145,50 +1157,15 @@ html,body{
                     <th style="text-align:right;padding:4px 8px;color:var(--t3);font-weight:600;font-size:10px">% ของรายจ่าย</th>
                     <th style="padding:4px 8px;color:var(--t3);font-weight:600;font-size:10px">สัดส่วน</th>
                   </tr></thead>
-                  <tbody>
-                    <tr style="border-bottom:1px solid var(--b1)">
-                      <td style="padding:6px 8px;color:var(--t1);font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-right:5px"></span>เงินเดือน (Payroll)</td>
-                      <td style="text-align:right;padding:6px 8px;color:#f87171;font-weight:700">฿824,000</td>
-                      <td style="text-align:right;padding:6px 8px;color:var(--t2)">70.8%</td>
-                      <td style="padding:6px 8px"><div style="background:var(--b1);border-radius:3px;height:5px"><div style="width:71%;height:5px;background:#8b5cf6;border-radius:3px"></div></div></td>
-                    </tr>
-                    <tr style="border-bottom:1px solid var(--b1)">
-                      <td style="padding:6px 8px;color:var(--t1);font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#3b82f6;margin-right:5px"></span>ค่าเช่า Office+Warehouse</td>
-                      <td style="text-align:right;padding:6px 8px;color:#f87171;font-weight:700">฿185,000</td>
-                      <td style="text-align:right;padding:6px 8px;color:var(--t2)">15.9%</td>
-                      <td style="padding:6px 8px"><div style="background:var(--b1);border-radius:3px;height:5px"><div style="width:16%;height:5px;background:#3b82f6;border-radius:3px"></div></div></td>
-                    </tr>
-                    <tr style="border-bottom:1px solid var(--b1)">
-                      <td style="padding:6px 8px;color:var(--t1);font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;margin-right:5px"></span>ค่า Logistics + Operations</td>
-                      <td style="text-align:right;padding:6px 8px;color:#f87171;font-weight:700">฿124,000</td>
-                      <td style="text-align:right;padding:6px 8px;color:var(--t2)">10.7%</td>
-                      <td style="padding:6px 8px"><div style="background:var(--b1);border-radius:3px;height:5px"><div style="width:11%;height:5px;background:#10b981;border-radius:3px"></div></div></td>
-                    </tr>
-                    <tr style="border-bottom:1px solid var(--b1)">
-                      <td style="padding:6px 8px;color:var(--t1);font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-right:5px"></span>Import Duty + Tax</td>
-                      <td style="text-align:right;padding:6px 8px;color:#f87171;font-weight:700">฿152,000</td>
-                      <td style="text-align:right;padding:6px 8px;color:var(--t2)">13.1%</td>
-                      <td style="padding:6px 8px"><div style="background:var(--b1);border-radius:3px;height:5px"><div style="width:13%;height:5px;background:#f59e0b;border-radius:3px"></div></div></td>
-                    </tr>
-                    <tr style="border-bottom:1px solid var(--b1)">
-                      <td style="padding:6px 8px;color:var(--t1);font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#06b6d4;margin-right:5px"></span>IT + Cloud + ค่าน้ำไฟ</td>
-                      <td style="text-align:right;padding:6px 8px;color:#f87171;font-weight:700">฿28,000</td>
-                      <td style="text-align:right;padding:6px 8px;color:var(--t2)">2.4%</td>
-                      <td style="padding:6px 8px"><div style="background:var(--b1);border-radius:3px;height:5px"><div style="width:2%;height:5px;background:#06b6d4;border-radius:3px"></div></div></td>
-                    </tr>
-                    <tr>
-                      <td style="padding:6px 8px;color:var(--t1);font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f43f5e;margin-right:5px"></span>OD Interest KBank</td>
-                      <td style="text-align:right;padding:6px 8px;color:#f87171;font-weight:700">฿18,400</td>
-                      <td style="text-align:right;padding:6px 8px;color:var(--t2)">1.6%</td>
-                      <td style="padding:6px 8px"><div style="background:var(--b1);border-radius:3px;height:5px"><div style="width:2%;height:5px;background:#f43f5e;border-radius:3px"></div></div></td>
-                    </tr>
+                  <tbody id="fin-exp-bkd-body">
+                    <tr><td colspan="4" style="text-align:center;color:var(--t3);padding:16px;font-size:11px">กำลังโหลดข้อมูล…</td></tr>
                   </tbody>
                   <tfoot>
                     <tr style="border-top:2px solid var(--b2)">
                       <td style="padding:8px 8px;color:var(--t1);font-weight:800">รวมรายจ่าย</td>
-                      <td style="text-align:right;padding:8px 8px;color:#f87171;font-weight:800;font-size:14px">฿1,331,400</td>
+                      <td id="fin-exp-bkd-tot" style="text-align:right;padding:8px 8px;color:#f87171;font-weight:800;font-size:14px">—</td>
                       <td style="text-align:right;padding:8px 8px;color:var(--t2);font-weight:700">100%</td>
-                      <td></td>
+                      <td id="fin-exp-bkd-src" style="font-size:10px;color:var(--t3)"></td>
                     </tr>
                   </tfoot>
                 </table></div>
@@ -1255,9 +1232,9 @@ html,body{
             <div style="background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:14px">
               <div style="font-size:11px;font-weight:700;color:var(--t1);margin-bottom:10px;display:flex;align-items:center;gap:6px">
                 <span style="width:3px;height:14px;background:#8b5cf6;border-radius:2px;display:inline-block"></span>
-                รายรับแยกตาม Customer — พ.ค. 2026
+                <span id="cust-rev-title">รายรับแยกตาม Customer — พ.ค. 2026</span>
               </div>
-              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+              <div id="cust-rev-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
                 <div style="text-align:center;padding:10px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.25);border-radius:8px">
                   <div style="font-size:10px;color:#a78bfa;margin-bottom:4px;font-weight:700">🏪 Lotus's</div>
                   <div style="font-size:18px;font-weight:800;color:var(--t1)">฿9.8M</div>
@@ -1305,8 +1282,18 @@ html,body{
           </div>
           <div style="display:none">
             <div class="fb"><button class="btn p" data-perm="finance:create" onclick="ov('mv-exp')">+ Add Expense</button></div>
-            <div class="tbl-wrap"><table class="tbl"><thead><tr><th>วันที่</th><th>รายการ</th><th>ประเภท</th><th>PO Link</th><th style="text-align:right">จำนวน</th><th>สถานะ</th></tr></thead>
+            <div class="tbl-wrap"><table class="tbl"><thead><tr><th>วันที่</th><th>รายการ</th><th>ประเภท</th><th>EXP Ref</th><th style="text-align:right">จำนวน</th><th>สถานะ</th></tr></thead>
             <tbody id="fin-exp-body"><tr><td colspan="6" style="text-align:center;color:#475569;padding:20px">กำลังโหลด...</td></tr></tbody></table></div>
+          </div>
+          <!-- AP / เจ้าหนี้ pane (AP- prefix rows) -->
+          <div style="display:none">
+            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+              <div class="kc ca" style="margin-bottom:0;flex:1;min-width:120px"><div class="kl">AP ค้างจ่าย</div><div class="kv" id="fin-ap-pend-amt">—</div><div class="ks"><span class="tag ta2" id="fin-ap-pend-cnt">—</span></div></div>
+              <div class="kc" style="margin-bottom:0;flex:1;min-width:120px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3)"><div class="kl">ชำระแล้ว YTD</div><div class="kv" id="fin-ap-paid-amt" style="color:#34d399">—</div><div class="ks"><span class="tag tg" id="fin-ap-paid-cnt">—</span></div></div>
+              <div class="kc" style="margin-bottom:0;flex:1;min-width:120px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3)"><div class="kl">Cheque-Done</div><div class="kv" id="fin-ap-cheq-amt" style="color:#60a5fa">—</div><div class="ks"><span class="tag tb" id="fin-ap-cheq-cnt">—</span></div></div>
+            </div>
+            <div class="tbl-wrap"><table class="tbl"><thead><tr><th>วันที่</th><th>Vendor / รายการ</th><th>ประเภท</th><th>AP Ref</th><th style="text-align:right">จำนวน</th><th>สถานะ</th></tr></thead>
+            <tbody id="fin-ap-pane-body"><tr><td colspan="6" style="text-align:center;color:#475569;padding:20px">กำลังโหลด...</td></tr></tbody></table></div>
           </div>
           <div style="display:none">
             <div class="tbl-wrap"><table class="tbl"><thead><tr><th>รายการ</th><th>หมวด</th><th style="text-align:right">จำนวน/เดือน</th><th>วันครบกำหนด</th><th>สถานะ</th></tr></thead>
@@ -1347,8 +1334,8 @@ html,body{
             <tbody id="po-all-body"><tr><td colspan="7" style="text-align:center;color:#475569;padding:20px">กำลังโหลด...</td></tr></tbody></table></div>
           </div>
           <div style="display:none">
-            <div class="tbl-wrap"><table class="tbl"><thead><tr><th>PO #</th><th>Supplier</th><th>สินค้า</th><th style="text-align:right">จำนวน</th><th>Lead Time</th><th>สถานะ</th></tr></thead>
-            <tbody id="po-dom-body"><tr><td colspan="6" style="text-align:center;color:#475569;padding:20px">กำลังโหลด...</td></tr></tbody></table></div>
+            <div class="tbl-wrap"><table class="tbl"><thead><tr><th>PO #</th><th>วันที่เอกสาร</th><th>Supplier</th><th>สินค้า</th><th style="text-align:right">จำนวน</th><th>Lead Time</th><th>สถานะ</th></tr></thead>
+            <tbody id="po-dom-body"><tr><td colspan="7" style="text-align:center;color:#475569;padding:20px">กำลังโหลด...</td></tr></tbody></table></div>
           </div>
           <div style="display:none">
             <div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap">
@@ -1358,17 +1345,17 @@ html,body{
             </div>
             <div class="tbl-wrap"><table class="tbl">
               <thead><tr>
-                <th>PO #</th><th>Supplier</th><th>Country</th><th>FX Rate</th>
+                <th>PO #</th><th>วันที่เอกสาร</th><th>Supplier</th><th>Country</th><th>FX Rate</th>
                 <th style="text-align:right">มูลค่า (THB)</th>
                 <th style="text-align:right">Import Duty</th>
                 <th style="text-align:right">VAT 7%</th>
                 <th style="text-align:right">รวมภาษี</th>
                 <th>HS Code</th><th>สถานะ</th>
               </tr></thead>
-              <tbody id="po-intl-body"><tr><td colspan="10" style="text-align:center;color:#475569;padding:20px">กำลังโหลด...</td></tr></tbody>
+              <tbody id="po-intl-body"><tr><td colspan="11" style="text-align:center;color:#475569;padding:20px">กำลังโหลด...</td></tr></tbody>
               <tfoot id="po-intl-foot">
                 <tr style="border-top:2px solid var(--b2)">
-                  <td colspan="4" style="padding:7px 8px;font-weight:800;color:var(--t1)">รวม</td>
+                  <td colspan="5" style="padding:7px 8px;font-weight:800;color:var(--t1)">รวม</td>
                   <td style="text-align:right;font-weight:800" id="po-tfoot-amt">—</td>
                   <td style="text-align:right;font-weight:800;color:#f87171" id="po-tfoot-duty">—</td>
                   <td style="text-align:right;font-weight:800;color:#fbbf24" id="po-tfoot-vat">—</td>
@@ -1378,7 +1365,7 @@ html,body{
               </tfoot>
             </table></div>
             <div style="margin-top:8px;padding:9px 12px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:7px;font-size:11px;color:#fbbf24">
-              💡 HS Code ใช้คำนวณ Import Duty อัตโนมัติ · VAT นำเข้า = (มูลค่า CIF + Duty) × 7% · ดูสรุปภาษีทั้งหมดใน <span onclick="go('finance',5)" style="cursor:pointer;text-decoration:underline">Finance → ภาษี / Tax</span>
+              💡 HS Code ใช้คำนวณ Import Duty อัตโนมัติ · VAT นำเข้า = (มูลค่า CIF + Duty) × 7% · ดูสรุปภาษีทั้งหมดใน <span onclick="go('finance',6)" style="cursor:pointer;text-decoration:underline">Finance → ภาษี / Tax</span>
             </div>
           </div>
           <div style="display:none">
@@ -1466,12 +1453,39 @@ html,body{
             </div>
 
             <!-- ── Format legend ── -->
-            <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+            <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
               <span style="font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3)">📄 PDF</span>
               <span style="font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(139,92,246,.15);color:#c4b5fd;border:1px solid rgba(139,92,246,.3)">📝 MD</span>
               <span style="font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3)">📊 XLS</span>
               <span style="font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3)">📋 CSV</span>
               <span style="font-size:9.5px;color:var(--t3);margin-left:4px">— คลิกปุ่ม export เพื่อดาวน์โหลดทันที</span>
+            </div>
+
+            <!-- ══ FEATURED: สรุปภาพรวมทั้งหมด ══ -->
+            <div style="margin-bottom:18px">
+              <div style="display:grid;gap:8px">
+                <div class="rpt-card rpt-featured" id="rpt-full-summary">
+                  <div class="rpt-icon">🗂️</div>
+                  <div class="rpt-info">
+                    <div class="rpt-name">สรุปภาพรวมทั้งหมด</div>
+                    <div class="rpt-desc">Executive · P&amp;L · AR Aging · PO Summary · ภาษี · Risk — รวมทุก module เป็น report เดียว หลายหน้า</div>
+                    <div class="rpt-meta">All modules · ข้อมูล real-time · รองรับ A4 / A3 แนวตั้ง-แนวนอน</div>
+                    <div class="rpt-kpis">
+                      <span class="rpt-kpi-pill gn" id="rpt-full-rev">Revenue: —</span>
+                      <span class="rpt-kpi-pill bl" id="rpt-full-margin">Margin: —</span>
+                      <span class="rpt-kpi-pill" id="rpt-full-cash">Cash: —</span>
+                      <span class="rpt-kpi-pill rd" id="rpt-full-ar">AR: —</span>
+                      <span class="rpt-kpi-pill yw" id="rpt-full-ap">AP: —</span>
+                    </div>
+                  </div>
+                  <div class="rpt-btns">
+                    <button onclick="openPrintReport('full-summary','A4','portrait')"  class="rbt rbt-pdf" title="ดาวน์โหลด HTML → เปิดใน Chrome → Ctrl+P → Save as PDF">📄 A4 แนวตั้ง</button>
+                    <button onclick="openPrintReport('full-summary','A4','landscape')" class="rbt rbt-xls" title="ดาวน์โหลด HTML → เปิดใน Chrome → Ctrl+P → Save as PDF">📊 A4 แนวนอน</button>
+                    <button onclick="openPrintReport('full-summary','A3','landscape')" class="rbt rbt-pdf" style="background:rgba(139,92,246,.18);color:#c4b5fd;border-color:rgba(139,92,246,.3)" title="ดาวน์โหลด HTML → เปิดใน Chrome → Ctrl+P → Save as PDF">📄 A3 แนวนอน</button>
+                    <button onclick="downloadFullSummaryMD()"                          class="rbt rbt-md">📝 MD</button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- ══ MODULE: OVERVIEW / EXECUTIVE ══ -->
@@ -1487,9 +1501,14 @@ html,body{
                     <div class="rpt-name">Executive Summary</div>
                     <div class="rpt-desc">KPI รวม · Revenue · Margin · Cash · Risk Overview</div>
                     <div class="rpt-meta">ทุก module · อัพเดท real-time</div>
+                    <div class="rpt-kpis">
+                      <span class="rpt-kpi-pill gn" id="rpt-exec-rev">Revenue: —</span>
+                      <span class="rpt-kpi-pill bl" id="rpt-exec-margin">Margin: —</span>
+                      <span class="rpt-kpi-pill" id="rpt-exec-cash">Cash: —</span>
+                    </div>
                   </div>
                   <div class="rpt-btns">
-                    <button onclick="doExport('executive','pdf')"  class="rbt rbt-pdf">📄 PDF</button>
+                    <button onclick="openPrintReport('executive','A4','portrait')"  class="rbt rbt-pdf">📄 PDF</button>
                     <button onclick="doExport('executive','md')"   class="rbt rbt-md">📝 MD</button>
                   </div>
                 </div>
@@ -1497,12 +1516,17 @@ html,body{
                 <div class="rpt-card" id="rpt-pl">
                   <div class="rpt-icon">📊</div>
                   <div class="rpt-info">
-                    <div class="rpt-name">P&L รายเดือน</div>
+                    <div class="rpt-name">P&amp;L รายเดือน</div>
                     <div class="rpt-desc">รายรับ · รายจ่าย · กำไรสุทธิ · Margin % · vs Budget</div>
                     <div class="rpt-meta">Finance module · 5 เดือนล่าสุด</div>
+                    <div class="rpt-kpis">
+                      <span class="rpt-kpi-pill gn" id="rpt-pl-rev">Revenue: —</span>
+                      <span class="rpt-kpi-pill" id="rpt-pl-profit">Net Profit: —</span>
+                      <span class="rpt-kpi-pill bl" id="rpt-pl-margin">Margin: —</span>
+                    </div>
                   </div>
                   <div class="rpt-btns">
-                    <button onclick="doExport('pl','pdf')"  class="rbt rbt-pdf">📄 PDF</button>
+                    <button onclick="openPrintReport('pl','A4','portrait')"  class="rbt rbt-pdf">📄 PDF</button>
                     <button onclick="doExport('pl','md')"   class="rbt rbt-md">📝 MD</button>
                     <button onclick="doExport('pl','xls')"  class="rbt rbt-xls">📊 XLS</button>
                     <button onclick="doExport('pl','csv')"  class="rbt rbt-csv">📋 CSV</button>
@@ -1515,11 +1539,16 @@ html,body{
                     <div class="rpt-name">Cash Flow Statement</div>
                     <div class="rpt-desc">เงินสด · OD · รับ-จ่ายสุทธิ · Ending Balance</div>
                     <div class="rpt-meta">Finance · Bank module</div>
+                    <div class="rpt-kpis">
+                      <span class="rpt-kpi-pill gn" id="rpt-cf-cash">Cash: —</span>
+                      <span class="rpt-kpi-pill rd" id="rpt-cf-od">OD: —</span>
+                      <span class="rpt-kpi-pill bl" id="rpt-cf-net">Net CF: —</span>
+                    </div>
                   </div>
                   <div class="rpt-btns">
-                    <button onclick="doExport('cashflow','pdf')"  class="rbt rbt-pdf">📄 PDF</button>
-                    <button onclick="doExport('cashflow','xls')"  class="rbt rbt-xls">📊 XLS</button>
-                    <button onclick="doExport('cashflow','csv')"  class="rbt rbt-csv">📋 CSV</button>
+                    <button onclick="openPrintReport('cashflow','A4','portrait')"  class="rbt rbt-pdf">📄 PDF</button>
+                    <button onclick="doExport('cashflow','xls')" class="rbt rbt-xls">📊 XLS</button>
+                    <button onclick="doExport('cashflow','csv')" class="rbt rbt-csv">📋 CSV</button>
                   </div>
                 </div>
 
@@ -1538,10 +1567,14 @@ html,body{
                   <div class="rpt-info">
                     <div class="rpt-name">Invoice List ทั้งหมด</div>
                     <div class="rpt-desc">วันที่ · เลขที่ · ลูกค้า · มูลค่า · VAT · สุทธิ · สถานะ · OD</div>
-                    <div class="rpt-meta" id="rpt-inv-meta">6 รายการ · พ.ค. 2026</div>
+                    <div class="rpt-meta" id="rpt-inv-meta">— · พ.ค. 2026</div>
+                    <div class="rpt-kpis">
+                      <span class="rpt-kpi-pill gn" id="rpt-inv-total">Total: —</span>
+                      <span class="rpt-kpi-pill rd" id="rpt-inv-ar">AR: —</span>
+                    </div>
                   </div>
                   <div class="rpt-btns">
-                    <button onclick="doExport('invoice','pdf')"  class="rbt rbt-pdf">📄 PDF</button>
+                    <button onclick="openPrintReport('invoice','A4','landscape')"  class="rbt rbt-pdf">📄 PDF</button>
                     <button onclick="doExport('invoice','md')"   class="rbt rbt-md">📝 MD</button>
                     <button onclick="doExport('invoice','xls')"  class="rbt rbt-xls">📊 XLS</button>
                     <button onclick="doExport('invoice','csv')"  class="rbt rbt-csv">📋 CSV</button>
@@ -1554,9 +1587,13 @@ html,body{
                     <div class="rpt-name">AR Aging Report</div>
                     <div class="rpt-desc">0–30 / 31–60 / 61–90 / 90+ วัน · ลูกหนี้ค้างชำระ</div>
                     <div class="rpt-meta">Finance · AR module</div>
+                    <div class="rpt-kpis">
+                      <span class="rpt-kpi-pill rd" id="rpt-aging-overdue">Overdue: —</span>
+                      <span class="rpt-kpi-pill gn" id="rpt-aging-ar">AR Total: —</span>
+                    </div>
                   </div>
                   <div class="rpt-btns">
-                    <button onclick="doExport('ar-aging','pdf')"  class="rbt rbt-pdf">📄 PDF</button>
+                    <button onclick="openPrintReport('ar-aging','A4','portrait')"  class="rbt rbt-pdf">📄 PDF</button>
                     <button onclick="doExport('ar-aging','md')"   class="rbt rbt-md">📝 MD</button>
                     <button onclick="doExport('ar-aging','xls')"  class="rbt rbt-xls">📊 XLS</button>
                     <button onclick="doExport('ar-aging','csv')"  class="rbt rbt-csv">📋 CSV</button>
@@ -1569,9 +1606,13 @@ html,body{
                     <div class="rpt-name">Sales Ranking by Customer</div>
                     <div class="rpt-desc">YTD Revenue · เดือนนี้ · จำนวน Invoice · % สัดส่วน</div>
                     <div class="rpt-meta">Sales module · YTD 2026</div>
+                    <div class="rpt-kpis">
+                      <span class="rpt-kpi-pill gn" id="rpt-rank-ytd">YTD: —</span>
+                      <span class="rpt-kpi-pill bl" id="rpt-rank-mtd">MTD: —</span>
+                    </div>
                   </div>
                   <div class="rpt-btns">
-                    <button onclick="doExport('sales-rank','pdf')"  class="rbt rbt-pdf">📄 PDF</button>
+                    <button onclick="openPrintReport('sales-rank','A4','portrait')"  class="rbt rbt-pdf">📄 PDF</button>
                     <button onclick="doExport('sales-rank','xls')"  class="rbt rbt-xls">📊 XLS</button>
                     <button onclick="doExport('sales-rank','csv')"  class="rbt rbt-csv">📋 CSV</button>
                   </div>
@@ -1591,11 +1632,15 @@ html,body{
                   <div class="rpt-icon">🧾</div>
                   <div class="rpt-info">
                     <div class="rpt-name">Expense Breakdown</div>
-                    <div class="rpt-desc">Payroll · Rent · Logistics · Import · IT · OD Interest</div>
+                    <div class="rpt-desc">AP ค้างจ่าย · Fixed · Payroll · Logistics · Import · OD Interest</div>
                     <div class="rpt-meta">Finance · Expenses/AP module</div>
+                    <div class="rpt-kpis">
+                      <span class="rpt-kpi-pill rd" id="rpt-exp-ap">AP Pending: —</span>
+                      <span class="rpt-kpi-pill yw" id="rpt-exp-fix">Fixed: —</span>
+                    </div>
                   </div>
                   <div class="rpt-btns">
-                    <button onclick="doExport('expense','pdf')"  class="rbt rbt-pdf">📄 PDF</button>
+                    <button onclick="openPrintReport('expense','A4','portrait')"  class="rbt rbt-pdf">📄 PDF</button>
                     <button onclick="doExport('expense','md')"   class="rbt rbt-md">📝 MD</button>
                     <button onclick="doExport('expense','xls')"  class="rbt rbt-xls">📊 XLS</button>
                     <button onclick="doExport('expense','csv')"  class="rbt rbt-csv">📋 CSV</button>
@@ -1608,9 +1653,14 @@ html,body{
                     <div class="rpt-name">Tax Summary</div>
                     <div class="rpt-desc">VAT · WHT · CIT · ภาษีนำเข้า · กำหนดส่ง · สถานะ</div>
                     <div class="rpt-meta">Finance · ภาษี/Tax module</div>
+                    <div class="rpt-kpis">
+                      <span class="rpt-kpi-pill yw" id="rpt-tax-vat">VAT: —</span>
+                      <span class="rpt-kpi-pill bl" id="rpt-tax-wht">WHT: —</span>
+                      <span class="rpt-kpi-pill rd" id="rpt-tax-cit">CIT: —</span>
+                    </div>
                   </div>
                   <div class="rpt-btns">
-                    <button onclick="doExport('tax','pdf')"  class="rbt rbt-pdf">📄 PDF</button>
+                    <button onclick="openPrintReport('tax','A4','portrait')"  class="rbt rbt-pdf">📄 PDF</button>
                     <button onclick="doExport('tax','md')"   class="rbt rbt-md">📝 MD</button>
                     <button onclick="doExport('tax','csv')"  class="rbt rbt-csv">📋 CSV</button>
                   </div>
@@ -1622,11 +1672,15 @@ html,body{
                     <div class="rpt-name">AR Statement</div>
                     <div class="rpt-desc">ลูกหนี้ทั้งหมด · ครบกำหนด · เครดิต · วันรับเงินจริง</div>
                     <div class="rpt-meta">Finance · AR / Invoicing</div>
+                    <div class="rpt-kpis">
+                      <span class="rpt-kpi-pill gn" id="rpt-arst-total">AR Total: —</span>
+                      <span class="rpt-kpi-pill bl" id="rpt-arst-dso">DSO: —</span>
+                    </div>
                   </div>
                   <div class="rpt-btns">
-                    <button onclick="doExport('ar-stmt','pdf')"  class="rbt rbt-pdf">📄 PDF</button>
-                    <button onclick="doExport('ar-stmt','xls')"  class="rbt rbt-xls">📊 XLS</button>
-                    <button onclick="doExport('ar-stmt','csv')"  class="rbt rbt-csv">📋 CSV</button>
+                    <button onclick="openPrintReport('ar-stmt','A4','landscape')"  class="rbt rbt-pdf">📄 PDF</button>
+                    <button onclick="doExport('ar-stmt','xls')" class="rbt rbt-xls">📊 XLS</button>
+                    <button onclick="doExport('ar-stmt','csv')" class="rbt rbt-csv">📋 CSV</button>
                   </div>
                 </div>
 
@@ -1646,11 +1700,15 @@ html,body{
                     <div class="rpt-name">PO Summary</div>
                     <div class="rpt-desc">PO ทั้งหมด · DOM / INTL · Supplier · สถานะ · จำนวน</div>
                     <div class="rpt-meta">Purchasing · All POs</div>
+                    <div class="rpt-kpis">
+                      <span class="rpt-kpi-pill yw" id="rpt-po-count">POs: —</span>
+                      <span class="rpt-kpi-pill bl" id="rpt-po-total">Total: —</span>
+                    </div>
                   </div>
                   <div class="rpt-btns">
-                    <button onclick="doExport('po-summary','pdf')"  class="rbt rbt-pdf">📄 PDF</button>
-                    <button onclick="doExport('po-summary','xls')"  class="rbt rbt-xls">📊 XLS</button>
-                    <button onclick="doExport('po-summary','csv')"  class="rbt rbt-csv">📋 CSV</button>
+                    <button onclick="openPrintReport('po-summary','A4','landscape')"  class="rbt rbt-pdf">📄 PDF</button>
+                    <button onclick="doExport('po-summary','xls')" class="rbt rbt-xls">📊 XLS</button>
+                    <button onclick="doExport('po-summary','csv')" class="rbt rbt-csv">📋 CSV</button>
                   </div>
                 </div>
 
@@ -1660,9 +1718,12 @@ html,body{
                     <div class="rpt-name">Import Duty &amp; Tax</div>
                     <div class="rpt-desc">HS Code · Duty Rate · Import VAT · รวมภาษีนำเข้า · FX</div>
                     <div class="rpt-meta">Purchasing · INTL module</div>
+                    <div class="rpt-kpis">
+                      <span class="rpt-kpi-pill yw" id="rpt-imp-fx">FX Exposure: —</span>
+                    </div>
                   </div>
                   <div class="rpt-btns">
-                    <button onclick="doExport('import-duty','pdf')"  class="rbt rbt-pdf">📄 PDF</button>
+                    <button onclick="openPrintReport('import-duty','A4','landscape')"  class="rbt rbt-pdf">📄 PDF</button>
                     <button onclick="doExport('import-duty','md')"   class="rbt rbt-md">📝 MD</button>
                     <button onclick="doExport('import-duty','xls')"  class="rbt rbt-xls">📊 XLS</button>
                     <button onclick="doExport('import-duty','csv')"  class="rbt rbt-csv">📋 CSV</button>
@@ -1675,8 +1736,12 @@ html,body{
                     <div class="rpt-name">Vendor Performance</div>
                     <div class="rpt-desc">Rating · Payment Terms · PO ล่าสุด · Country · สินค้า</div>
                     <div class="rpt-meta">Purchasing · Vendors</div>
+                    <div class="rpt-kpis">
+                      <span class="rpt-kpi-pill bl" id="rpt-vend-count">Vendors: —</span>
+                    </div>
                   </div>
                   <div class="rpt-btns">
+                    <button onclick="openPrintReport('vendor','A4','portrait')" class="rbt rbt-pdf">📄 PDF</button>
                     <button onclick="doExport('vendor','xls')"  class="rbt rbt-xls">📊 XLS</button>
                     <button onclick="doExport('vendor','csv')"  class="rbt rbt-csv">📋 CSV</button>
                   </div>
@@ -1698,9 +1763,13 @@ html,body{
                     <div class="rpt-name">Risk Assessment</div>
                     <div class="rpt-desc">Risk Score · AR Overdue · OD Usage · FX Exposure · Mitigation</div>
                     <div class="rpt-meta">Management · Risk Center</div>
+                    <div class="rpt-kpis">
+                      <span class="rpt-kpi-pill rd" id="rpt-risk-od">OD: —</span>
+                      <span class="rpt-kpi-pill yw" id="rpt-risk-fx">FX: —</span>
+                    </div>
                   </div>
                   <div class="rpt-btns">
-                    <button onclick="doExport('risk','pdf')"  class="rbt rbt-pdf">📄 PDF</button>
+                    <button onclick="openPrintReport('risk','A4','portrait')"  class="rbt rbt-pdf">📄 PDF</button>
                     <button onclick="doExport('risk','md')"   class="rbt rbt-md">📝 MD</button>
                   </div>
                 </div>
@@ -1708,12 +1777,16 @@ html,body{
                 <div class="rpt-card" id="rpt-budget">
                   <div class="rpt-icon">🎯</div>
                   <div class="rpt-info">
-                    <div class="rpt-name">P&L vs Budget</div>
+                    <div class="rpt-name">P&amp;L vs Budget</div>
                     <div class="rpt-desc">Actual vs Budget ทุกหมวด · Variance · % Deviation</div>
                     <div class="rpt-meta">Management · Budget module</div>
+                    <div class="rpt-kpis">
+                      <span class="rpt-kpi-pill gn" id="rpt-bud-rev">Actual Rev: —</span>
+                      <span class="rpt-kpi-pill bl" id="rpt-bud-margin">Margin: —</span>
+                    </div>
                   </div>
                   <div class="rpt-btns">
-                    <button onclick="doExport('budget','pdf')"  class="rbt rbt-pdf">📄 PDF</button>
+                    <button onclick="openPrintReport('budget','A4','portrait')"  class="rbt rbt-pdf">📄 PDF</button>
                     <button onclick="doExport('budget','xls')"  class="rbt rbt-xls">📊 XLS</button>
                     <button onclick="doExport('budget','csv')"  class="rbt rbt-csv">📋 CSV</button>
                   </div>
@@ -1723,7 +1796,7 @@ html,body{
             </div>
 
             <!-- ── Export status bar ── -->
-            <div id="rpt-status" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:8px;font-size:11px;color:#34d399;display:flex;align-items:center;gap:8px">
+            <div id="rpt-status" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:8px;font-size:11px;color:#34d399;align-items:center;gap:8px">
               <div class="ld"></div><span id="rpt-status-msg">กำลัง export...</span>
             </div>
 
@@ -1834,6 +1907,572 @@ html,body{
     </div>
 
   </div><!-- /ct -->
+
+  <!-- ══ AUDIT PAGE ══════════════════════════════════════════════════════ -->
+  <div class="pg" id="p-audit">
+    <div style="padding:0 0 32px 0">
+
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(59,130,246,.1));border:1px solid rgba(139,92,246,.3);border-radius:12px;padding:20px 24px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+          <span style="font-size:28px">🔍</span>
+          <div>
+            <div style="font-size:18px;font-weight:800;color:var(--t1)">Data Audit & Transparency</div>
+            <div style="font-size:12px;color:var(--t3);margin-top:2px">เอกสารแหล่งข้อมูลและสูตรคำนวณทุก Module — สำหรับผู้บริหารและ Auditor</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <span style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#34d399;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">✅ 5 Google Sheet Tabs</span>
+          <span style="background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#a78bfa;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">🔄 Auto-sync 5 นาที</span>
+          <span style="background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#60a5fa;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">📊 6 Modules</span>
+          <span style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#fbbf24;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">⚡ Real-time Calculation</span>
+        </div>
+      </div>
+
+      <!-- Tab bar -->
+      <div class="tbar" id="tb-audit">
+        <div class="tt on"  onclick="sw('tb-audit',0,'pn-audit')">🗄️ Data Pipeline</div>
+        <div class="tt"     onclick="sw('tb-audit',1,'pn-audit')">📊 Overview</div>
+        <div class="tt"     onclick="sw('tb-audit',2,'pn-audit')">💰 Finance</div>
+        <div class="tt"     onclick="sw('tb-audit',3,'pn-audit')">🧾 Sales</div>
+        <div class="tt"     onclick="sw('tb-audit',4,'pn-audit')">🛒 Purchasing</div>
+        <div class="tt"     onclick="sw('tb-audit',5,'pn-audit')">🏦 Management</div>
+        <div class="tt"     onclick="sw('tb-audit',6,'pn-audit')">⚠️ Known Gaps</div>
+      </div>
+
+      <div id="pn-audit">
+
+        <!-- ══ TAB 0: Data Pipeline ══ -->
+        <div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
+
+            <!-- Sync Architecture -->
+            <div style="background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:16px">
+              <div style="font-size:12px;font-weight:800;color:#a78bfa;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+                <span style="width:3px;height:14px;background:#8b5cf6;border-radius:2px;display:inline-block"></span>
+                Data Flow Architecture
+              </div>
+              <div style="font-size:11px;color:var(--t2);line-height:1.8">
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--b2)">
+                  <span style="background:#8b5cf6;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;min-width:80px;text-align:center">Google Sheets</span>
+                  <span style="color:var(--t3)">→</span>
+                  <span style="color:var(--t1)">5 Sheet Tabs (AR, PO, AP, FIX, CASH)</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--b2)">
+                  <span style="background:#3b82f6;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;min-width:80px;text-align:center">SheetProxy.gs</span>
+                  <span style="color:var(--t3)">→</span>
+                  <span style="color:var(--t1)">GAS Web App · แปลง rows → JSON + คำนวณ KPI</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--b2)">
+                  <span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;min-width:80px;text-align:center">Dashboard</span>
+                  <span style="color:var(--t3)">→</span>
+                  <span style="color:var(--t1)">fetch ?action=all → _cache.{kpi,ar,po,ap,fix,cash}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0">
+                  <span style="background:#f59e0b;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;min-width:80px;text-align:center">UI Render</span>
+                  <span style="color:var(--t3)">→</span>
+                  <span style="color:var(--t1)">updateXxx() functions ทุก module</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sync Settings -->
+            <div style="background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:16px">
+              <div style="font-size:12px;font-weight:800;color:#60a5fa;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+                <span style="width:3px;height:14px;background:#3b82f6;border-radius:2px;display:inline-block"></span>
+                Sync Configuration
+              </div>
+              <table style="width:100%;font-size:11px;border-collapse:collapse">
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 0;color:var(--t3);width:45%">Auto-sync interval</td><td style="color:var(--t1);font-weight:700">5 นาที (300,000 ms)</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 0;color:var(--t3)">Timeout</td><td style="color:var(--t1);font-weight:700">20 วินาที (AbortController)</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 0;color:var(--t3)">Auto-retry</td><td style="color:var(--t1);font-weight:700">สูงสุด 3 ครั้ง (5s backoff)</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 0;color:var(--t3)">Offline cache</td><td style="color:var(--t1);font-weight:700">localStorage: pt_kpi_cache</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 0;color:var(--t3)">GAS URL storage</td><td style="color:var(--t1);font-weight:700">localStorage: pt_gas_url</td></tr>
+                <tr><td style="padding:5px 0;color:var(--t3)">Cache scope</td><td style="color:#fbbf24;font-weight:700">⚠ kpi เท่านั้น (ไม่ cache raw rows)</td></tr>
+              </table>
+            </div>
+          </div>
+
+          <!-- Sheet Tabs Table -->
+          <div style="background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:16px;margin-top:16px">
+            <div style="font-size:12px;font-weight:800;color:#34d399;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+              <span style="width:3px;height:14px;background:#10b981;border-radius:2px;display:inline-block"></span>
+              Google Sheet Tabs → JavaScript Field Mapping
+            </div>
+            <div style="overflow-x:auto">
+            <table style="width:100%;font-size:11px;border-collapse:collapse">
+              <thead>
+                <tr style="border-bottom:2px solid var(--b2)">
+                  <th style="text-align:left;padding:6px 8px;color:var(--t3);font-weight:700">Sheet Tab</th>
+                  <th style="text-align:left;padding:6px 8px;color:var(--t3);font-weight:700">_cache Variable</th>
+                  <th style="text-align:left;padding:6px 8px;color:var(--t3);font-weight:700">Key Columns (Thai → JS Field)</th>
+                  <th style="text-align:left;padding:6px 8px;color:var(--t3);font-weight:700">Used By</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:6px 8px;color:#a78bfa;font-weight:700;white-space:nowrap">TRC-R3สรุป_ALL</td>
+                  <td style="padding:6px 8px;color:#34d399;font-family:monospace">_cache.ar</td>
+                  <td style="padding:6px 8px;color:var(--t2);font-size:10px">เลขที่เอกสาร→docNo · ลูกค้า→customer · สุทธิ→net · สถานะ→status · OD→od · VAT→vat · เครดิต→credit</td>
+                  <td style="padding:6px 8px;color:var(--t3);font-size:10px">Overview, Finance, Sales, Revenue KPIs</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:6px 8px;color:#60a5fa;font-weight:700;white-space:nowrap">TRC-PO3รายละเอียด</td>
+                  <td style="padding:6px 8px;color:#34d399;font-family:monospace">_cache.po</td>
+                  <td style="padding:6px 8px;color:var(--t2);font-size:10px">เลขที่→docNo · ผู้ขาย→supplier · สุทธิ→net · Currency→currency · Rate→rate · Import Duty→importDuty · ประเภท_PO→type</td>
+                  <td style="padding:6px 8px;color:var(--t3);font-size:10px">Purchasing (DOM/INTL/Vendors)</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:6px 8px;color:#fbbf24;font-weight:700;white-space:nowrap">TRC_F4จ่าย</td>
+                  <td style="padding:6px 8px;color:#34d399;font-family:monospace">_cache.ap</td>
+                  <td style="padding:6px 8px;color:var(--t2);font-size:10px">วันที่จ่าย→payDate · ผู้ขาย→vendor · สุทธิ→net · สถานะ→status · หัก ณ ที่จ่าย→wht · ประเภทคู่ค้า→tradeType</td>
+                  <td style="padding:6px 8px;color:var(--t3);font-size:10px">Finance AP, Expense Breakdown, AP KPIs</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:6px 8px;color:#f87171;font-weight:700;white-space:nowrap">การจ่าย FIX</td>
+                  <td style="padding:6px 8px;color:#34d399;font-family:monospace">_cache.fix</td>
+                  <td style="padding:6px 8px;color:var(--t2);font-size:10px">รายการ→name · จำนวน→amount · วันครบกำหนด→dueDate · หมวด→category · ความถี่→freq</td>
+                  <td style="padding:6px 8px;color:var(--t3);font-size:10px">Finance Fixed Expenses, Expense Breakdown</td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 8px;color:#34d399;font-weight:700;white-space:nowrap">CASH_Bank</td>
+                  <td style="padding:6px 8px;color:#34d399;font-family:monospace">_cache.cash</td>
+                  <td style="padding:6px 8px;color:var(--t2);font-size:10px">ธนาคาร→bank · ประเภท→type (OD/CURRENT/SAVINGS) · วงเงิน_OD→limit · ยอดคงเหลือ→balance · OD_ใช้ไป→odUsed</td>
+                  <td style="padding:6px 8px;color:var(--t3);font-size:10px">Management Bank/OD, Cash KPIs</td>
+                </tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+
+          <!-- KPI Formulas from GAS -->
+          <div style="background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:16px;margin-top:16px">
+            <div style="font-size:12px;font-weight:800;color:#fbbf24;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+              <span style="width:3px;height:14px;background:#f59e0b;border-radius:2px;display:inline-block"></span>
+              KPI Aggregation Formulas (คำนวณใน SheetProxy.gs)
+            </div>
+            <div style="overflow-x:auto">
+            <table style="width:100%;font-size:11px;border-collapse:collapse">
+              <thead><tr style="border-bottom:2px solid var(--b2)">
+                <th style="text-align:left;padding:5px 8px;color:var(--t3)">KPI Field</th>
+                <th style="text-align:left;padding:5px 8px;color:var(--t3)">สูตร</th>
+                <th style="text-align:left;padding:5px 8px;color:var(--t3)">หมายเหตุ</th>
+              </tr></thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 8px;color:#34d399;font-family:monospace;white-space:nowrap">revenueMTD</td><td style="padding:5px 8px;color:var(--t2)">SUM(ar.net) WHERE date เดือนปัจจุบัน</td><td style="padding:5px 8px;color:var(--t3)">ar = TRC-R3สรุป_ALL</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 8px;color:#34d399;font-family:monospace;white-space:nowrap">revenueYTD</td><td style="padding:5px 8px;color:var(--t2)">SUM(ar.net) ทุก row ใน sheet</td><td style="padding:5px 8px;color:var(--t3)">ไม่กรองปี</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 8px;color:#34d399;font-family:monospace;white-space:nowrap">arOutstanding</td><td style="padding:5px 8px;color:var(--t2)">SUM(ar.net) WHERE status ≠ Paid/ชำระแล้ว/ยกเลิก</td><td style="padding:5px 8px;color:var(--t3)">ลูกหนี้ค้างทั้งหมด</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 8px;color:#34d399;font-family:monospace;white-space:nowrap">arOverdueAmount</td><td style="padding:5px 8px;color:var(--t2)">SUM(ar.net) WHERE od &gt; 0</td><td style="padding:5px 8px;color:var(--t3)">od = วันเกินกำหนด</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 8px;color:#34d399;font-family:monospace;white-space:nowrap">apPending</td><td style="padding:5px 8px;color:var(--t2)">SUM(ap.net || ap.total) ทุก row</td><td style="padding:5px 8px;color:var(--t3)">ap = TRC_F4จ่าย</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 8px;color:#34d399;font-family:monospace;white-space:nowrap">fixedCostMTD</td><td style="padding:5px 8px;color:var(--t2)">SUM(fix.amount) ทุก row</td><td style="padding:5px 8px;color:var(--t3)">fix = การจ่าย FIX</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 8px;color:#34d399;font-family:monospace;white-space:nowrap">expensesMTD</td><td style="padding:5px 8px;color:var(--t2)">apPending + fixedCostMTD</td><td style="padding:5px 8px;color:#fbbf24">⚠ ใช้ยอด all-time ไม่ใช่แค่เดือนนี้</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 8px;color:#34d399;font-family:monospace;white-space:nowrap">netMargin</td><td style="padding:5px 8px;color:var(--t2)">(revenueYTD − expensesMTD) / revenueYTD × 100</td><td style="padding:5px 8px;color:#fbbf24">⚠ YTD rev / all-time exp อาจ skew</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 8px;color:#34d399;font-family:monospace;white-space:nowrap">dso</td><td style="padding:5px 8px;color:var(--t2)">AVG(ar.od) WHERE od &gt; 0</td><td style="padding:5px 8px;color:var(--t3)">เป้า &lt; 30 วัน</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 8px;color:#34d399;font-family:monospace;white-space:nowrap">vatPayable</td><td style="padding:5px 8px;color:var(--t2)">SUM(ar.vat) WHERE date เดือนปัจจุบัน</td><td style="padding:5px 8px;color:var(--t3)">VAT จาก Invoice</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 8px;color:#34d399;font-family:monospace;white-space:nowrap">whtPayable</td><td style="padding:5px 8px;color:var(--t2)">SUM(ap.wht)</td><td style="padding:5px 8px;color:var(--t3)">หัก ณ ที่จ่ายทั้งหมดใน AP</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 8px;color:#34d399;font-family:monospace;white-space:nowrap">odAvailable</td><td style="padding:5px 8px;color:var(--t2)">SUM(cash.limit) − SUM(cash.odUsed)</td><td style="padding:5px 8px;color:var(--t3)">CASH_Bank type=OD rows</td></tr>
+                <tr><td style="padding:5px 8px;color:#f87171;font-family:monospace;white-space:nowrap">importDutyMTD / citPayable</td><td style="padding:5px 8px;color:#f87171">Hardcoded = 0</td><td style="padding:5px 8px;color:#f87171">⛔ ยังไม่ implement</td></tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ TAB 1: Overview ══ -->
+        <div style="display:none">
+          <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+            <div style="background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:16px">
+              <div style="font-size:12px;font-weight:800;color:#a78bfa;margin-bottom:12px">📊 KPI Cards — แหล่งข้อมูล</div>
+              <table style="width:100%;font-size:11px;border-collapse:collapse">
+                <thead><tr style="border-bottom:2px solid var(--b2)">
+                  <th style="text-align:left;padding:5px 6px;color:var(--t3)">Card</th>
+                  <th style="text-align:left;padding:5px 6px;color:var(--t3)">Element ID</th>
+                  <th style="text-align:left;padding:5px 6px;color:var(--t3)">ข้อมูล</th>
+                </tr></thead>
+                <tbody>
+                  <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 6px;color:var(--t1)">รายรับ MTD</td><td style="padding:5px 6px;font-family:monospace;color:#60a5fa;font-size:10px">ov-rev</td><td style="padding:5px 6px;color:var(--t2);font-size:10px">kpi.revenueMTD (จาก GAS)</td></tr>
+                  <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 6px;color:var(--t1)">Net Margin</td><td style="padding:5px 6px;font-family:monospace;color:#60a5fa;font-size:10px">ov-margin</td><td style="padding:5px 6px;color:var(--t2);font-size:10px">kpi.netMargin + kpi.netProfit</td></tr>
+                  <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 6px;color:var(--t1)">AR Outstanding</td><td style="padding:5px 6px;font-family:monospace;color:#60a5fa;font-size:10px">ov-ar</td><td style="padding:5px 6px;color:var(--t2);font-size:10px">kpi.arOutstanding (GAS pre-aggregated)</td></tr>
+                  <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 6px;color:var(--t1)">AP Payable</td><td style="padding:5px 6px;font-family:monospace;color:#60a5fa;font-size:10px">ov-ap</td><td style="padding:5px 6px;color:var(--t2);font-size:10px">kpi.apPending (GAS pre-aggregated)</td></tr>
+                  <tr><td style="padding:5px 6px;color:var(--t1)">Cash / OD</td><td style="padding:5px 6px;font-family:monospace;color:#60a5fa;font-size:10px">ov-cash</td><td style="padding:5px 6px;color:var(--t2);font-size:10px">kpi.cashBalance || kpi.netCashPosition</td></tr>
+                </tbody>
+              </table>
+              <div style="margin-top:10px;padding:8px 10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:6px;font-size:10px;color:#fbbf24">
+                ⚠ KPI Cards ดึงค่า pre-aggregated จาก GAS — Period filter (MTD/QTD/YTD) ไม่กรอง KPI cards โดยตรง
+              </div>
+            </div>
+
+            <div style="background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:16px">
+              <div style="font-size:12px;font-weight:800;color:#34d399;margin-bottom:12px">📋 Tables & Charts</div>
+              <table style="width:100%;font-size:11px;border-collapse:collapse">
+                <thead><tr style="border-bottom:2px solid var(--b2)">
+                  <th style="text-align:left;padding:5px 6px;color:var(--t3)">ส่วน</th>
+                  <th style="text-align:left;padding:5px 6px;color:var(--t3)">ข้อมูลและสูตร</th>
+                </tr></thead>
+                <tbody>
+                  <tr style="border-bottom:1px solid var(--b2)">
+                    <td style="padding:5px 6px;color:var(--t1);white-space:nowrap">Recent Transactions</td>
+                    <td style="padding:5px 6px;color:var(--t2);font-size:10px">_cache.ar ทุก row เรียงตาม date desc · แสดง docNo, customer, date, net, status · ไม่กรองตาม period</td>
+                  </tr>
+                  <tr style="border-bottom:1px solid var(--b2)">
+                    <td style="padding:5px 6px;color:var(--t1);white-space:nowrap">Revenue/Expense Bar</td>
+                    <td style="padding:5px 6px;color:var(--t2);font-size:10px">AR group by date.slice(0,7) → revByM; AP group by payDate.slice(0,7) → expByM; แสดง 6 เดือนล่าสุด</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:5px 6px;color:var(--t1);white-space:nowrap">Cash Flow Donut</td>
+                    <td style="padding:5px 6px;color:var(--t2);font-size:10px">kpi.revenueMTD / kpi.apPending+fixedCostMTD / kpi.netProfit / kpi.vatPayable</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style="background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:16px;margin-top:16px">
+            <div style="font-size:12px;font-weight:800;color:#60a5fa;margin-bottom:10px">🔄 Period Filter — ผลต่อ Overview</div>
+            <table style="width:100%;font-size:11px;border-collapse:collapse">
+              <thead><tr style="border-bottom:2px solid var(--b2)">
+                <th style="text-align:left;padding:5px 8px;color:var(--t3)">Period Mode</th>
+                <th style="text-align:left;padding:5px 8px;color:var(--t3)">_periodFrom</th>
+                <th style="text-align:left;padding:5px 8px;color:var(--t3)">ผลต่อ KPI Cards</th>
+                <th style="text-align:left;padding:5px 8px;color:var(--t3)">ผลต่อตาราง/chart</th>
+              </tr></thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 8px;color:var(--t1)">MTD</td><td style="padding:5px 8px;color:#60a5fa;font-family:monospace;font-size:10px">YYYY-MM-01</td><td style="padding:5px 8px;color:#fbbf24;font-size:10px">⚠ KPI ยังใช้ค่า GAS (ไม่กรอง client)</td><td style="padding:5px 8px;color:#34d399;font-size:10px">✅ Expenses card กรอง _cache.ap/_cache.fix</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 8px;color:var(--t1)">QTD</td><td style="padding:5px 8px;color:#60a5fa;font-family:monospace;font-size:10px">YYYY-Q1-01</td><td style="padding:5px 8px;color:#fbbf24;font-size:10px">⚠ KPI ยังใช้ค่า GAS</td><td style="padding:5px 8px;color:#34d399;font-size:10px">✅ Expenses card กรอง</td></tr>
+                <tr><td style="padding:5px 8px;color:var(--t1)">ทั้งหมด</td><td style="padding:5px 8px;color:#60a5fa;font-family:monospace;font-size:10px">''  (empty)</td><td style="padding:5px 8px;color:var(--t2);font-size:10px">GAS pre-aggregated</td><td style="padding:5px 8px;color:var(--t2);font-size:10px">ใช้ทุก row</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ══ TAB 2: Finance ══ -->
+        <div style="display:none">
+          <div style="margin-top:16px">
+            <table style="width:100%;font-size:11px;border-collapse:collapse;background:var(--card);border:1px solid var(--b1);border-radius:10px;overflow:hidden">
+              <thead>
+                <tr style="background:rgba(139,92,246,.1);border-bottom:2px solid var(--b2)">
+                  <th style="text-align:left;padding:8px 12px;color:var(--t3)">ส่วน (Finance Module)</th>
+                  <th style="text-align:left;padding:8px 12px;color:var(--t3)">Element ID</th>
+                  <th style="text-align:left;padding:8px 12px;color:var(--t3)">แหล่งข้อมูล</th>
+                  <th style="text-align:left;padding:8px 12px;color:var(--t3)">สูตรคำนวณ</th>
+                  <th style="text-align:left;padding:8px 12px;color:var(--t3)">Period Filter</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">P&L Inline Summary</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">fin-rev-inline<br>fin-cogs-inline<br>fin-fixcost-inline</td>
+                  <td style="padding:7px 12px;color:var(--t2)">_cache.kpi</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">revenueMTD / expensesMTD / fixedCostMTD (จาก GAS โดยตรง)</td>
+                  <td style="padding:7px 12px;color:#fbbf24;font-size:10px">⚠ ไม่กรอง</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">Customer Revenue Cards</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">cust-rev-grid<br>cust-rev-title</td>
+                  <td style="padding:7px 12px;color:var(--t2)">_cache.ar</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">Group by r.customer · SUM(r.net) · Top3 + อื่นๆ · % = amt/grand×100</td>
+                  <td style="padding:7px 12px;color:#34d399;font-size:10px">✅ กรองตาม period</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">AR / Invoicing Pane</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">fin-ar-pane-body</td>
+                  <td style="padding:7px 12px;color:var(--t2)">_cache.ar</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">กรองออก status=Paid/ยกเลิก · เรียงตาม od desc · badge สี: od&gt;30=red, od&gt;0=amber</td>
+                  <td style="padding:7px 12px;color:var(--t3);font-size:10px">ไม่กรอง</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">AR Aging Buckets</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">aging-90-amt<br>aging-3190-amt<br>aging-030-amt</td>
+                  <td style="padding:7px 12px;color:var(--t2)">_cache.ar</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">od ≤ 30 → bucket0-30; 31≤od≤90 → bucket31-90; od&gt;90 → bucket90+; ยอดในแต่ละ bucket</td>
+                  <td style="padding:7px 12px;color:var(--t3);font-size:10px">ไม่กรอง</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">Expenses / AP Pane</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">fin-exp-body</td>
+                  <td style="padding:7px 12px;color:var(--t2)">_cache.ap</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">เรียงตาม payDate desc · badge ตาม tradeType (import/fix/payroll)</td>
+                  <td style="padding:7px 12px;color:var(--t3);font-size:10px">ไม่กรอง</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">Expense Breakdown</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">fin-exp-bkd-body</td>
+                  <td style="padding:7px 12px;color:var(--t2)">_cache.ap + _cache.fix</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">Group by category/vendor · SUM · Fallback ถ้า AP=฿0 → ใช้ kpi.apPending · Top8</td>
+                  <td style="padding:7px 12px;color:#34d399;font-size:10px">✅ กรองตาม period</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">Fixed Expenses Tab</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">fix-body</td>
+                  <td style="padding:7px 12px;color:var(--t2)">_cache.fix</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">แสดงทุก row · status badge ตาม dueDate: overdue/ใกล้ถึง/Active</td>
+                  <td style="padding:7px 12px;color:var(--t3);font-size:10px">ไม่กรอง</td>
+                </tr>
+                <tr>
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">Tax / VAT Tab</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">tax-body</td>
+                  <td style="padding:7px 12px;color:var(--t2)">_cache.kpi</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">vatPayable / whtPayable / citPayable / importDutyMTD (4 fixed line items)</td>
+                  <td style="padding:7px 12px;color:#fbbf24;font-size:10px">⚠ citPayable=0 (static)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ══ TAB 3: Sales ══ -->
+        <div style="display:none">
+          <div style="margin-top:16px">
+            <table style="width:100%;font-size:11px;border-collapse:collapse;background:var(--card);border:1px solid var(--b1);border-radius:10px;overflow:hidden">
+              <thead>
+                <tr style="background:rgba(16,185,129,.08);border-bottom:2px solid var(--b2)">
+                  <th style="text-align:left;padding:8px 12px;color:var(--t3)">ส่วน (Sales Module)</th>
+                  <th style="text-align:left;padding:8px 12px;color:var(--t3)">Element ID</th>
+                  <th style="text-align:left;padding:8px 12px;color:var(--t3)">แหล่งข้อมูล</th>
+                  <th style="text-align:left;padding:8px 12px;color:var(--t3)">สูตรคำนวณ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">Invoice List Table</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">inv-body</td>
+                  <td style="padding:7px 12px;color:var(--t2)">window.invData (จาก _cache.ar ผ่าน gasARtoInv())</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">แสดง: date, docNo, ref, customer, class, status, value, vat(7%), net, credit, expDate, actDate, od</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">Invoice Filters</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">inv-f-*</td>
+                  <td style="padding:7px 12px;color:var(--t2)">window.invData</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">AND logic: ลูกค้า + สถานะ + Class + เดือน + ช่วงวันที่ + ค้นหาอิสระ (6 filters)</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">Invoice Summary Bar</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">inv-s-grand<br>inv-s-paid<br>inv-s-pending<br>inv-s-overdue</td>
+                  <td style="padding:7px 12px;color:var(--t2)">Filtered invData</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">grand=SUM(net); paid=SUM(net) where paid; pending=SUM where pending; overdue=SUM where overdue</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">Customer Ranking</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">sales-ranking-body</td>
+                  <td style="padding:7px 12px;color:var(--t2)">_cache.ar</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">Group by customer · ytd=SUM(net) all-time · mtd=SUM(net) เดือนปัจจุบัน · sort by ytd desc · bar = ytd/max×100%</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">Sales KPI Cards</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">sal-ytd / sal-inv<br>sal-paid30 / sal-od</td>
+                  <td style="padding:7px 12px;color:var(--t2)">kpi + _cache.ar</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">ytd=kpi.revenueYTD; invCnt=count ar เดือนนี้; paid30=SUM(net) paid ใน 30วัน; od=SUM(net) เกินกำหนด</td>
+                </tr>
+                <tr>
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">DSO (Days Sales Outstanding)</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">mgmt-dso</td>
+                  <td style="padding:7px 12px;color:var(--t2)">kpi.dso (GAS)</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">AVG(ar.od) WHERE od&gt;0 · คำนวณใน GAS · เป้า &lt; 30 วัน</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ══ TAB 4: Purchasing ══ -->
+        <div style="display:none">
+          <div style="margin-top:16px">
+            <table style="width:100%;font-size:11px;border-collapse:collapse;background:var(--card);border:1px solid var(--b1);border-radius:10px;overflow:hidden">
+              <thead>
+                <tr style="background:rgba(59,130,246,.08);border-bottom:2px solid var(--b2)">
+                  <th style="text-align:left;padding:8px 12px;color:var(--t3)">ส่วน (Purchasing)</th>
+                  <th style="text-align:left;padding:8px 12px;color:var(--t3)">Tab</th>
+                  <th style="text-align:left;padding:8px 12px;color:var(--t3)">แหล่งข้อมูล</th>
+                  <th style="text-align:left;padding:8px 12px;color:var(--t3)">สูตรคำนวณ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">All PO Table</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">po-all-body</td>
+                  <td style="padding:7px 12px;color:var(--t2)">_cache.po (ทุก row)</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">แสดง: PO#, Supplier, ประเภท, วันที่, จำนวน(THB), Finance AP, สถานะ</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">DOM ในประเทศ</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">po-dom-body</td>
+                  <td style="padding:7px 12px;color:var(--t2)">_cache.po WHERE !_chkIntl(r)</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">DOM = currency เป็น THB และ type ไม่มีคำว่า intl/import/ต่างประเทศ · แสดงมูลค่าตรงจาก r.net</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">INTL ต่างประเทศ</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">po-intl-body</td>
+                  <td style="padding:7px 12px;color:var(--t2)">_cache.po WHERE _chkIntl(r)</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">
+                    <strong>amtFX</strong> = r.net (สกุลเดิม)<br>
+                    <strong>amtTHB</strong> = amtFX × r.rate (แปลงเป็น THB)<br>
+                    <strong>VAT 7%</strong> = (amtTHB + importDuty) × 0.07<br>
+                    <strong>รวมภาษี</strong> = importDuty + vat7
+                  </td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">INTL Classification</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">_chkIntl(r)</td>
+                  <td style="padding:7px 12px;color:var(--t2)">r.type + r.currency</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">INTL ถ้า type มี 'intl'/'ต่างประเทศ'/'นำเข้า'/'import' หรือ currency เป็น USD/EUR/CNY/SGD/JPY/GBP</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--b2)">
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">Vendors Table</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">po-vendor-body</td>
+                  <td style="padding:7px 12px;color:var(--t2)">_cache.po deduplicated</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">Group by r.supplier · เก็บ row ที่มี docDate ล่าสุด (lexicographic) · flag ประเทศตาม currency</td>
+                </tr>
+                <tr>
+                  <td style="padding:7px 12px;color:var(--t1);font-weight:700">KPI Cards</td>
+                  <td style="padding:7px 12px;font-family:monospace;color:#60a5fa;font-size:10px">po-kv-*</td>
+                  <td style="padding:7px 12px;color:var(--t2)">_cache.po</td>
+                  <td style="padding:7px 12px;color:var(--t2);font-size:10px">PO total count / Pending (status รอ/new/'') / DOM count+sum / INTL count+sum / Import Duty MTD sum</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ══ TAB 5: Management ══ -->
+        <div style="display:none">
+          <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+            <div style="background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:16px">
+              <div style="font-size:12px;font-weight:800;color:#34d399;margin-bottom:12px">🏦 Bank / OD Section</div>
+              <table style="width:100%;font-size:11px;border-collapse:collapse">
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 0;color:var(--t3)">Data source</td><td style="color:var(--t2);font-size:10px">_cache.cash (CASH_Bank sheet)</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 0;color:var(--t3)">netCash</td><td style="color:var(--t2);font-size:10px">SUM(balance) WHERE type ≠ OD</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 0;color:var(--t3)">odUsed</td><td style="color:var(--t2);font-size:10px">SUM(odUsed) WHERE type = OD</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 0;color:var(--t3)">odAvailable</td><td style="color:var(--t2);font-size:10px">SUM(limit) − SUM(odUsed)</td></tr>
+                <tr style="border-bottom:1px solid var(--b2)"><td style="padding:5px 0;color:var(--t3)">% OD Used</td><td style="color:var(--t2);font-size:10px">round(odUsed / odLimit × 100)</td></tr>
+                <tr><td style="padding:5px 0;color:var(--t3)">Monthly Interest</td><td style="color:#fbbf24;font-size:10px">⚠ odUsed × 6.5% / 12 (ประมาณเท่านั้น)</td></tr>
+              </table>
+            </div>
+
+            <div style="background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:16px">
+              <div style="font-size:12px;font-weight:800;color:#f87171;margin-bottom:12px">⚠️ Risk Center</div>
+              <table style="width:100%;font-size:11px;border-collapse:collapse">
+                <thead><tr style="border-bottom:2px solid var(--b2)">
+                  <th style="text-align:left;padding:4px 0;color:var(--t3)">Risk Factor</th>
+                  <th style="text-align:left;padding:4px 0;color:var(--t3)">Score</th>
+                  <th style="text-align:left;padding:4px 0;color:var(--t3)">Live?</th>
+                </tr></thead>
+                <tbody>
+                  <tr style="border-bottom:1px solid var(--b2)"><td style="padding:4px 0;color:var(--t1)">AR Overdue Risk</td><td style="color:#f87171">72/100</td><td style="color:#34d399;font-size:10px">✅ Live (top overdue)</td></tr>
+                  <tr style="border-bottom:1px solid var(--b2)"><td style="padding:4px 0;color:var(--t1)">OD Utilization</td><td style="color:#fbbf24">70/100</td><td style="color:#fbbf24;font-size:10px">⚠ Static default</td></tr>
+                  <tr style="border-bottom:1px solid var(--b2)"><td style="padding:4px 0;color:var(--t1)">Margin Risk</td><td style="color:#fbbf24">45/100</td><td style="color:#fbbf24;font-size:10px">⚠ Static default</td></tr>
+                  <tr style="border-bottom:1px solid var(--b2)"><td style="padding:4px 0;color:var(--t1)">FX Risk</td><td style="color:#64748b">38/100</td><td style="color:#fbbf24;font-size:10px">⚠ Static default</td></tr>
+                  <tr style="border-bottom:1px solid var(--b2)"><td style="padding:4px 0;color:var(--t1)">Liquidity Risk</td><td style="color:#34d399">28/100</td><td style="color:#fbbf24;font-size:10px">⚠ Static default</td></tr>
+                  <tr><td style="padding:4px 0;color:var(--t1);font-weight:700">Overall Score</td><td style="color:#fbbf24;font-weight:700">62/100</td><td style="color:#f87171;font-size:10px">⛔ Static (ไม่ recalculate)</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style="background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:16px;margin-top:16px">
+            <div style="font-size:12px;font-weight:800;color:#60a5fa;margin-bottom:12px">📊 Reports Export</div>
+            <div style="font-size:11px;color:var(--t2);margin-bottom:8px">Export formats: <strong style="color:#34d399">PDF</strong> · <strong style="color:#a78bfa">Markdown</strong> · <strong style="color:#fbbf24">XLS</strong> · <strong style="color:#f87171">CSV</strong> · <strong style="color:#60a5fa">Export All CSV</strong></div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <span style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.25);color:#a78bfa;padding:3px 8px;border-radius:4px;font-size:10px">Executive Summary</span>
+              <span style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:#34d399;padding:3px 8px;border-radius:4px;font-size:10px">P&L รายเดือน</span>
+              <span style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:#60a5fa;padding:3px 8px;border-radius:4px;font-size:10px">Cash Flow</span>
+              <span style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:#fbbf24;padding:3px 8px;border-radius:4px;font-size:10px">Invoice List</span>
+              <span style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:#fbbf24;padding:3px 8px;border-radius:4px;font-size:10px">AR Aging</span>
+              <span style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:#fbbf24;padding:3px 8px;border-radius:4px;font-size:10px">Sales Ranking</span>
+              <span style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#f87171;padding:3px 8px;border-radius:4px;font-size:10px">Expense Breakdown</span>
+              <span style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#f87171;padding:3px 8px;border-radius:4px;font-size:10px">Tax Summary</span>
+              <span style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:#60a5fa;padding:3px 8px;border-radius:4px;font-size:10px">PO Summary</span>
+              <span style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:#60a5fa;padding:3px 8px;border-radius:4px;font-size:10px">Import Duty & Tax</span>
+              <span style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:#34d399;padding:3px 8px;border-radius:4px;font-size:10px">Vendor Performance</span>
+              <span style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#f87171;padding:3px 8px;border-radius:4px;font-size:10px">Risk Assessment</span>
+              <span style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:#34d399;padding:3px 8px;border-radius:4px;font-size:10px">P&L vs Budget</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ TAB 6: Known Gaps ══ -->
+        <div style="display:none">
+          <div style="margin-top:16px">
+            <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:16px;margin-bottom:12px">
+              <div style="font-size:12px;font-weight:800;color:#f87171;margin-bottom:12px">⛔ Known Limitations & Hardcoded Values</div>
+              <table style="width:100%;font-size:11px;border-collapse:collapse">
+                <thead><tr style="border-bottom:2px solid rgba(239,68,68,.3)">
+                  <th style="text-align:left;padding:5px 8px;color:#f87171">รายการ</th>
+                  <th style="text-align:left;padding:5px 8px;color:#f87171">ปัญหา</th>
+                  <th style="text-align:left;padding:5px 8px;color:#f87171">ผลกระทบ</th>
+                  <th style="text-align:left;padding:5px 8px;color:#f87171">แนวทางแก้ไข</th>
+                </tr></thead>
+                <tbody>
+                  <tr style="border-bottom:1px solid rgba(239,68,68,.15)">
+                    <td style="padding:6px 8px;color:var(--t1);font-weight:700">importDutyMTD</td>
+                    <td style="padding:6px 8px;color:#f87171">Hardcoded = 0 ใน SheetProxy.gs</td>
+                    <td style="padding:6px 8px;color:var(--t2)">Finance → Tax แสดงภาษีนำเข้า ฿0 เสมอ</td>
+                    <td style="padding:6px 8px;color:#34d399;font-size:10px">คำนวณจาก INTL PO importDuty ใน GAS</td>
+                  </tr>
+                  <tr style="border-bottom:1px solid rgba(239,68,68,.15)">
+                    <td style="padding:6px 8px;color:var(--t1);font-weight:700">citPayable</td>
+                    <td style="padding:6px 8px;color:#f87171">Hardcoded = 0</td>
+                    <td style="padding:6px 8px;color:var(--t2)">ภาษีเงินได้นิติบุคคลแสดง ฿0 เสมอ</td>
+                    <td style="padding:6px 8px;color:#34d399;font-size:10px">คำนวณ netProfit × 20% ใน GAS</td>
+                  </tr>
+                  <tr style="border-bottom:1px solid rgba(239,68,68,.15)">
+                    <td style="padding:6px 8px;color:var(--t1);font-weight:700">revenuePrevMTD</td>
+                    <td style="padding:6px 8px;color:#f87171">Hardcoded = 0</td>
+                    <td style="padding:6px 8px;color:var(--t2)">เปรียบเทียบ MoM growth ไม่ได้</td>
+                    <td style="padding:6px 8px;color:#34d399;font-size:10px">เก็บ KPI เดือนก่อนใน sheet หรือ GAS</td>
+                  </tr>
+                  <tr style="border-bottom:1px solid rgba(239,68,68,.15)">
+                    <td style="padding:6px 8px;color:var(--t1);font-weight:700">expensesMTD</td>
+                    <td style="padding:6px 8px;color:#fbbf24">ใช้ all-time AP total ไม่ใช่แค่เดือนนี้</td>
+                    <td style="padding:6px 8px;color:var(--t2)">Margin% อาจ skew — YTD revenue / all-time expense</td>
+                    <td style="padding:6px 8px;color:#34d399;font-size:10px">กรอง AP ตาม payDate ใน GAS</td>
+                  </tr>
+                  <tr style="border-bottom:1px solid rgba(239,68,68,.15)">
+                    <td style="padding:6px 8px;color:var(--t1);font-weight:700">Risk Scores</td>
+                    <td style="padding:6px 8px;color:#fbbf24">4/5 risk scores เป็น static default</td>
+                    <td style="padding:6px 8px;color:var(--t2)">Risk Center แสดงตัวเลขเดิมไม่ว่าข้อมูลจะเปลี่ยน</td>
+                    <td style="padding:6px 8px;color:#34d399;font-size:10px">คำนวณ composite score จาก live data</td>
+                  </tr>
+                  <tr style="border-bottom:1px solid rgba(239,68,68,.15)">
+                    <td style="padding:6px 8px;color:var(--t1);font-weight:700">OD Monthly Interest</td>
+                    <td style="padding:6px 8px;color:#fbbf24">6.5% p.a. hardcoded</td>
+                    <td style="padding:6px 8px;color:var(--t2)">อัตราดอกเบี้ยจริงอาจต่างกัน</td>
+                    <td style="padding:6px 8px;color:#34d399;font-size:10px">ดึงอัตราจาก CASH_Bank sheet</td>
+                  </tr>
+                  <tr style="border-bottom:1px solid rgba(239,68,68,.15)">
+                    <td style="padding:6px 8px;color:var(--t1);font-weight:700">Lead Time / HS Code / Rating</td>
+                    <td style="padding:6px 8px;color:#fbbf24">แสดง "—" ทุก row</td>
+                    <td style="padding:6px 8px;color:var(--t2)">Purchasing columns ยังไม่มีข้อมูลจาก sheet</td>
+                    <td style="padding:6px 8px;color:#34d399;font-size:10px">เพิ่ม columns ใน TRC-PO3รายละเอียด</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:6px 8px;color:var(--t1);font-weight:700">GAS URL Override</td>
+                    <td style="padding:6px 8px;color:#fbbf24">init() overwrite localStorage ทุก page load</td>
+                    <td style="padding:6px 8px;color:var(--t2)">Admin → ตั้ง GAS URL ใหม่จะถูก reset ทุกครั้งที่ refresh</td>
+                    <td style="padding:6px 8px;color:#34d399;font-size:10px">เอา hardcode override ออกจาก init()</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.25);border-radius:10px;padding:14px">
+              <div style="font-size:12px;font-weight:800;color:#34d399;margin-bottom:8px">✅ Data Accuracy Notes</div>
+              <div style="font-size:11px;color:var(--t2);line-height:1.7">
+                <div style="padding:3px 0">• ข้อมูลทุก module ดึงจาก Google Sheets โดยตรงผ่าน GAS Web App — ไม่มีการเก็บข้อมูลใน database อื่น</div>
+                <div style="padding:3px 0">• ตัวเลข KPI บาง card เป็น pre-aggregated จาก GAS ไม่ได้คำนวณใหม่ใน browser → ต้องตรวจสอบกับ GAS code เมื่อเกิดความผิดพลาด</div>
+                <div style="padding:3px 0">• Period filter (MTD/QTD/YTD) กรองข้อมูลใน browser สำหรับ tables และบาง cards — แต่ KPI cards หลักยังอ่านค่า pre-aggregated</div>
+                <div style="padding:3px 0">• INTL PO — มูลค่า THB คำนวณจาก <code style="background:var(--b1);padding:1px 4px;border-radius:3px">amtFX × rate</code> โดย rate ต้องมีอยู่ใน sheet column "Rate"</div>
+                <div style="padding:3px 0">• Offline mode — เมื่อ GAS offline dashboard จะแสดง kpi จาก localStorage cache แต่ tables (AR/AP/PO/FIX) จะว่างเปล่า</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /pn-audit -->
+    </div>
+  </div><!-- /p-audit -->
+
   <div id="pg-store" style="display:none" aria-hidden="true"></div>
 </div><!-- /main -->
 </div><!-- /app -->
@@ -1962,17 +2601,18 @@ html,body{
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 /* ── NAV ── */
-var pgM={dashboard:'p-dashboard',sales:'p-sales',finance:'p-finance',po:'p-po',mgmt:'p-mgmt',admin:'p-admin'};
-var ttM={dashboard:'Overview',sales:'Sales & Invoicing',finance:'Finance & Accounting',po:'Purchase Orders',mgmt:'Management',admin:'Administration'};
+var pgM={dashboard:'p-dashboard',sales:'p-sales',finance:'p-finance',po:'p-po',mgmt:'p-mgmt',admin:'p-admin',audit:'p-audit'};
+var ttM={dashboard:'Overview',sales:'Sales & Invoicing',finance:'Finance & Accounting',po:'Purchase Orders',mgmt:'Management',admin:'Administration',audit:'Data Audit & Transparency'};
 var tbM={sales:'tb-s',finance:'tb-f',po:'tb-p',mgmt:'tb-m',admin:'tb-a'};
 var pnM={sales:'pn-s',finance:'pn-f',po:'pn-p',mgmt:'pn-m',admin:'pn-a'};
 var naM={
   'dashboard':['n-dash'],
   'sales-0':['n-inv'],'sales-1':['n-rank'],'sales-2':['n-inv'],'sales-3':['n-cust'],
-  'finance-0':['n-snap'],'finance-1':['n-ar'],'finance-2':['n-aging'],'finance-3':['n-exp'],'finance-4':['n-fix'],'finance-5':['n-tax'],
+  'finance-0':['n-snap'],'finance-1':['n-ar'],'finance-2':['n-aging'],'finance-3':['n-exp'],'finance-4':['n-exp'],'finance-5':['n-fix'],'finance-6':['n-tax'],
   'po-0':['n-po'],'po-1':['n-dom'],'po-2':['n-intl'],'po-3':['n-vend'],
   'mgmt-0':['n-bank'],'mgmt-1':['n-bank'],'mgmt-2':['n-risk'],'mgmt-3':['n-rpt'],
-  'admin-0':['n-usr'],'admin-1':['n-set'],'admin-2':['n-gs'],'admin-3':['n-set'],'admin-4':['n-usr']
+  'admin-0':['n-usr'],'admin-1':['n-set'],'admin-2':['n-gs'],'admin-3':['n-set'],'admin-4':['n-usr'],
+  'audit':['n-audit']
 };
 
 function _orig_go(pg,tab){
@@ -3771,38 +4411,11 @@ window.showFinDetail = function(type){
       +'<td></td></tr></tfoot></table></div>';
 
   } else if(type === 'expenses'){
-    title = '🔴 รายจ่ายรวม · EXPENSES — พ.ค. 2026';
-    var cats=[
-      {n:'เงินเดือน (Payroll)',  a:824000,c:'#8b5cf6'},
-      {n:'ค่าเช่า Office+Warehouse',       a:185000,c:'#3b82f6'},
-      {n:'Logistics + Operations',                                               a:124000,c:'#10b981'},
-      {n:'Import Duty + Tax',                                                    a:152000,c:'#f59e0b'},
-      {n:'IT + Cloud + ค่าน้ำไฟ',     a:28000, c:'#06b6d4'},
-      {n:'OD Interest KBank',                                                   a:18400, c:'#f43f5e'}
-    ];
-    var tot2 = cats.reduce(function(a,x){return a+x.a;},0);
-    html = '<p style="font-size:11px;color:var(--t3);margin:0 0 12px">ยอดรวม: <span style="font-size:20px;font-weight:800;color:#fff">฿11,640,000</span> <span style="color:#f87171">↑ +6.2%</span></p>'
-      +'<table style="width:100%;border-collapse:collapse;font-size:11.5px">'
-      +'<thead><tr style="border-bottom:1px solid var(--b1)">'
-      +'<th style="text-align:left;padding:5px 8px;color:var(--t3)">หมวดรายจ่าย</th>'
-      +'<th style="text-align:right;padding:5px 8px;color:var(--t3)">จำนวน (฿)</th>'
-      +'<th style="text-align:right;padding:5px 8px;color:var(--t3)">สัดส่วน</th>'
-      +'<th style="padding:5px 8px;color:var(--t3)">กราฟ</th>'
-      +'</tr></thead><tbody>'
-      +cats.map(function(x){
-        var w=Math.round(x.a/tot2*100);
-        return '<tr style="border-bottom:1px solid rgba(255,255,255,.04)">'
-          +'<td style="padding:6px 8px;font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+x.c+';margin-right:6px;vertical-align:middle"></span>'+x.n+'</td>'
-          +'<td style="padding:6px 8px;text-align:right;color:#f87171;font-weight:700">'+fmt(x.a)+'</td>'
-          +'<td style="padding:6px 8px;text-align:right;color:var(--t2)">'+Math.round(x.a/tot2*1000)/10+'%</td>'
-          +'<td style="padding:6px 8px;min-width:80px"><div style="background:var(--b1);border-radius:3px;height:6px"><div style="width:'+w+'%;height:6px;background:'+x.c+';border-radius:3px"></div></div></td>'
-          +'</tr>';
-      }).join('')
-      +'</tbody><tfoot><tr style="border-top:2px solid var(--b2)">'
-      +'<td style="padding:8px;font-weight:800;color:var(--t1)">รวม</td>'
-      +'<td style="padding:8px;text-align:right;font-weight:800;color:#f87171;font-size:14px">'+fmt(tot2)+'</td>'
-      +'<td colspan="2" style="padding:8px;font-size:10px;color:var(--t3)">* Fixed cost ไม่รวม COGS / variable ops</td>'
-      +'</tr></tfoot></table>';
+    // ── init modal-internal period (default = current global period) ──
+    window._expMF=window._periodFrom||''; window._expMT=window._periodTo||'';
+    var built = _buildExpensesModal(window._expMF, window._expMT);
+    title = built.title;
+    html  = _expPickerHTML() + built.html;
 
   } else if(type === 'profit'){
     title = '💚 กำไรสุทธิ · NET PROFIT — พ.ค. 2026';
@@ -3849,58 +4462,183 @@ window.showFinDetail = function(type){
   modal.classList.add('on');
 };
 
-/* ── Build live expenses modal HTML from _fos_cache ─────── */
-function _buildExpensesModal() {
-  var fc  = window._fos_cache || {};
-  var ap  = Array.isArray(fc.ap)  ? fc.ap  : [];
-  var fix = Array.isArray(fc.fix) ? fc.fix : [];
-  var kpi = fc.kpi || {};
-  var catMap = {};
-  ap.forEach(function(r){
-    var cat = r.supplier||r.vendor||r.payee||r.name||r.description||'AP อื่นๆ';
-    catMap[cat] = (catMap[cat]||0) + Number(r.net||r.total||r.amount||0);
-  });
-  fix.forEach(function(r){
-    var cat = r.name||r.expense||r.category||'Fixed Cost';
-    catMap[cat] = (catMap[cat]||0) + Number(r.amount||0);
-  });
-  var colors = ['#8b5cf6','#3b82f6','#10b981','#f59e0b','#06b6d4','#f43f5e','#a78bfa','#34d399','#fb923c','#22d3ee'];
-  var entries = Object.keys(catMap).map(function(k){ return {n:k,a:catMap[k]}; })
-    .filter(function(x){ return x.a>0; }).sort(function(a,b){ return b.a-a.a; });
-  var fixTotal = fix.reduce(function(s,r){ return s+Number(r.amount||0); },0);
-  var apTotal  = ap.reduce(function(s,r){ return s+Number(r.net||r.total||r.amount||0); },0);
-  var grandTotal = apTotal+fixTotal || kpi.expensesMTD || 0;
-  var now=new Date();
-  var mLabel=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'][now.getMonth()]+' '+now.getFullYear();
-  if(!entries.length){
-    return { title:'🔴 รายจ่ายรวม · EXPENSES — '+mLabel,
-      html:'<div style="text-align:center;padding:32px;color:var(--t3)"><div style="font-size:32px;margin-bottom:8px">📂</div>'
-        +'<div style="font-weight:600;margin-bottom:6px">ยังไม่มีข้อมูล Expenses</div>'
-        +'<div style="font-size:11px">ตรวจสอบ sheet TRC_F4จ่าย และ การจ่าย FIX แล้วกด Sync</div></div>'};
-  }
-  var rows=entries.map(function(x,i){
-    var pct=grandTotal>0?Math.round(x.a/grandTotal*100):0;
-    var clr=colors[i%colors.length];
-    return '<tr style="border-bottom:1px solid rgba(255,255,255,.04)">'
-      +'<td style="padding:6px 8px;font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+clr+';margin-right:6px;vertical-align:middle"></span>'+x.n+'</td>'
-      +'<td style="padding:6px 8px;text-align:right;color:'+_tc('#f87171')+';font-weight:700">฿'+B(x.a)+'</td>'
-      +'<td style="padding:6px 8px;text-align:right;color:var(--t2)">'+pct+'%</td>'
-      +'<td style="padding:6px 8px;min-width:80px"><div style="background:var(--b1);border-radius:3px;height:5px"><div style="width:'+Math.min(pct,100)+'%;height:5px;background:'+clr+';border-radius:3px"></div></div></td>'
-      +'</tr>';
+/* ── Expenses modal internal period picker ───────────────── */
+function _expPickerHTML(){
+  var curF=window._expMF||'', curT=window._expMT||'';
+  var now=new Date(); var curY=now.getFullYear();
+  var thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var years=[curY-1,curY,curY+1].filter(function(y){return y<=curY+1;}).reverse();
+  var activeY=curF?parseInt(curF.slice(0,4),10):null;
+  var activeM=curF&&curT&&curF.slice(5,7)===curT.slice(5,7)?parseInt(curF.slice(5,7),10):null;
+  var btnBase='border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;padding:3px 9px;transition:.12s;';
+  var btnY=years.map(function(y){
+    var on=(activeY===y&&!(!curF&&!curT));
+    return '<button onclick="_expSetYear('+y+')" style="'+btnBase+'background:'+(on?'rgba(239,68,68,.35)':'rgba(255,255,255,.06)')+';color:'+(on?'#fca5a5':'var(--t2)')+';border:1px solid '+(on?'rgba(239,68,68,.6)':'rgba(255,255,255,.1)')+'">'+(on&&activeM?String(y):String(y))+'</button>';
   }).join('');
-  var h='<div style="margin-bottom:12px;font-size:11px;color:var(--t3)">ยอดรวม: <span style="font-size:20px;font-weight:800;color:'+_tc('#f87171')+'">฿'+B(grandTotal)+'</span>'
-    +(fixTotal?' <span style="font-size:10px;color:var(--t3);margin-left:8px">AP ฿'+B(apTotal)+' + Fixed ฿'+B(fixTotal)+'</span>':'')
-    +'</div><table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr style="border-bottom:1px solid var(--b1)">'
-    +'<th style="text-align:left;padding:5px 8px;color:var(--t3);font-weight:600">หมวดรายจ่าย</th>'
-    +'<th style="text-align:right;padding:5px 8px;color:var(--t3);font-weight:600">จำนวน (฿)</th>'
-    +'<th style="text-align:right;padding:5px 8px;color:var(--t3);font-weight:600">สัดส่วน</th>'
-    +'<th style="padding:5px 8px;color:var(--t3);font-weight:600">กราฟ</th>'
-    +'</tr></thead><tbody>'+rows+'</tbody>'
-    +'<tfoot><tr style="border-top:2px solid var(--b2)"><td style="padding:8px;font-weight:800;color:var(--t1)">รวมรายจ่าย</td>'
-    +'<td style="padding:8px;text-align:right;font-weight:800;color:'+_tc('#f87171')+';font-size:14px">฿'+B(grandTotal)+'</td>'
-    +'<td colspan="2" style="padding:8px;color:var(--t3);font-size:10px">* จาก TRC_F4จ่าย + การจ่าย FIX (live)</td>'
-    +'</tr></tfoot></table>';
-  return { title:'🔴 รายจ่ายรวม · EXPENSES — '+mLabel, html:h };
+  var btnAll='<button onclick="_expSetAll()" style="'+btnBase+'background:'+(!curF&&!curT?'rgba(239,68,68,.35)':'rgba(255,255,255,.06)')+';color:'+(!curF&&!curT?'#fca5a5':'var(--t2)')+';border:1px solid '+(!curF&&!curT?'rgba(239,68,68,.6)':'rgba(255,255,255,.1)')+'">ทั้งหมด</button>';
+  var btnM=activeY?thM.map(function(m,i){
+    var mo=i+1; var mon=String(mo).padStart(2,'0');
+    var on=(activeM===mo);
+    return '<button onclick="_expSetMonth('+activeY+','+mo+')" style="'+btnBase+'background:'+(on?'rgba(239,68,68,.3)':'rgba(255,255,255,.04)')+';color:'+(on?'#fca5a5':'var(--t3)')+';border:1px solid '+(on?'rgba(239,68,68,.5)':'rgba(255,255,255,.08)')+'">'+m+'</button>';
+  }).join(''):'';
+  return '<div id="exp-picker" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:10px 12px;margin-bottom:12px">'
+    +'<div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.06em;margin-bottom:6px">⏱ เลือกช่วงเวลา</div>'
+    +'<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:'+(activeY?'7':'0')+'px">'
+    +btnAll+btnY+'</div>'
+    +(activeY?'<div style="display:flex;gap:5px;flex-wrap:wrap">'+btnM+'</div>':'')
+    +'</div>';
+}
+function _expSetYear(y){
+  window._expMF=y+'-01-01'; window._expMT=y+'-12-31'; _refreshExpensesModal();
+}
+function _expSetMonth(y,m){
+  var mon=String(m).padStart(2,'0');
+  var last=new Date(y,m,0).getDate();
+  window._expMF=y+'-'+mon+'-01'; window._expMT=y+'-'+mon+'-'+String(last).padStart(2,'0');
+  _refreshExpensesModal();
+}
+function _expSetAll(){
+  window._expMF=''; window._expMT=''; _refreshExpensesModal();
+}
+function _refreshExpensesModal(){
+  var bodyEl=document.getElementById('fin-detail-body'); if(!bodyEl) return;
+  var titleEl=document.getElementById('fin-detail-title');
+  var built=_buildExpensesModal(window._expMF,window._expMT);
+  if(titleEl) titleEl.textContent=built.title;
+  bodyEl.innerHTML=_expPickerHTML()+built.html;
+}
+
+/* ── Period label helper ─────────────────────────────────── */
+function _getPeriodLabel(){
+  var f=window._periodFrom||'', t=window._periodTo||'';
+  var thM=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var fmtYM=function(s){ if(!s||s.length<7) return ''; var p=s.split('-'); return thM[parseInt(p[1],10)]+' '+p[0]; };
+  if(!f&&!t) return 'ทั้งหมด';
+  if(f&&t){
+    var fYM=f.slice(0,7), tYM=t.slice(0,7);
+    // same month
+    if(fYM===tYM) return fmtYM(fYM);
+    // same year, Jan–Dec = full year
+    var fY=f.slice(0,4), tY=t.slice(0,4);
+    if(fY===tY&&f.slice(5,10)==='01-01'&&t.slice(5,10)==='12-31') return 'ปี '+fY;
+    return fmtYM(fYM)+' – '+fmtYM(tYM);
+  }
+  if(f) return 'ตั้งแต่ '+fmtYM(f.slice(0,7));
+  if(t) return 'ถึง '+fmtYM(t.slice(0,7));
+  return 'MTD';
+}
+
+/* ── Build live expenses modal HTML from _fos_cache ─────── */
+function _buildExpensesModal(fromOvr, toOvr) {
+  var fc  = window._fos_cache || {};
+  var ap  = Array.isArray(fc.ap)  ? fc.ap.slice()  : [];
+  var fix = Array.isArray(fc.fix) ? fc.fix.slice() : [];
+  var kpi = fc.kpi || {};
+  var pF=fromOvr!==undefined?fromOvr:(window._periodFrom||''), pT=toOvr!==undefined?toOvr:(window._periodTo||'');
+  if(pF||pT){
+    ap  = ap.filter(function(r){ var d=r.date||r.docDate||r.payDate||''; return (!pF||d>=pF)&&(!pT||d<=pT); });
+    fix = fix.filter(function(r){ var d=r.date||r.docDate||''; if(!d) return true; return (!pF||d>=pF)&&(!pT||d<=pT); });
+  }
+  var mLabel=(function(){
+    var f=pF,t=pT;
+    var thM=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    var ym=function(s){if(!s||s.length<7)return ''; var p=s.split('-'); return thM[parseInt(p[1],10)]+' '+p[0];};
+    if(!f&&!t) return 'ทั้งหมด';
+    if(f&&t){
+      var fY=f.slice(0,4);
+      if(fY===t.slice(0,4)&&f.slice(5,10)==='01-01'&&t.slice(5,10)==='12-31') return 'ปี '+fY;
+      var fM=f.slice(0,7),tM=t.slice(0,7); return fM===tM?ym(fM):ym(fM)+' – '+ym(tM);
+    }
+    return ym((f||t).slice(0,7));
+  })();
+  var apTotal  = ap.reduce(function(s,r){return s+Number(r.net||r.total||r.amount||0);},0);
+  var fixTotal = fix.reduce(function(s,r){return s+Number(r.amount||0);},0);
+  var grandTotal = apTotal+fixTotal || kpi.expensesMTD || 0;
+  if(!ap.length&&!fix.length){
+    return {title:'🔴 รายจ่ายรวม · EXPENSES — '+mLabel,
+      html:'<div style="text-align:center;padding:32px;color:var(--t3)"><div style="font-size:32px;margin-bottom:8px">📂</div>'
+        +'<div style="font-weight:600;margin-bottom:6px">ยังไม่มีข้อมูล Expenses ในช่วงที่เลือก</div>'
+        +'<div style="font-size:11px">ลองเลือก ทั้งหมด หรือปีอื่น หรือกด Sync ใหม่</div></div>'};
+  }
+  var _d=function(r){return r.date||r.docDate||r.payDate||'';};
+  var _v=function(r){return r.vendor||r.supplier||r.payee||r.project||r.note||r.name||r.description||'—';};
+  var _ref=function(r){return r.ref||r.docNo||r.poNo||'';};
+  var _amt=function(r){return Number(r.net||r.total||r.amount||0);};
+  var _st=function(r){return r.status||'—';};
+  var _type=function(r){return r.tradeType||r.type||r.category||'AP';};
+  var stBadge=function(s){
+    var sl=(s||'').toLowerCase();
+    if(sl.indexOf('paid')!==-1||sl.indexOf('จ่ายแล้ว')!==-1||sl.indexOf('success')!==-1)
+      return 'background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3)';
+    if(sl.indexOf('cancel')!==-1||sl.indexOf('ยกเลิก')!==-1)
+      return 'background:rgba(100,116,139,.15);color:#94a3b8;border:1px solid rgba(100,116,139,.3)';
+    return 'background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3)';
+  };
+  var fmtD=function(d){
+    if(!d||d==='—') return '—';
+    var p=d.split('-'); return p.length===3?p[2]+'/'+p[1]+'/'+(p[0].slice(2)):d.slice(0,10);
+  };
+  ap.sort(function(a,b){return (_d(b)||'').localeCompare(_d(a)||'');});
+  var h='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">';
+  h+='<div style="flex:1;min-width:110px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:10px 14px">';
+  h+='<div style="font-size:10px;color:var(--t3);margin-bottom:3px">รวมทั้งหมด · '+mLabel+'</div>';
+  h+='<div style="font-size:22px;font-weight:800;color:'+_tc('#f87171')+'">฿'+B(grandTotal)+'</div>';
+  h+='<div style="font-size:10px;color:var(--t3);margin-top:2px">'+ap.length+' รายการ AP'+(fix.length?' + '+fix.length+' Fixed':'')+'</div></div>';
+  if(fixTotal>0){
+    h+='<div style="flex:1;min-width:110px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:8px;padding:10px 14px">';
+    h+='<div style="font-size:10px;color:var(--t3);margin-bottom:3px">AP จ่าย</div>';
+    h+='<div style="font-size:18px;font-weight:800;color:#a78bfa">฿'+B(apTotal)+'</div></div>';
+    h+='<div style="flex:1;min-width:110px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:10px 14px">';
+    h+='<div style="font-size:10px;color:var(--t3);margin-bottom:3px">Fixed Cost</div>';
+    h+='<div style="font-size:18px;font-weight:800;color:#60a5fa">฿'+B(fixTotal)+'</div></div>';
+  }
+  h+='</div>';
+  if(ap.length){
+    h+='<div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.05em;margin-bottom:6px">📋 รายการ AP ('+ap.length+' รายการ)</div>';
+    h+='<div style="overflow-x:auto;max-height:300px;overflow-y:auto;border:1px solid var(--b1);border-radius:8px">';
+    h+='<table style="width:100%;border-collapse:collapse;font-size:11px">';
+    h+='<thead style="position:sticky;top:0;background:var(--card);z-index:1"><tr style="border-bottom:2px solid var(--b1)">';
+    h+='<th style="padding:6px 8px;text-align:left;color:var(--t3);font-size:10px;white-space:nowrap">วันที่</th>';
+    h+='<th style="padding:6px 8px;text-align:left;color:var(--t3);font-size:10px">ผู้รับเงิน / Vendor</th>';
+    h+='<th style="padding:6px 8px;text-align:left;color:var(--t3);font-size:10px">ประเภท</th>';
+    h+='<th style="padding:6px 8px;text-align:left;color:var(--t3);font-size:10px">เลขอ้างอิง</th>';
+    h+='<th style="padding:6px 8px;text-align:right;color:var(--t3);font-size:10px">จำนวน (฿)</th>';
+    h+='<th style="padding:6px 8px;text-align:center;color:var(--t3);font-size:10px">สถานะ</th>';
+    h+='</tr></thead><tbody>';
+    h+=ap.map(function(r,i){
+      var amt=_amt(r);
+      var bg=i%2===0?'':' style="background:rgba(255,255,255,.015)"';
+      return '<tr'+bg+'>'
+        +'<td style="padding:5px 8px;color:var(--t3);white-space:nowrap;font-size:10.5px">'+fmtD(_d(r))+'</td>'
+        +'<td style="padding:5px 8px;font-weight:600;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+_v(r)+'">'+_v(r)+'</td>'
+        +'<td style="padding:5px 8px;font-size:10px;color:var(--t2)">'+_type(r)+'</td>'
+        +'<td style="padding:5px 8px;font-size:10px;color:#a78bfa">'+(_ref(r)||'—')+'</td>'
+        +'<td style="padding:5px 8px;text-align:right;font-weight:700;color:'+_tc('#f87171')+'">฿'+B(amt)+'</td>'
+        +'<td style="padding:5px 8px;text-align:center"><span style="border-radius:4px;padding:2px 6px;font-size:9.5px;font-weight:700;'+stBadge(_st(r))+'">'+_st(r)+'</span></td>'
+        +'</tr>';
+    }).join('');
+    h+='<tr style="border-top:2px solid var(--b1);background:var(--card)">'
+      +'<td colspan="4" style="padding:7px 8px;font-weight:800;color:var(--t1);font-size:11px">รวม AP ('+ap.length+' รายการ)</td>'
+      +'<td style="padding:7px 8px;text-align:right;font-weight:800;color:'+_tc('#f87171')+';font-size:12px">฿'+B(apTotal)+'</td><td></td></tr>';
+    h+='</tbody></table></div>';
+  }
+  if(fix.length){
+    h+='<div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.05em;margin:10px 0 6px">🏠 Fixed Expenses ('+fix.length+' รายการ)</div>';
+    h+='<div style="border:1px solid var(--b1);border-radius:8px;overflow:hidden">';
+    h+='<table style="width:100%;border-collapse:collapse;font-size:11px">';
+    h+=fix.map(function(r,i){
+      var bg=i%2===0?'':' style="background:rgba(255,255,255,.015)"';
+      return '<tr'+bg+' style="border-bottom:1px solid var(--b1)">'
+        +'<td style="padding:5px 8px;font-weight:600">'+(r.name||r.expense||r.category||'Fixed')+'</td>'
+        +'<td style="padding:5px 8px;color:var(--t3);font-size:10px">'+(r.date||r.month||'—')+'</td>'
+        +'<td style="padding:5px 8px;text-align:right;font-weight:700;color:#60a5fa">฿'+B(r.amount||0)+'</td>'
+        +'</tr>';
+    }).join('');
+    h+='<tr style="border-top:2px solid var(--b1)"><td colspan="2" style="padding:7px 8px;font-weight:800;color:var(--t1)">รวม Fixed</td>'
+      +'<td style="padding:7px 8px;text-align:right;font-weight:800;color:#60a5fa">฿'+B(fixTotal)+'</td></tr>';
+    h+='</table></div>';
+  }
+  return {title:'🔴 รายจ่ายรวม · EXPENSES — '+mLabel, html:h};
 }
 </script>
 
@@ -4358,60 +5096,6 @@ function showToast(msg){
 }
 
 // ══ Finance Detail Modal ══
-function showFinDetail(type){
-  var title, html;
-  if(type==='revenue'){
-    title='💜 รายรับเดือนนี้ · REVENUE — พ.ค. 2026';
-    html='<div style="margin-bottom:12px;font-size:11px;color:var(--t3)">ยอดรวม: <span style="font-size:20px;font-weight:800;color:#fff">฿18,320,000</span> <span style="color:#a78bfa">↑ +12.4%</span></div>'
-      +'<table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr style="border-bottom:1px solid var(--b1)">'
-      +'<th style="text-align:left;padding:5px 8px;color:var(--t3);font-weight:600">ลูกค้า</th>'
-      +'<th style="text-align:left;padding:5px 8px;color:var(--t3);font-weight:600">Invoice</th>'
-      +'<th style="text-align:right;padding:5px 8px;color:var(--t3);font-weight:600">สุทธิ</th>'
-      +'<th style="text-align:center;padding:5px 8px;color:var(--t3);font-weight:600">สถานะ</th></tr></thead><tbody>'
-      +invData.map(function(d){
-        return'<tr style="border-bottom:1px solid rgba(255,255,255,.04)">'
-          +'<td style="padding:6px 8px;font-weight:600">'+d.cust+'</td>'
-          +'<td style="padding:6px 8px;color:#a78bfa">'+d.no+'</td>'
-          +'<td style="padding:6px 8px;text-align:right;font-weight:700">'+fmtB(d.net)+'</td>'
-          +'<td style="padding:6px 8px;text-align:center"><span style="border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;'+statusStyle(d.status)+'">'+d.status+'</span></td>'
-          +'</tr>';
-      }).join('')+'</tbody>'
-      +'<tfoot><tr style="border-top:2px solid var(--b2)"><td colspan="2" style="padding:8px;font-weight:800;color:var(--t1)">รวม</td>'
-      +'<td style="padding:8px;text-align:right;font-weight:800;color:#a78bfa;font-size:14px">'+fmtB(invData.reduce(function(a,d){return a+d.net},0))+'</td><td></td></tr></tfoot></table>';
-  } else {
-    title='🔴 รายจ่ายรวม · EXPENSES — พ.ค. 2026';
-    var items=[
-      {cat:'เงินเดือน (Payroll)',     amt:824000, pct:'70.8%', clr:'#8b5cf6'},
-      {cat:'ค่าเช่า Office+Warehouse',amt:185000, pct:'15.9%', clr:'#3b82f6'},
-      {cat:'Logistics + Operations',  amt:124000, pct:'10.7%', clr:'#10b981'},
-      {cat:'Import Duty + Tax',       amt:152000, pct:'13.1%', clr:'#f59e0b'},
-      {cat:'IT + Cloud + ค่าน้ำไฟ',  amt:28000,  pct:'2.4%',  clr:'#06b6d4'},
-      {cat:'OD Interest KBank',       amt:18400,  pct:'1.6%',  clr:'#f43f5e'},
-    ];
-    html='<div style="margin-bottom:12px;font-size:11px;color:var(--t3)">ยอดรวม: <span style="font-size:20px;font-weight:800;color:#fff">฿11,640,000</span> <span style="color:#f87171">↑ +6.2%</span></div>'
-      +'<table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr style="border-bottom:1px solid var(--b1)">'
-      +'<th style="text-align:left;padding:5px 8px;color:var(--t3);font-weight:600">หมวดรายจ่าย</th>'
-      +'<th style="text-align:right;padding:5px 8px;color:var(--t3);font-weight:600">จำนวน (฿)</th>'
-      +'<th style="text-align:right;padding:5px 8px;color:var(--t3);font-weight:600">สัดส่วน</th>'
-      +'<th style="padding:5px 8px;color:var(--t3);font-weight:600">กราฟ</th></tr></thead><tbody>'
-      +items.map(function(x){
-        var w=Math.round(x.amt/1331400*100);
-        return'<tr style="border-bottom:1px solid rgba(255,255,255,.04)">'
-          +'<td style="padding:6px 8px;font-weight:600;display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:'+x.clr+';display:inline-block;flex-shrink:0"></span>'+x.cat+'</td>'
-          +'<td style="padding:6px 8px;text-align:right;color:#f87171;font-weight:700">'+fmtB(x.amt)+'</td>'
-          +'<td style="padding:6px 8px;text-align:right;color:var(--t2)">'+x.pct+'</td>'
-          +'<td style="padding:6px 8px;min-width:80px"><div style="background:var(--b1);border-radius:3px;height:5px"><div style="width:'+w+'%;height:5px;background:'+x.clr+';border-radius:3px"></div></div></td>'
-          +'</tr>';
-      }).join('')
-      +'</tbody><tfoot><tr style="border-top:2px solid var(--b2)"><td style="padding:8px;font-weight:800;color:var(--t1)">รวมรายจ่าย</td>'
-      +'<td style="padding:8px;text-align:right;font-weight:800;color:#f87171;font-size:14px">฿1,331,400</td>'
-      +'<td colspan="2" style="padding:8px;color:var(--t3);font-size:10px">* Fixed cost ไม่รวม COGS / variable ops</td></tr></tfoot></table>';
-  }
-  document.getElementById('fin-detail-title').textContent=title;
-  document.getElementById('fin-detail-body').innerHTML=html;
-  ov('mv-fin-detail');
-}
-
 // Render invoice table on page load
 if(document.readyState==='loading'){
   document.addEventListener('DOMContentLoaded',function(){
@@ -4442,7 +5126,23 @@ function dlFile(name, content, mime){
 }
 function fmtN(n){return Number(n).toLocaleString('th-TH');}
 function rptToast(msg){
-  if(typeof window.showToast==='function') window.showToast(msg);
+  // Try app's showToast first; fallback to a self-contained toast div
+  if(typeof window.showToast==='function'){ window.showToast(msg); return; }
+  var id='_fos_toast';
+  var t=document.getElementById(id);
+  if(!t){
+    t=document.createElement('div');
+    t.id=id;
+    t.style.cssText='position:fixed;bottom:24px;right:24px;z-index:999999;'
+      +'background:#1e293b;color:#e2e8f0;padding:10px 18px;border-radius:8px;'
+      +'font-size:12px;font-family:sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.4);'
+      +'pointer-events:none;opacity:0;transition:opacity .2s';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg;
+  t.style.opacity='1';
+  clearTimeout(t._t);
+  t._t=setTimeout(function(){t.style.opacity='0';},4000);
 }
 
 function getInvData(){ return window.invData||[]; }
@@ -4626,28 +5326,773 @@ var mdBuilders = {
   },
   'executive': function(){
     return '# Executive Summary — พ.ค. 2026\n**FinanceOS · PT / PEO Tech Co., Ltd.**\n\n## KPI Overview\n| Metric | Value | Status |\n|---|---|---|\n| Revenue MTD | ฿18,320,000 | +12.4% |\n| Net Margin | 36.4% | Target 35% ✓ |\n| Cash Balance | ฿2,847,320 | Safe |\n| AR Outstanding | ฿778,000 | 3 overdue |\n| AP Payable | ฿890,000 | Due 5d |\n| Risk Score | 62/100 | Moderate |';
+  },
+  'ar-aging': function(){
+    var lines = ['# AR Aging Report — พ.ค. 2026\n',
+      '| Invoice # | ลูกค้า | สุทธิ (฿) | Overdue (วัน) | Bucket |',
+      '|---|---|---|---|---|'];
+    var buckets = {b1:0,b2:0,b3:0,b4:0};
+    getInvData().forEach(function(d){
+      if(d.od > 0){
+        var bk = d.od<=30?'0–30 วัน':d.od<=60?'31–60 วัน':d.od<=90?'61–90 วัน':'90+ วัน';
+        if(d.od<=30) buckets.b1+=(d.net||0); else if(d.od<=60) buckets.b2+=(d.net||0);
+        else if(d.od<=90) buckets.b3+=(d.net||0); else buckets.b4+=(d.net||0);
+        lines.push('| '+d.no+' | '+d.cust+' | ฿'+fmtN(d.net)+' | '+d.od+' วัน | '+bk+' |');
+      }
+    });
+    lines.push('\n## Aging Summary\n');
+    lines.push('| Bucket | ยอดรวม (฿) |\n|---|---|');
+    if(buckets.b1) lines.push('| 0–30 วัน | ฿'+fmtN(buckets.b1)+' |');
+    if(buckets.b2) lines.push('| 31–60 วัน | ฿'+fmtN(buckets.b2)+' |');
+    if(buckets.b3) lines.push('| 61–90 วัน | ฿'+fmtN(buckets.b3)+' |');
+    if(buckets.b4) lines.push('| 90+ วัน | ฿'+fmtN(buckets.b4)+' |');
+    return lines.join('\n');
+  },
+  'cashflow': function(){
+    var lines = ['# Cash Flow Statement — พ.ค. 2026\n',
+      '| เดือน | รายรับ (฿) | รายจ่าย (฿) | Net CF (฿) | Ending Balance (฿) |',
+      '|---|---|---|---|---|'];
+    var bal = 3200000;
+    getPLData().forEach(function(d){ var net=d.rev-d.exp; bal+=net;
+      lines.push('| '+d.month+' | ฿'+fmtN(d.rev)+' | ฿'+fmtN(d.exp)+' | ฿'+fmtN(net)+' | ฿'+fmtN(bal)+' |'); });
+    return lines.join('\n');
   }
 };
 
-function printReport(reportId){
-  var mdFn = mdBuilders[reportId];
-  var csvFn = csvBuilders[reportId];
-  var w = window.open('','_blank','width=800,height=600');
-  w.document.write('<html><head><title>FinanceOS Report</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#111}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:6px 10px;font-size:12px}th{background:#f5f5f5;font-weight:700}@media print{body{padding:0}}</style></head><body>');
-  w.document.write('<h1>FinanceOS — '+reportId.toUpperCase()+'</h1>');
-  w.document.write('<p style="color:#666;font-size:12px">Generated: '+new Date().toLocaleString('th-TH')+'</p><hr>');
-  if(mdFn){
-    var html=mdFn().replace(/^# (.+)$/gm,'<h2>$1</h2>').replace(/^## (.+)$/gm,'<h3>$1</h3>').replace(/^\*\*(.+)\*\*$/gm,'<strong>$1</strong>');
-    w.document.write(html);
-  } else if(csvFn){
-    w.document.write('<pre>'+csvFn()+'</pre>');
+/* ═══════════════════════════════════════════════════════
+   FinanceOS Print Engine v2.0 — A4/A3 Portrait/Landscape
+   ═══════════════════════════════════════════════════════ */
+function _printB(n){ if(n===null||n===undefined) return '—'; return '฿'+Number(n).toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+function _printP(n){ if(n===null||n===undefined) return '—'; return Math.round(Number(n)*10)/10+'%'; }
+function _printFmtD(d){ if(!d||d==='—') return '—'; var p=d.split('-'); return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:d; }
+function _printFmtN(n){ return Number(n||0).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+function _printGetCSS(pageSize, orientation){
+  var sz = (pageSize||'A4').toUpperCase();
+  var or = (orientation||'portrait').toLowerCase();
+  return '@page{size:'+sz+' '+or+';margin:14mm 16mm 16mm 16mm}'
+    +'*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'body{font-family:"Sarabun","Noto Sans Thai",Arial,sans-serif;font-size:11px;color:#1a1a2e;background:#fff;margin:0;padding:0}'
+    +'.cover{background:linear-gradient(135deg,#1e1b4b 0%,#312e81 40%,#1e3a5f 100%);color:#fff;padding:32px 28px 28px;border-radius:0;page-break-after:always;break-after:page}'
+    +'.cover h1{margin:0 0 6px;font-size:22px;font-weight:900;letter-spacing:-.3px}'
+    +'.cover .sub{font-size:12px;opacity:.75;margin-bottom:20px}'
+    +'.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0}'
+    +'.kpi-box{background:rgba(255,255,255,.12);border-radius:8px;padding:12px 14px;border:1px solid rgba(255,255,255,.18)}'
+    +'.kpi-box .lbl{font-size:9px;text-transform:uppercase;letter-spacing:.08em;opacity:.7;margin-bottom:4px}'
+    +'.kpi-box .val{font-size:16px;font-weight:800;}'
+    +'.kpi-box .chg{font-size:9.5px;opacity:.7;margin-top:3px}'
+    +'.sec{margin:0 0 18px}'
+    +'.sec-head{display:flex;align-items:center;gap:8px;margin:0 0 8px;padding-bottom:5px;border-bottom:2px solid #e5e7eb}'
+    +'.sec-bar{width:4px;height:16px;border-radius:2px;flex-shrink:0}'
+    +'.sec-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em}'
+    +'table{width:100%;border-collapse:collapse;font-size:10px}'
+    +'thead tr{background:#1e3a5f;color:#fff}'
+    +'thead th{padding:7px 9px;font-weight:700;text-align:left;font-size:10px;white-space:nowrap}'
+    +'tbody tr:nth-child(even){background:#f8fafc}'
+    +'tbody tr:hover{background:#eff6ff}'
+    +'td{padding:5px 9px;border-bottom:1px solid #e5e7eb;vertical-align:top}'
+    +'td.num{text-align:right;font-variant-numeric:tabular-nums}'
+    +'.tag-paid{background:#dcfce7;color:#166534;border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700}'
+    +'.tag-pend{background:#fef3c7;color:#92400e;border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700}'
+    +'.tag-over{background:#fee2e2;color:#991b1b;border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700}'
+    +'.pg-brk{page-break-after:always;break-after:page}'
+    +'.footer{margin-top:10px;padding-top:6px;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;font-size:9px;color:#94a3b8}'
+    +'.mini-kpi{display:inline-block;background:#f1f5f9;border-radius:6px;padding:6px 12px;margin:0 6px 8px 0;border-left:3px solid #3b82f6}'
+    +'.mini-kpi .lbl{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#64748b}'
+    +'.mini-kpi .val{font-size:14px;font-weight:800;color:#1e293b;margin-top:2px}'
+    +'@media screen{body{padding:16px;background:#f1f5f9}.cover{border-radius:12px}}'
+    +'@media print{'
+    +  'html,body{height:auto!important;overflow:visible!important;max-height:none!important}'
+    +  ' .no-print{display:none!important}'
+    +  ' .pg-brk{page-break-after:always!important;break-after:page!important}'
+    +  ' .sec{page-break-inside:avoid;break-inside:avoid}'
+    +'}';
+}
+
+function _printHeader(title, subtitle, pageSize, orientation){
+  var k  = (window._fos_cache && window._fos_cache.kpi) || {};
+  var now = new Date().toLocaleString('th-TH',{dateStyle:'long',timeStyle:'short'});
+  var pg  = (pageSize||'A4')+' '+(orientation==='landscape'?'แนวนอน':'แนวตั้ง');
+  return '<div class="cover">'
+    +'<div style="font-size:10px;opacity:.6;margin-bottom:8px;letter-spacing:.05em">PT / PEO TECH CO., LTD. &nbsp;·&nbsp; FinanceOS &nbsp;·&nbsp; '+pg+'</div>'
+    +'<h1>'+title+'</h1>'
+    +'<div class="sub">'+subtitle+'</div>'
+    +'<div class="kpi-grid">'
+      +'<div class="kpi-box"><div class="lbl">Revenue MTD</div><div class="val">'+_printB(k.revenueMTD)+'</div><div class="chg">YTD: '+_printB(k.revenueYTD)+'</div></div>'
+      +'<div class="kpi-box"><div class="lbl">Net Margin</div><div class="val">'+_printP(k.netMargin)+'</div><div class="chg">Net Profit: '+_printB(k.netProfit)+'</div></div>'
+      +'<div class="kpi-box"><div class="lbl">Cash Balance</div><div class="val">'+_printB(k.cashBalance)+'</div><div class="chg">OD Used: '+_printB(k.odUsed)+'</div></div>'
+      +'<div class="kpi-box"><div class="lbl">AR Outstanding</div><div class="val">'+_printB(k.arOutstanding)+'</div><div class="chg">AR Overdue: '+_printB(k.arOverdueAmount)+'</div></div>'
+    +'</div>'
+    +'<div style="font-size:9px;opacity:.5;margin-top:18px">Generated: '+now+'</div>'
+    +'</div>';
+}
+
+function _printSec(title, color, content){
+  return '<div class="sec">'
+    +'<div class="sec-head"><div class="sec-bar" style="background:'+color+'"></div><div class="sec-title" style="color:'+color+'">'+title+'</div></div>'
+    +content
+    +'</div>';
+}
+
+function _printTbl(headers, rows, colAligns){
+  var ths = headers.map(function(h){ return '<th>'+h+'</th>'; }).join('');
+  var trs = rows.map(function(row){
+    var tds = row.map(function(c,i){
+      var align = (colAligns&&colAligns[i]) ? ' class="num"' : '';
+      return '<td'+align+'>'+c+'</td>';
+    }).join('');
+    return '<tr>'+tds+'</tr>';
+  }).join('');
+  return '<table><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table>';
+}
+
+function _printMiniKpis(items){
+  return items.map(function(it){
+    return '<div class="mini-kpi" style="border-left-color:'+it.c+'"><div class="lbl">'+it.lbl+'</div><div class="val">'+it.val+'</div></div>';
+  }).join('');
+}
+
+function _printFooter(reportId){
+  var now = new Date().toLocaleString('th-TH');
+  return '<div class="footer"><span>FinanceOS · PT / PEO Tech Co., Ltd.</span><span>Report: '+reportId+'</span><span>'+now+'</span></div>';
+}
+
+function _svgBarChart(data, opts){
+  var w = opts.w || 480;
+  var h = opts.h || 140;
+  var title = opts.title || '';
+  if(!data || !data.length) return '';
+  var max = Math.max.apply(null, data.map(function(d){ return d.value || 0; })) || 1;
+  var pad = {l:8, r:8, t:20, b:28};
+  var bw  = Math.floor((w - pad.l - pad.r) / data.length);
+  var bGap = Math.max(2, Math.floor(bw * 0.15));
+  var bars = '';
+  var labels = '';
+  var vals = '';
+  data.forEach(function(d, i){
+    var bh = Math.max(2, Math.round((d.value / max) * (h - pad.t - pad.b)));
+    var x  = pad.l + i * bw + bGap;
+    var bwi = bw - bGap * 2;
+    var y  = pad.t + (h - pad.t - pad.b) - bh;
+    bars   += '<rect x="'+x+'" y="'+y+'" width="'+bwi+'" height="'+bh+'" fill="'+(d.color||'#3b82f6')+'" rx="2"/>';
+    var lbl = (d.label||'').toString().slice(0,6);
+    labels += '<text x="'+(x+bwi/2)+'" y="'+(h-pad.b+12)+'" text-anchor="middle" font-size="8" fill="#64748b">'+lbl+'</text>';
+    var vStr = d.value >= 1000000 ? Math.round(d.value/100000)/10+'M' : d.value >= 1000 ? Math.round(d.value/100)/10+'K' : d.value;
+    vals   += '<text x="'+(x+bwi/2)+'" y="'+(y-3)+'" text-anchor="middle" font-size="7.5" fill="#374151">'+vStr+'</text>';
+  });
+  return '<svg width="'+w+'" height="'+h+'" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 0 8px">'
+    +'<text x="'+(w/2)+'" y="12" text-anchor="middle" font-size="9" font-weight="700" fill="#1e293b">'+title+'</text>'
+    +bars+labels+vals
+    +'</svg>';
+}
+
+function _svgHBarChart(data, opts){
+  var w = opts.w || 480;
+  var title = opts.title || '';
+  if(!data || !data.length) return '';
+  var rowH = 22;
+  var h    = data.length * rowH + 24;
+  var labelW = 160;
+  var barW   = w - labelW - 60;
+  var max = Math.max.apply(null, data.map(function(d){ return d.total || d.value || 1; })) || 1;
+  var rows = '';
+  data.forEach(function(d, i){
+    var bLen = Math.max(2, Math.round((d.value / max) * barW));
+    var y    = 20 + i * rowH;
+    var lbl  = (d.label||'').toString();
+    if(lbl.length > 18) lbl = lbl.slice(0,17)+'…';
+    var vStr = '฿'+(d.value >= 1000000 ? Math.round(d.value/100000)/10+'M' : d.value >= 1000 ? Math.round(d.value/1000)+'K' : d.value);
+    rows += '<text x="'+(labelW-4)+'" y="'+(y+11)+'" text-anchor="end" font-size="8.5" fill="#374151">'+lbl+'</text>';
+    rows += '<rect x="'+labelW+'" y="'+(y+2)+'" width="'+bLen+'" height="14" fill="'+(d.color||'#f59e0b')+'" rx="2"/>';
+    rows += '<text x="'+(labelW+bLen+4)+'" y="'+(y+11)+'" font-size="8" fill="#64748b">'+vStr+'</text>';
+  });
+  return '<svg width="'+w+'" height="'+h+'" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 0 8px">'
+    +'<text x="'+(w/2)+'" y="12" text-anchor="middle" font-size="9" font-weight="700" fill="#1e293b">'+title+'</text>'
+    +rows
+    +'</svg>';
+}
+
+function _svgDonut(data, opts){
+  var title = opts.title || '';
+  var r = 55; var cx = 70; var cy = 70;
+  var w = 280; var h = 140;
+  if(!data || !data.length) return '';
+  var total = data.reduce(function(a,d){ return a + (d.value||0); }, 0) || 1;
+  var slices = '';
+  var legend = '';
+  var angle  = -Math.PI / 2;
+  data.forEach(function(d, i){
+    var pct   = d.value / total;
+    var sweep = pct * 2 * Math.PI;
+    var x1    = cx + r * Math.cos(angle);
+    var y1    = cy + r * Math.sin(angle);
+    angle    += sweep;
+    var x2    = cx + r * Math.cos(angle);
+    var y2    = cy + r * Math.sin(angle);
+    var large = sweep > Math.PI ? 1 : 0;
+    if(pct > 0.001){
+      slices += '<path d="M'+cx+' '+cy+' L'+x1.toFixed(1)+' '+y1.toFixed(1)
+        +' A'+r+' '+r+' 0 '+large+' 1 '+x2.toFixed(1)+' '+y2.toFixed(1)+' Z"'
+        +' fill="'+(d.color||'#3b82f6')+'"/>';
+    }
+    var ly = 18 + i * 16;
+    var lbl = (d.label||'').toString(); if(lbl.length>14) lbl=lbl.slice(0,13)+'…';
+    var pctStr = Math.round(pct*1000)/10+'%';
+    legend += '<rect x="145" y="'+(ly-8)+'" width="10" height="10" fill="'+(d.color||'#3b82f6')+'" rx="2"/>';
+    legend += '<text x="158" y="'+ly+'" font-size="8.5" fill="#374151">'+lbl+' ('+pctStr+')</text>';
+  });
+  // Center hole
+  slices += '<circle cx="'+cx+'" cy="'+cy+'" r="28" fill="white"/>';
+  slices += '<text x="'+cx+'" y="'+(cy+4)+'" text-anchor="middle" font-size="8" font-weight="700" fill="#1e293b">'+title+'</text>';
+  return '<svg width="'+w+'" height="'+h+'" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 0 8px">'
+    +slices+legend
+    +'</svg>';
+}
+
+
+/* ─── Report Builders ─── */
+function _buildReportContent(reportId){
+  var k  = (window._fos_cache && window._fos_cache.kpi) || {};
+  var ar = window._fos_cache && window._fos_cache.ar  || [];
+  var ap = window._fos_cache && window._fos_cache.ap  || [];
+  var po = window._fos_cache && window._fos_cache.po  || [];
+  var fx = window._fos_cache && window._fos_cache.fix || [];
+  var now = new Date().toLocaleString('th-TH',{dateStyle:'long'});
+
+  if(reportId==='executive'){
+    var kpis = _printMiniKpis([
+      {lbl:'Revenue MTD',     val:_printB(k.revenueMTD),       c:'#10b981'},
+      {lbl:'Revenue YTD',     val:_printB(k.revenueYTD),       c:'#10b981'},
+      {lbl:'Gross Profit',    val:_printB(k.grossProfit),       c:'#3b82f6'},
+      {lbl:'Net Profit',      val:_printB(k.netProfit),         c:'#8b5cf6'},
+      {lbl:'Net Margin',      val:_printP(k.netMargin),         c:'#8b5cf6'},
+      {lbl:'Cash Balance',    val:_printB(k.cashBalance),       c:'#06b6d4'},
+      {lbl:'OD Used',         val:_printB(k.odUsed),            c:'#f59e0b'},
+      {lbl:'OD Available',    val:_printB(k.odAvailable),       c:'#06b6d4'},
+      {lbl:'AR Outstanding',  val:_printB(k.arOutstanding),     c:'#ef4444'},
+      {lbl:'AR Overdue',      val:_printB(k.arOverdueAmount),   c:'#ef4444'},
+      {lbl:'AP Payable',      val:_printB(k.apPending),         c:'#f59e0b'},
+      {lbl:'VAT Payable',     val:_printB(k.vatPayable),        c:'#64748b'},
+    ]);
+    var arRows = ar.slice(0,8).map(function(r){
+      var st = (r.status||'').toLowerCase();
+      var hasAct2=r.actDate&&r.actDate!==''&&r.actDate!=='null'&&r.actDate!=='—';
+      var isPd2=st.indexOf('paid')!==-1||st==='done'||st.indexOf('ชำระ')!==-1||st==='ลดหนี้'||hasAct2;
+      var tag = isPd2?'<span class="tag-paid">ชำระแล้ว</span>':
+                r.od>30?'<span class="tag-over">เกินกำหนด</span>':'<span class="tag-pend">รอรับ</span>';
+      return [r.no||r.docNo||'—',r.cust||r.customer||'—',_printFmtD(r.date),_printFmtN(r.net||r.amount||0),tag];
+    });
+    var arTbl = arRows.length ? _printTbl(['Invoice #','ลูกค้า','วันที่','สุทธิ (฿)','สถานะ'],arRows,[0,0,0,1,0]) : '<p style="color:#64748b;font-size:10px">ไม่มีข้อมูล AR</p>';
+    return '<div style="padding:20px">'
+      +_printSec('KPI Overview — '+now,'#10b981',kpis)
+      +_printSec('AR ลูกหนี้ (ล่าสุด)','#ef4444',arTbl)
+      +_printFooter(reportId)+'</div>';
   }
-  w.document.write('</body></html>');
-  w.document.close();
-  setTimeout(function(){w.print();},500);
+
+  if(reportId==='pl'){
+    var plData = getPLData();
+    var plRows = plData.map(function(d){ var p=d.rev-d.exp; var m=d.rev?Math.round(p/d.rev*1000)/10:0;
+      return [d.month,_printFmtN(d.rev),_printFmtN(d.exp),_printFmtN(p),(m>0?'<span style="color:#10b981;font-weight:700">':'<span style="color:#ef4444;font-weight:700">')+m+'%</span>'];
+    });
+    var totR=plData.reduce(function(a,d){return a+d.rev;},0);
+    var totE=plData.reduce(function(a,d){return a+d.exp;},0);
+    var totP=totR-totE; var totM=totR?Math.round(totP/totR*1000)/10:0;
+    plRows.push(['<strong>รวม YTD</strong>','<strong>'+_printFmtN(totR)+'</strong>','<strong>'+_printFmtN(totE)+'</strong>','<strong>'+_printFmtN(totP)+'</strong>','<strong>'+totM+'%</strong>']);
+    var plChartData = plData.map(function(d,i){
+      return {label:d.month.slice(0,5), value:d.rev, color:i===plData.length-1?'#10b981':'#6ee7b7'};
+    });
+    var plChart2 = _svgBarChart(plChartData,{title:'Monthly Revenue',w:500,h:140});
+    var expChartData = plData.map(function(d,i){
+      return {label:d.month.slice(0,5), value:d.exp, color:i===plData.length-1?'#ef4444':'#fca5a5'};
+    });
+    var expChart2 = _svgBarChart(expChartData,{title:'Monthly Expenses',w:500,h:140});
+    return '<div style="padding:20px">'
+      +_printSec('Monthly Revenue &amp; Expense Trend','#8b5cf6',plChart2+expChart2)
+      +_printSec('Profit & Loss — รายเดือน 2026','#8b5cf6',_printTbl(['เดือน','รายรับ (฿)','รายจ่าย (฿)','กำไรสุทธิ์ (฿)','Net Margin'],plRows,[0,1,1,1,1]))
+      +_printFooter(reportId)+'</div>';
+  }
+
+  if(reportId==='cashflow'){
+    var plCF = getPLData(); var bal=k.cashBalance||3200000;
+    var cfRows = plCF.map(function(d){ var net=d.rev-d.exp; bal+=net;
+      return [d.month,_printFmtN(d.rev),_printFmtN(d.exp),_printFmtN(net),(net>=0?'<span style="color:#10b981">':'<span style="color:#ef4444">')+_printFmtN(bal)+'</span>'];
+    });
+    var cfKpis = _printMiniKpis([
+      {lbl:'Cash Balance',val:_printB(k.cashBalance),c:'#06b6d4'},
+      {lbl:'OD Used',val:_printB(k.odUsed),c:'#f59e0b'},
+      {lbl:'OD Available',val:_printB(k.odAvailable),c:'#10b981'},
+      {lbl:'Net CF MTD',val:_printB((k.revenueMTD||0)-(k.expensesMTD||0)),c:'#8b5cf6'},
+    ]);
+    return '<div style="padding:20px">'
+      +_printSec('KPI เงินสด','#06b6d4',cfKpis)
+      +_printSec('Cash Flow Statement','#3b82f6',_printTbl(['เดือน','รายรับ (฿)','รายจ่าย (฿)','Net CF (฿)','Ending Balance (฿)'],cfRows,[0,1,1,1,1]))
+      +_printFooter(reportId)+'</div>';
+  }
+
+  if(reportId==='invoice'){
+    var invD = getInvData();
+    var invRows = invD.map(function(d){
+      var st = (d.status||'').toLowerCase();
+      var hasAct3=d.actDate&&d.actDate!==''&&d.actDate!=='null'&&d.actDate!=='—';
+      var isPd3=st.indexOf('paid')!==-1||st==='done'||st.indexOf('ชำระ')!==-1||st==='ลดหนี้'||hasAct3;
+      var tag = isPd3?'<span class="tag-paid">ชำระแล้ว</span>':
+                d.od>0?'<span class="tag-over">เกิน '+d.od+'วัน</span>':'<span class="tag-pend">รอ</span>';
+      return [d.no,d.cust,_printFmtD(d.date),_printFmtN(d.val),_printFmtN(d.vat),_printFmtN(d.net),tag,d.credit];
+    });
+    var invTot = invD.reduce(function(a,d){return a+(d.net||0);},0);
+    invRows.push(['<strong>รวม</strong>','','','','','<strong>'+_printFmtN(invTot)+'</strong>','','']);
+    return '<div style="padding:20px">'
+      +_printSec('Invoice List — พ.ค. 2026','#10b981',_printTbl(['Invoice #','ลูกค้า','วันที่','มูลค่า','VAT 7%','สุทธิ (฿)','สถานะ','เครดิต(วัน)'],invRows,[0,0,0,1,1,1,0,1]))
+      +_printFooter(reportId)+'</div>';
+  }
+
+  if(reportId==='ar-aging'){
+    var invAg = getInvData().filter(function(d){return d.od>0;});
+    var b1=0,b2=0,b3=0,b4=0;
+    var agRows = invAg.map(function(d){
+      var bk,bc;
+      if(d.od<=30){bk='0–30 วัน';bc='#10b981';b1+=d.net||0;}
+      else if(d.od<=60){bk='31–60 วัน';bc='#f59e0b';b2+=d.net||0;}
+      else if(d.od<=90){bk='61–90 วัน';bc='#ef4444';b3+=d.net||0;}
+      else{bk='90+ วัน';bc='#7f1d1d';b4+=d.net||0;}
+      return [d.no,d.cust,_printFmtN(d.net),'<span style="color:'+bc+';font-weight:700">'+d.od+' วัน</span>','<span style="color:'+bc+'">'+bk+'</span>'];
+    });
+    var agSum = _printMiniKpis([
+      {lbl:'0–30 วัน',val:_printB(b1),c:'#10b981'},{lbl:'31–60 วัน',val:_printB(b2),c:'#f59e0b'},
+      {lbl:'61–90 วัน',val:_printB(b3),c:'#ef4444'},{lbl:'90+ วัน',val:_printB(b4),c:'#7f1d1d'},
+    ]);
+    var agChartData = [{label:'0–30 วัน',value:b1,color:'#10b981'},{label:'31–60 วัน',value:b2,color:'#f59e0b'},{label:'61–90 วัน',value:b3,color:'#ef4444'},{label:'90+ วัน',value:b4,color:'#7f1d1d'}].filter(function(d){return d.value>0;});
+    var agChart = agChartData.length ? _svgDonut(agChartData,{title:'Aging'}) : '';
+    return '<div style="padding:20px">'
+      +_printSec('Aging Summary','#ef4444',agChart+agSum)
+      +_printSec('AR Aging Detail','#ef4444',agRows.length?_printTbl(['Invoice #','ลูกค้า','สุทธิ์ (฿)','Overdue','Bucket'],agRows,[0,0,1,1,0]):'<p style="color:#64748b">ไม่มีรายการค้าง</p>')
+      +_printFooter(reportId)+'</div>';
+  }
+
+  if(reportId==='sales-rank'){
+    var srk = getSalesRank();
+    var srkRows = srk.map(function(d,i){
+      var medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
+      var pct = Math.round(d.ytd/srk.reduce(function(a,x){return a+x.ytd;},1)*1000)/10;
+      return [medal,d.cust,_printFmtN(d.ytd),_printFmtN(d.mtd),d.inv,pct+'%'];
+    });
+    return '<div style="padding:20px">'
+      +_printSec('Sales Ranking by Customer — YTD 2026','#10b981',_printTbl(['Rank','ลูกค้า','YTD Revenue (฿)','MTD Revenue (฿)','Invoice จำนวน','สัดส่วน'],srkRows,[0,0,1,1,1,1]))
+      +_printFooter(reportId)+'</div>';
+  }
+
+  if(reportId==='expense'){
+    var expAP = ap.filter(function(r){ var s=(r.status||'').toLowerCase(); return !(s==='done'||s==='cheque-done'||s==='ชำระแล้ว'||s==='paid'); });
+    var apTot = expAP.reduce(function(a,r){return a+Number(r.amount||r.net||0);},0) || (k.apPending||0);
+    var fixTot= fx.reduce(function(a,r){return a+Number(r.amount||r.net||0);},0) || (k.fixedCostMTD||0);
+    var expD = getExpData();
+    var expRows = expD.map(function(d){ var tot2=expD.reduce(function(a,x){return a+x.amt;},0); return [d.cat,_printFmtN(d.amt),Math.round(d.amt/tot2*1000)/10+'%']; });
+    var expKpis = _printMiniKpis([
+      {lbl:'AP ค้างจ่าย',val:_printB(apTot),c:'#ef4444'},
+      {lbl:'Fixed Expenses',val:_printB(fixTot),c:'#f59e0b'},
+      {lbl:'รวมทั้งหมด',val:_printB(apTot+fixTot),c:'#8b5cf6'},
+    ]);
+    var expColours = ['#ef4444','#f59e0b','#3b82f6','#8b5cf6','#10b981','#06b6d4','#f97316'];
+    var expTotal2 = expD.reduce(function(a,d){return a+d.amt;},0)||1;
+    var expDonut = _svgDonut(expD.map(function(d,i){return {label:d.cat,value:d.amt,color:expColours[i%expColours.length]};}),{title:'Expenses'});
+    var expHBar  = _svgHBarChart(expD.map(function(d){return {label:d.cat,value:d.amt,color:'#f59e0b',total:expTotal2};}),{title:'Expense Breakdown',w:480});
+    return '<div style="padding:20px">'
+      +_printSec('Expense KPIs','#ef4444',expKpis)
+      +_printSec('Expense Breakdown Charts','#f59e0b',expDonut+expHBar)
+      +_printSec('Expense Detail Table','#f59e0b',_printTbl(['หมวดรายจ่าย','จำนวน (฿)','สัดส่วน'],expRows,[0,1,1]))
+      +_printFooter(reportId)+'</div>';
+  }
+
+  if(reportId==='tax'){
+    var taxD = getTaxData();
+    var taxRows = taxD.map(function(d){
+      var tag = d.status==='รอส่ง'?'<span class="tag-pend">'+d.status+'</span>':d.status==='รอชำระ'?'<span class="tag-over">'+d.status+'</span>':'<span style="color:#64748b">'+d.status+'</span>';
+      return [d.type,d.form,_printFmtN(d.amt),d.due,tag];
+    });
+    var taxTot = taxD.reduce(function(a,d){return a+d.amt;},0);
+    taxRows.push(['<strong>รวม</strong>','','<strong>'+_printFmtN(taxTot)+'</strong>','','']);
+    var taxKpis = _printMiniKpis([
+      {lbl:'VAT Payable',val:_printB(k.vatPayable),c:'#f59e0b'},
+      {lbl:'WHT Payable',val:_printB(k.whtPayable),c:'#3b82f6'},
+      {lbl:'CIT Payable',val:_printB(k.citPayable),c:'#8b5cf6'},
+      {lbl:'Import Duty MTD',val:_printB(k.importDutyMTD),c:'#06b6d4'},
+    ]);
+    return '<div style="padding:20px">'
+      +_printSec('Tax Summary KPIs','#f59e0b',taxKpis)
+      +_printSec('Tax Detail — พ.ค. 2026','#f59e0b',_printTbl(['ประเภทภาษี','แบบฟอร์ม','ยอด (฿)','กำหนดส่ง','สถานะ'],taxRows,[0,0,1,0,0]))
+      +_printFooter(reportId)+'</div>';
+  }
+
+  if(reportId==='ar-stmt'){
+    var invSt = getInvData();
+    var stRows = invSt.map(function(d){
+      var st=(d.status||'').toLowerCase();
+      var hasAct=d.actDate&&d.actDate!==''&&d.actDate!=='null'&&d.actDate!=='—';
+      var isPd=st.indexOf('paid')!==-1||st==='done'||st.indexOf('ชำระ')!==-1||st==='ลดหนี้'||hasAct;
+      var tag=isPd?'<span class="tag-paid">ชำระแล้ว</span>':'<span class="tag-pend">รอรับ</span>';
+      return [d.no,d.cust,_printFmtN(d.net),d.credit,_printFmtD(d.expDate),_printFmtD(d.actDate),tag];
+    });
+    return '<div style="padding:20px">'
+      +_printSec('AR Statement — พ.ค. 2026','#3b82f6',_printTbl(['Invoice #','ลูกค้า','สุทธิ (฿)','เครดิต(วัน)','ประมาณรับ','รับจริง','สถานะ'],stRows,[0,0,1,1,0,0,0]))
+      +_printFooter(reportId)+'</div>';
+  }
+
+  if(reportId==='po-summary'){
+    var poD = getPOData();
+    var poRows = poD.map(function(d){
+      var tag=d.status&&d.status.toLowerCase().indexOf('done')!==-1?'<span class="tag-paid">สำเร็จ</span>':'<span class="tag-pend">'+d.status+'</span>';
+      return [d.no,d.sup,d.type||'DOM',d.country||'TH',_printFmtN(d.amt),tag];
+    });
+    var poTot = poD.reduce(function(a,d){return a+(d.amt||0);},0);
+    var poKpis = _printMiniKpis([
+      {lbl:'PO ทั้งหมด',val:poD.length+' รายการ',c:'#f59e0b'},
+      {lbl:'มูลค่ารวม',val:_printB(poTot),c:'#3b82f6'},
+      {lbl:'FX Exposure',val:_printB(k.fxExposure),c:'#ef4444'},
+    ]);
+    return '<div style="padding:20px">'
+      +_printSec('PO KPIs','#f59e0b',poKpis)
+      +_printSec('PO Summary — All Orders','#f59e0b',poRows.length?_printTbl(['PO #','Supplier','ประเภท','Country','มูลค่า (฿)','สถานะ'],poRows,[0,0,0,0,1,0]):'<p style="color:#64748b">ไม่มีข้อมูล PO</p>')
+      +_printFooter(reportId)+'</div>';
+  }
+
+  if(reportId==='import-duty'){
+    var impRows = [
+      ['PO-046','Ningbo Wheel Ltd.','China','CNY','380,000','38,000','29,260','67,260','8716.80.00'],
+      ['PO-044','SG Logistics','Singapore','SGD','320,000','16,000','23,520','39,520','8431.20.00'],
+      ['<strong>รวม</strong>','','','','<strong>700,000</strong>','<strong>54,000</strong>','<strong>52,780</strong>','<strong>106,780</strong>',''],
+    ];
+    var impKpis = _printMiniKpis([
+      {lbl:'FX Exposure',val:_printB(k.fxExposure),c:'#f59e0b'},
+      {lbl:'Import Duty MTD',val:_printB(k.importDutyMTD),c:'#ef4444'},
+    ]);
+    return '<div style="padding:20px">'
+      +_printSec('Import FX KPIs','#f59e0b',impKpis)
+      +_printSec('Import Duty & Tax Detail','#f59e0b',_printTbl(['PO #','Supplier','Country','Currency','มูลค่า THB','Import Duty','VAT นำเข้า 7%','รวมภาษี','HS Code'],impRows,[0,0,0,0,1,1,1,1,0]))
+      +_printFooter(reportId)+'</div>';
+  }
+
+  if(reportId==='vendor'){
+    var vRows = [
+      ['Thai Caster Co.','TH','Caster Wheels','PO-047','Net 30','⭐⭐⭐⭐⭐'],
+      ['Ningbo Wheel Ltd.','CN','Industrial Wheels','PO-046','T/T 50%+50%','⭐⭐⭐⭐'],
+      ['SG Logistics','SG','Parts & Components','PO-044','Net 45','⭐⭐⭐⭐'],
+    ];
+    return '<div style="padding:20px">'
+      +_printSec('Vendor Performance','#8b5cf6',_printTbl(['Vendor','Country','สินค้า','PO ล่าสุด','Payment Terms','Rating'],vRows,[0,0,0,0,0,0]))
+      +_printFooter(reportId)+'</div>';
+  }
+
+  if(reportId==='risk'){
+    var odPct = k.odLimit ? Math.round((k.odUsed||0)/(k.odLimit)*100) : 0;
+    var riskRows = [
+      ['AR Overdue','<span style="color:#ef4444;font-weight:700">สูง</span>','30',_printB(k.arOverdueAmount||0),'ติดตามลูกหนี้เกินกำหนด'],
+      ['OD Usage',odPct>70?'<span style="color:#f59e0b;font-weight:700">กลาง</span>':'<span style="color:#10b981;font-weight:700">ต่ำ</span>','20',odPct+'% of limit','ติดตาม OD utilization'],
+      ['FX Exposure','<span style="color:#f59e0b;font-weight:700">กลาง</span>','15',_printB(k.fxExposure||0),'Hedge หรือ Natural offset'],
+      ['Cash Flow','<span style="color:#10b981;font-weight:700">ต่ำ</span>','10',_printB(k.netCashPosition||0),'Net CF Positive'],
+    ];
+    var riskKpis = _printMiniKpis([
+      {lbl:'OD Usage',val:odPct+'%',c:odPct>80?'#ef4444':'#f59e0b'},
+      {lbl:'AR Overdue',val:_printB(k.arOverdueAmount),c:'#ef4444'},
+      {lbl:'FX Exposure',val:_printB(k.fxExposure),c:'#f59e0b'},
+      {lbl:'Collection Rate',val:_printP(k.collectionRate),c:'#10b981'},
+    ]);
+    return '<div style="padding:20px">'
+      +_printSec('Risk KPIs','#ef4444',riskKpis)
+      +_printSec('Risk Factors','#ef4444',_printTbl(['Risk Factor','ระดับ','Score','มูลค่า','Mitigation'],riskRows,[0,0,1,1,0]))
+      +_printFooter(reportId)+'</div>';
+  }
+
+  if(reportId==='budget'){
+    var budRows = [
+      {cat:'รายรับ',act:k.revenueMTD||18320000,bud:17000000},
+      {cat:'รายจ่าย',act:k.expensesMTD||11640000,bud:11000000},
+      {cat:'กำไรสุทธิ',act:k.netProfit||6680000,bud:6000000},
+      {cat:'AP Payable',act:k.apPending||890000,bud:900000},
+    ].map(function(d){ var v=d.act-d.bud; var pct=Math.round(v/d.bud*1000)/10;
+      return [d.cat,_printFmtN(d.act),_printFmtN(d.bud),
+        (v>=0?'<span style="color:#10b981">':'<span style="color:#ef4444">')+_printFmtN(Math.abs(v))+'</span>',
+        (pct>=0?'<span style="color:#10b981">+':'<span style="color:#ef4444">')+pct+'%</span>'];
+    });
+    return '<div style="padding:20px">'
+      +_printSec('Actual vs Budget — พ.ค. 2026','#3b82f6',_printTbl(['หมวด','Actual (฿)','Budget (฿)','Variance (฿)','% Dev'],budRows,[0,1,1,1,1]))
+      +_printFooter(reportId)+'</div>';
+  }
+
+  // Fallback
+  return '<div style="padding:20px"><p>Report: '+reportId+'</p>'+_printFooter(reportId)+'</div>';
+}
+
+function buildFullSummaryHTML(pageSize, orientation){
+  var css  = _printGetCSS(pageSize||'A4', orientation||'portrait');
+  var hdr  = _printHeader('สรุปภาพรวมทั้งหมด','FinanceOS — รายงานรวมทุก Module',pageSize,orientation);
+  var body = '';
+  var sections = [
+    {id:'executive',    title:'Executive Summary',     pg:true},
+    {id:'pl',           title:'P&L รายเดือน',           pg:true},
+    {id:'cashflow',     title:'Cash Flow',               pg:false},
+    {id:'budget',       title:'P&L vs Budget',           pg:true},
+    {id:'invoice',      title:'Invoice List',             pg:true},
+    {id:'ar-aging',     title:'AR Aging',                 pg:true},
+    {id:'ar-stmt',      title:'AR Statement',             pg:false},
+    {id:'sales-rank',   title:'Sales Ranking',            pg:true},
+    {id:'expense',      title:'Expense Breakdown',        pg:true},
+    {id:'tax',          title:'Tax Summary',              pg:true},
+    {id:'po-summary',   title:'PO Summary',               pg:false},
+    {id:'import-duty',  title:'Import Duty & FX',         pg:false},
+    {id:'vendor',       title:'Vendor Performance',       pg:true},
+    {id:'risk',         title:'Risk Assessment',          pg:false},
+  ];
+  sections.forEach(function(s){
+    var content = _buildReportContent(s.id);
+    body += (s.pg ? '<div class="pg-brk">' : '<div>') + content + '</div>';
+  });
+  return '<!DOCTYPE html><html><head>'
+    +'<meta charset="utf-8">'
+    +'<title>FinanceOS — สรุปภาพรวมทั้งหมด</title>'
+    +'<style>'+css+'</style>'
+    +'</head><body>'
+    +'<div class="pg-brk">'+hdr+'</div>'
+    +body
+    +'</body></html>';
+}
+
+function buildPrintHTML(reportId, pageSize, orientation){
+  var css = _printGetCSS(pageSize||'A4', orientation||'portrait');
+  var k   = (window._fos_cache && window._fos_cache.kpi) || {};
+  var now = new Date().toLocaleString('th-TH',{dateStyle:'long'});
+  var titles = {
+    'executive':'Executive Summary','pl':'P&L รายเดือน','cashflow':'Cash Flow Statement',
+    'invoice':'Invoice List','ar-aging':'AR Aging Report','sales-rank':'Sales Ranking',
+    'expense':'Expense Breakdown','tax':'Tax Summary','ar-stmt':'AR Statement',
+    'po-summary':'PO Summary','import-duty':'Import Duty & Tax','vendor':'Vendor Performance',
+    'risk':'Risk Assessment','budget':'P&L vs Budget'
+  };
+  var title = titles[reportId] || reportId.toUpperCase();
+  var hdr   = _printHeader(title, 'FinanceOS — '+now, pageSize, orientation);
+  var body  = _buildReportContent(reportId);
+  return '<!DOCTYPE html><html><head>'
+    +'<meta charset="utf-8">'
+    +'<title>FinanceOS — '+title+'</title>'
+    +'<style>'+css+'</style>'
+    +'</head><body>'
+    +'<div class="pg-brk">'+hdr+'</div>'
+    +body
+    +'</body></html>';
+}
+
+function buildFullSummaryMD(){
+  var k   = (window._fos_cache && window._fos_cache.kpi) || {};
+  var ar  = (window._fos_cache && window._fos_cache.ar)  || [];
+  var now = new Date().toLocaleString('th-TH',{dateStyle:'long'});
+  var B2  = function(n){ if(n===null||n===undefined) return '—'; return '฿'+Number(n).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var P2  = function(n){ if(n===null||n===undefined) return '—'; return Math.round(Number(n)*10)/10+'%'; };
+  var lines = [];
+
+  lines.push('# FinanceOS — สรุปภาพรวมทั้งหมด');
+  lines.push('**PT / PEO Tech Co., Ltd.**  ');
+  lines.push('**Generated:** '+now+'  ');
+  lines.push('');
+  lines.push('---');
+  lines.push('');
+
+  // KPI Overview
+  lines.push('## 1. KPI Overview');
+  lines.push('');
+  lines.push('| Metric | Value |');
+  lines.push('|---|---|');
+  lines.push('| Revenue MTD | '+B2(k.revenueMTD)+' |');
+  lines.push('| Revenue YTD | '+B2(k.revenueYTD)+' |');
+  lines.push('| Net Margin | '+P2(k.netMargin)+' |');
+  lines.push('| Net Profit | '+B2(k.netProfit)+' |');
+  lines.push('| Cash Balance | '+B2(k.cashBalance)+' |');
+  lines.push('| OD Used | '+B2(k.odUsed)+' (Limit: '+B2(k.odLimit)+') |');
+  lines.push('| OD Available | '+B2(k.odAvailable)+' |');
+  lines.push('| AR Outstanding | '+B2(k.arOutstanding)+' |');
+  lines.push('| AR Overdue | '+B2(k.arOverdueAmount)+' |');
+  lines.push('| AP Pending | '+B2(k.apPending)+' |');
+  lines.push('| AP Paid YTD | '+B2(k.apPaidYTD)+' |');
+  lines.push('| VAT Payable | '+B2(k.vatPayable)+' |');
+  lines.push('| WHT Payable | '+B2(k.whtPayable)+' |');
+  lines.push('| DSO | '+(k.dso||'—')+' วัน |');
+  lines.push('');
+
+  // P&L
+  lines.push('---');
+  lines.push('');
+  lines.push('## 2. P&L รายเดือน');
+  lines.push('');
+  if(typeof mdBuilders !== 'undefined' && mdBuilders.pl) lines.push(mdBuilders.pl());
+  lines.push('');
+
+  // AR Aging
+  lines.push('---');
+  lines.push('');
+  lines.push('## 3. AR Aging');
+  lines.push('');
+  if(typeof mdBuilders !== 'undefined' && mdBuilders['ar-aging']) lines.push(mdBuilders['ar-aging']());
+  lines.push('');
+
+  // AR Statement (top 10)
+  lines.push('---');
+  lines.push('');
+  lines.push('## 4. AR Statement (ล่าสุด 10 รายการ)');
+  lines.push('');
+  lines.push('| Invoice # | ลูกค้า | สุทธิ (฿) | เครดิต | สถานะ |');
+  lines.push('|---|---|---|---|---|');
+  ar.slice(0,10).forEach(function(r){
+    var net = Number(r.net||r.amount||0).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});
+    lines.push('| '+(r.no||r.docNo||'—')+' | '+(r.cust||r.customer||'—').slice(0,35)+' | '+net+' | '+(r.credit||'—')+' | '+(r.status||'—')+' |');
+  });
+  lines.push('');
+
+  // Expense
+  lines.push('---');
+  lines.push('');
+  lines.push('## 5. Expense Breakdown');
+  lines.push('');
+  if(typeof mdBuilders !== 'undefined' && mdBuilders.expense) lines.push(mdBuilders.expense());
+  lines.push('');
+
+  // Tax
+  lines.push('---');
+  lines.push('');
+  lines.push('## 6. Tax Summary');
+  lines.push('');
+  if(typeof mdBuilders !== 'undefined' && mdBuilders.tax) lines.push(mdBuilders.tax());
+  lines.push('');
+
+  // PO Summary
+  lines.push('---');
+  lines.push('');
+  lines.push('## 7. PO Summary');
+  lines.push('');
+  if(typeof csvBuilders !== 'undefined' && csvBuilders['po-summary']){
+    lines.push('```');
+    lines.push(csvBuilders['po-summary']());
+    lines.push('```');
+  }
+  lines.push('');
+
+  // Risk
+  lines.push('---');
+  lines.push('');
+  lines.push('## 8. Risk Assessment');
+  lines.push('');
+  if(typeof mdBuilders !== 'undefined' && mdBuilders.risk) lines.push(mdBuilders.risk());
+  lines.push('');
+  lines.push('---');
+  lines.push('');
+  lines.push('*FinanceOS · PT/PEO Tech Co., Ltd. · '+now+'*');
+
+  return lines.join('\n');
+}
+
+function downloadFullSummaryMD(){
+  var md  = buildFullSummaryMD();
+  var ts  = new Date().toISOString().slice(0,10);
+  dlFile('FinanceOS_Full_Summary_'+ts+'.md', md, 'text/markdown');
+  rptToast('MD downloaded: Full Summary');
+}
+
+function openPrintReport(reportId, pageSize, orientation){
+  // Toast FIRST — so user gets feedback even if build throws
+  rptToast('⏳ กำลังเตรียม PDF...');
+
+  // Use setTimeout(0) so toast renders before heavy JS runs
+  setTimeout(function(){
+    try {
+      // ── Step 1: Build HTML ──
+      var htmlStr = reportId==='full-summary'
+        ? buildFullSummaryHTML(pageSize, orientation)
+        : buildPrintHTML(reportId, pageSize||'A4', orientation||'portrait');
+
+      if(!htmlStr || htmlStr.length < 100){
+        rptToast('❌ ไม่สามารถสร้าง HTML ได้'); return;
+      }
+
+      // ── Step 2: Parse → extract CSS + body ──
+      var parser  = new DOMParser();
+      var doc     = parser.parseFromString(htmlStr, 'text/html');
+      var cssText = '';
+      doc.querySelectorAll('style').forEach(function(s){ cssText += s.textContent + '\n'; });
+      var bodyHtml = doc.body ? doc.body.innerHTML : htmlStr;
+
+      // ── Step 3: Remove old print elements ──
+      ['_fos_ps','_fos_pd'].forEach(function(id){
+        var e = document.getElementById(id); if(e) e.parentNode.removeChild(e);
+      });
+
+      // ── Step 4: Inject CSS ──
+      // Existing @media print: body>*{display:none} + #kpi-overlay{display:block}
+      // We inject AFTER → same-specificity rules: last wins.
+      // ID specificity (1-0-0) beats tag+universal (0-0-1) even with !important.
+      var st = document.createElement('style');
+      st.id  = '_fos_ps';
+      st.textContent = cssText
+        + '\n@media screen{#_fos_pd{display:none!important}}'
+        + '\n@media print{'
+        +   'body>*{display:none!important}'
+        +   ' #kpi-overlay,#kpi-modal,[id*="popup"],[id*="modal"],[id*="overlay"],[id*="toast"],'
+        +   '_fos_toast{display:none!important}'
+        +   ' #_fos_pd{display:block!important;position:static!important;'
+        +   'top:0!important;left:0!important;width:100%!important;'
+        +   'height:auto!important;overflow:visible!important;max-height:none!important;'
+        +   'margin:0!important;padding:0!important}'
+        +   ' #_fos_pd *{overflow:visible!important;max-height:none!important}'
+        +   ' #_fos_pd .pg-brk{page-break-after:always!important;break-after:page!important}'
+        +   ' html,body{height:auto!important;overflow:visible!important;max-height:none!important}}';
+      document.head.appendChild(st);
+
+      // ── Step 5: Inject content ──
+      var pd = document.createElement('div');
+      pd.id  = '_fos_pd';
+      pd.innerHTML = bodyHtml;
+      document.body.appendChild(pd);
+
+      // ── Step 6: Cleanup helper ──
+      function cleanup(){
+        ['_fos_ps','_fos_pd'].forEach(function(id){
+          var e = document.getElementById(id); if(e) e.parentNode.removeChild(e);
+        });
+      }
+      window.addEventListener('afterprint', function _once(){
+        cleanup();
+        window.removeEventListener('afterprint', _once);
+      });
+      setTimeout(cleanup, 90000);
+
+      // ── Step 7: Print ──
+      window.focus();
+      setTimeout(function(){
+        try {
+          window.print();
+        } catch(printErr){
+          cleanup();
+          rptToast('❌ Print error: ' + printErr.message);
+        }
+      }, 400);
+
+    } catch(e){
+      // Clean up if anything above threw
+      ['_fos_ps','_fos_pd'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.parentNode.removeChild(el);
+      });
+      rptToast('❌ Error: ' + e.message);
+      console.error('[openPrintReport]', e);
+    }
+  }, 20); // 20ms: enough for toast to paint
+}
+
+function printReport(reportId){
+  openPrintReport(reportId, 'A4', 'portrait');
 }
 
 function doExport(reportId, fmt){
+  // Special case: full-summary
+  if(reportId==='full-summary'){
+    if(fmt==='md'){ downloadFullSummaryMD(); return; }
+    if(fmt==='pdf'){ openPrintReport('full-summary','A4','portrait'); return; }
+  }
   var btn = event && event.target;
   if(btn){ btn.textContent='⏳'; btn.style.opacity='.6'; }
   var done = function(msg){
@@ -4686,6 +6131,66 @@ function exportAllCSV(){
     }, i*300);
   });
 }
+
+function updateReportKPIs(kpi){
+  var k = kpi || (window._fos_cache && window._fos_cache.kpi) || {};
+  var B2 = function(n){ return '฿'+Number(n||0).toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:0}); };
+  var P2 = function(n){ return Math.round(Number(n||0)*10)/10+'%'; };
+  var el = function(id, txt){ var e=document.getElementById(id); if(e) e.textContent=txt; };
+  // Full summary
+  el('rpt-full-rev',   'Revenue: '+B2(k.revenueMTD));
+  el('rpt-full-margin','Margin: '+(k.netMargin!==null&&k.netMargin!==undefined?P2(k.netMargin):'—'));
+  el('rpt-full-cash',  'Cash: '+B2(k.cashBalance));
+  el('rpt-full-ar',    'AR: '+B2(k.arOutstanding));
+  el('rpt-full-ap',    'AP: '+B2(k.apPending));
+  // Executive
+  el('rpt-exec-rev',    'Revenue: '+B2(k.revenueMTD));
+  el('rpt-exec-margin', 'Margin: '+(k.netMargin!==null&&k.netMargin!==undefined?P2(k.netMargin):'—'));
+  el('rpt-exec-cash',   'Cash: '+B2(k.cashBalance));
+  // P&L
+  el('rpt-pl-rev',    B2(k.revenueMTD));
+  el('rpt-pl-profit', B2(k.netProfit));
+  el('rpt-pl-margin', (k.netMargin!==null&&k.netMargin!==undefined?P2(k.netMargin):'—'));
+  // Cash Flow
+  el('rpt-cf-cash', B2(k.cashBalance));
+  el('rpt-cf-od',   B2(k.odUsed));
+  el('rpt-cf-net',  B2((k.revenueMTD||0)-(k.expensesMTD||0)));
+  // Invoice
+  el('rpt-inv-total', B2(k.revenueMTD));
+  el('rpt-inv-ar',    B2(k.arOutstanding));
+  // AR Aging
+  el('rpt-aging-overdue', B2(k.arOverdueAmount));
+  el('rpt-aging-ar',      B2(k.arOutstanding));
+  // Sales Rank
+  el('rpt-rank-ytd', B2(k.revenueYTD));
+  el('rpt-rank-mtd', B2(k.revenueMTD));
+  // Expense
+  el('rpt-exp-ap',  B2(k.apPending));
+  el('rpt-exp-fix', B2(k.fixedCostMTD));
+  // Tax
+  el('rpt-tax-vat', B2(k.vatPayable));
+  el('rpt-tax-wht', B2(k.whtPayable));
+  el('rpt-tax-cit', B2(k.citPayable));
+  // AR Statement
+  el('rpt-arst-total', B2(k.arOutstanding));
+  el('rpt-arst-dso',   (k.dso||'—')+' วัน');
+  // PO
+  var po = (window._fos_cache && window._fos_cache.po) || [];
+  el('rpt-po-count', po.length+' รายการ');
+  el('rpt-po-total', B2(po.reduce(function(a,r){return a+Number(r.net||r.amount||0);},0)));
+  // Import Duty
+  el('rpt-imp-fx', B2(k.fxExposure));
+  // Vendor
+  var vendors = po.map(function(r){return r.supplier||r.vendor||'';}).filter(function(s){return s&&s!=='—';});
+  var uniqV = vendors.filter(function(s,i){return vendors.indexOf(s)===i;}).length;
+  el('rpt-vend-count', uniqV ? uniqV+' รายการ' : '—');
+  // Risk
+  el('rpt-risk-od', B2(k.odUsed));
+  el('rpt-risk-fx', B2(k.fxExposure));
+  // Budget
+  el('rpt-bud-rev',    B2(k.revenueMTD));
+  el('rpt-bud-margin', P2(k.netMargin));
+}
 </script>
 
 <!-- FinanceOS Live Data Engine v2.3 -->
@@ -4702,7 +6207,9 @@ window._fos_cache = _cache; // exposed for admin functions outside IIFE
 function $id(id){ return document.getElementById(id); }
 function setText(id, val){ var el=$id(id); if(el){ el.textContent=val; el.dataset.live='1'; } }
 function B(n){ var v=Number(n||0); return v.toLocaleString('th-TH',{minimumFractionDigits:v%1?2:0,maximumFractionDigits:2}); }
+window.B = B; // expose for use outside IIFE
 function B2(n){ var v=Number(n||0); return v.toLocaleString('th-TH',{minimumFractionDigits:v%1?2:0,maximumFractionDigits:2}); }
+window.B2 = B2;
 function Bp(n){ return Number(n||0).toFixed(1)+'%'; }
 function shortName(s){ return (s||'').split(' ').slice(0,2).join(' '); }
 function fmtD(d){ if(!d||d==='—') return '—'; var p=d.split('-'); return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:d; }
@@ -4750,14 +6257,14 @@ function updateByIDs(kpi, ar){
 
   // Overview KPI cards
   setText('ov-rev',    '฿'+B(kpi.revenueMTD));
-  setText('ov-margin', (kpi.netMargin||0).toFixed(1)+'%');
+  setText('ov-margin', (kpi.netMargin!==null&&kpi.netMargin!==undefined) ? kpi.netMargin.toFixed(1)+'%' : '—');
   setText('ov-ar',     '฿'+B(kpi.arOutstanding));
   setText('ov-ap',     '฿'+B(kpi.apPending));
   setText('ov-cash',   '฿'+B(kpi.cashBalance||kpi.netCashPosition));
 
   // Finance KPI row
   setText('fin-ar',  '฿'+B(kpi.arOutstanding));
-  setText('fin-ap',  '฿'+B(kpi.apPending));
+  setText('fin-ap',  '฿'+B(typeof _apPend!=='undefined'?_apPend:(kpi.apPending||0)));
   setText('fin-vat', '฿'+B(kpi.vatPayable));
   setText('fin-fix', '฿'+B(kpi.fixedCostMTD));
 
@@ -4765,12 +6272,40 @@ function updateByIDs(kpi, ar){
   setText('fin-rev-big', '฿'+B(kpi.revenueMTD));
 
   // Expenses card = AP + Fixed (both from GAS)
-  var _totalExp = (kpi.apPending||0) + (kpi.fixedCostMTD||0);
+  // ── Expenses card: compute from cached data (period-filtered) ──
+  var _apData  = Array.isArray(_cache.ap)  ? _cache.ap  : [];
+  var _fixData = Array.isArray(_cache.fix) ? _cache.fix : [];
+  var _pF=window._periodFrom||'', _pT=window._periodTo||'';
+  var _apFiltered  = _pF||_pT ? _apData.filter(function(r){  var d=r.date||r.docDate||r.payDate||''; return(!_pF||d>=_pF)&&(!_pT||d<=_pT);}) : _apData;
+  var _fixFiltered = _pF||_pT ? _fixData.filter(function(r){ var d=r.date||r.docDate||'';          return(!_pF||d>=_pF)&&(!_pT||d<=_pT);}) : _fixData;
+
+  // ── แยก paid vs pending ก่อน sum — ไม่นับซ้ำ ─────────────────
+  var _apIsPaidLocal = function(r){
+    var s=(r.status||'').toLowerCase().trim();
+    if(s==='done'||s==='cheque-done'||s==='ชำระแล้ว'||s==='paid'||s==='จ่ายแล้ว') return true;
+    var pr=((r.payRef||r.payNo||'')+'').toUpperCase().trim();
+    return pr.indexOf('PS-')===0 || pr.indexOf('PV-')===0;
+  };
+  var _apPaid    = _apFiltered.filter(function(r){ return  _apIsPaidLocal(r); });
+  var _apPending = _apFiltered.filter(function(r){ return !_apIsPaidLocal(r); });
+
+  // EXPENSES = เฉพาะที่ชำระแล้วจริง (cash out) / fallback = kpi.apPending ถ้าไม่มีข้อมูล status
+  var _hasPaidData = _apPaid.length > 0 || _apPending.length > 0;
+  var _apPaidSum   = _apPaid.reduce(function(s,r){ return s+Number(r.net||r.total||r.amount||0); }, 0);
+  var _apPendSum   = _apPending.reduce(function(s,r){ return s+Number(r.net||r.total||r.amount||0); }, 0);
+  // ถ้า GAS ยังไม่ได้ redeploy (status ว่างทุกแถว) ให้ fallback ใช้ kpi จาก GAS
+  var _noStatusData = _apFiltered.length>0 && _apPaid.length===0 && _apPending.length===_apFiltered.length;
+  var _apPaidAmt = _hasPaidData && !_noStatusData ? _apPaidSum : 0;   // ชำระแล้ว (subtitle)
+  var _apPend    = _hasPaidData && !_noStatusData ? _apPendSum : (kpi.apPending||0); // ค้างจ่าย (headline)
+  var _fixSum    = _fixFiltered.reduce(function(s,r){ return s+Number(r.amount||0);},0);
+  var _paidYTD   = _apPaidAmt || ((window._fos_cache&&window._fos_cache.kpi) ? (window._fos_cache.kpi.apPaidYTD||0) : 0);
+  // ตัวเลขใหญ่ = ค้างจ่าย + Fixed (สิ่งที่ต้องจัดการ)
+  var _totalExp  = (_apPend||_fixSum) ? (_apPend+_fixSum) : ((kpi.apPending||0)+(kpi.fixedCostMTD||0));
   var _profitMTD = (kpi.revenueMTD||0) - _totalExp;
   var _margin = (kpi.netMargin||0);
   setText('fin-exp-big', '฿'+B(_totalExp));
   var expTrEl = $id('fin-exp-trend');
-  if(expTrEl) expTrEl.textContent = 'AP ฿'+B(kpi.apPending||0)+' + Fixed ฿'+B(kpi.fixedCostMTD||0);
+  if(expTrEl) expTrEl.textContent = '🧾 ชำระแล้ว ฿'+B(_paidYTD||0)+' + Fixed ฿'+B(_fixSum||kpi.fixedCostMTD||0)+(_apPend>0?' · ค้างจ่าย ฿'+B(_apPend):'');
   setText('fin-profit-big', '฿'+B(_profitMTD>0?_profitMTD:0));
   var profTrEl = $id('fin-profit-trend');
   if(profTrEl){
@@ -6402,52 +7937,279 @@ function updateFinanceARPane(ar){
   }).join('');
 }
 /* ── Expenses/AP pane — live from _cache.ap ── */
-function updateExpensesPane(ap){
-  var tbody = $id('fin-exp-body'); if(!tbody) return;
-  if(!ap||!ap.length){
-    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#475569;padding:16px">ไม่มีข้อมูล AP/Expenses</td></tr>';
+function updateCustRevCards(ar){
+  var grid  = document.getElementById('cust-rev-grid');
+  var title = document.getElementById('cust-rev-title');
+  if(!grid) return;
+
+  // Filter by current period
+  var pF = window._periodFrom || '';
+  var pT = window._periodTo   || '';
+  var arF = (ar||[]).filter(function(r){
+    var d = r.date||r.docDate||r.invoiceDate||'';
+    if(!d) return !pF && !pT;
+    return (!pF||d>=pF) && (!pT||d<=pT);
+  });
+
+  // Update title with period label derived from current period state
+  if(title){
+    var thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    var periodLabel;
+    if(!pF && !pT){ periodLabel='ข้อมูลทั้งหมด'; }
+    else if(pF && pT){
+      var fParts=pF.split('-'), tParts=pT.split('-');
+      if(fParts[0]===tParts[0] && fParts[1]===tParts[1]){
+        // same month/year — show month label
+        var mIdx=parseInt(fParts[1],10)-1;
+        periodLabel=thM[mIdx]+' '+fParts[0];
+      } else {
+        periodLabel=fParts[2]+'/'+fParts[1]+'/'+fParts[0]+' – '+tParts[2]+'/'+tParts[1]+'/'+tParts[0];
+      }
+    } else { periodLabel='ช่วงที่เลือก'; }
+    title.textContent = 'รายรับแยกตาม Customer — '+periodLabel;
+  }
+
+  // Group by customer
+  var map = {};
+  arF.forEach(function(r){
+    var c = r.customer || 'อื่นๆ';
+    map[c] = (map[c]||0) + Number(r.net||r.value||r.amount||0);
+  });
+  var rows = Object.keys(map).map(function(c){ return {c:c,v:map[c]}; })
+    .sort(function(a,b){ return b.v-a.v; });
+
+  var grand = rows.reduce(function(s,e){ return s+e.v; }, 0);
+
+  if(rows.length === 0 || grand === 0){
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--t3);font-size:12px">⏳ ไม่มีข้อมูล AR ในช่วงเวลาที่เลือก</div>';
     return;
   }
-  // Sort by payDate descending (most recent first)
-  var items = ap.slice().sort(function(a,b){
-    var da=a.payDate||'', db=b.payDate||'';
-    return db.localeCompare(da);
+
+  // Top 3 + อื่นๆ
+  var palette = [
+    {bg:'rgba(139,92,246,.1)', border:'rgba(139,92,246,.25)', txt:'#a78bfa', bar:'#8b5cf6'},
+    {bg:'rgba(16,185,129,.1)', border:'rgba(16,185,129,.25)', txt:'#34d399', bar:'#10b981'},
+    {bg:'rgba(59,130,246,.1)', border:'rgba(59,130,246,.25)', txt:'#60a5fa', bar:'#3b82f6'},
+    {bg:'rgba(245,158,11,.1)', border:'rgba(245,158,11,.25)', txt:'#fbbf24', bar:'#f59e0b'}
+  ];
+  var icons = ['🏪','🛒','🏬','🏷️'];
+
+  var top3 = rows.slice(0,3);
+  var othersSum = rows.slice(3).reduce(function(s,e){ return s+e.v; }, 0);
+  var cards = top3.slice();
+  if(othersSum > 0) cards.push({c:'อื่นๆ', v:othersSum});
+
+  // Pad to 4 columns (show "—" cards if fewer than 4 customers)
+  while(cards.length < 4) cards.push(null);
+
+  var colCount = Math.min(cards.filter(Boolean).length, 4);
+  grid.style.gridTemplateColumns = 'repeat('+colCount+',1fr)';
+
+  var B2fn = window.B2 || function(n){ return Number(n).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+
+  grid.innerHTML = cards.map(function(e,i){
+    if(!e) return '';
+    var p = palette[i] || palette[3];
+    var ico = icons[i] || '🏷️';
+    var pct = grand>0 ? (e.v/grand*100).toFixed(1) : '0.0';
+    var barW = grand>0 ? Math.round(e.v/grand*100) : 0;
+    return '<div style="text-align:center;padding:10px;background:'+p.bg+';border:1px solid '+p.border+';border-radius:8px">'
+      +'<div style="font-size:10px;color:'+p.txt+';margin-bottom:4px;font-weight:700">'+ico+' '+e.c+'</div>'
+      +'<div style="font-size:16px;font-weight:800;color:var(--t1)">฿'+B2fn(e.v)+'</div>'
+      +'<div style="font-size:10px;color:var(--t3)">'+pct+'% of revenue</div>'
+      +'<div style="margin-top:6px;background:var(--b1);border-radius:3px;height:4px">'
+        +'<div style="width:'+barW+'%;height:4px;background:'+p.bar+';border-radius:3px"></div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+function updateExpensesBreakdown(ap, fix){
+  var tbody = document.getElementById('fin-exp-bkd-body'); if(!tbody) return;
+  var pF=window._periodFrom||'', pT=window._periodTo||'';
+  // AP filter — date-less entries pass when no period set; always include when no period
+  var apF  = (ap||[]).filter(function(r){ var d=r.date||r.docDate||r.payDate||''; if(!d) return !pF&&!pT; return (!pF||d>=pF)&&(!pT||d<=pT); });
+  var fixF = (fix||[]).filter(function(r){ var d=r.date||r.docDate||''; if(!d) return true; return (!pF||d>=pF)&&(!pT||d<=pT); });
+  // update period label
+  var pEl=document.getElementById('fin-exp-bkd-period');
+  if(pEl) pEl.textContent=_getPeriodLabel();
+  var colors=['#8b5cf6','#3b82f6','#10b981','#f59e0b','#06b6d4','#f43f5e','#a78bfa','#34d399','#fb923c','#22d3ee'];
+  var catMap={};
+  apF.forEach(function(r){
+    var c=r.supplier||r.vendor||r.payee||r.project||r.description||r.name||'AP อื่นๆ';
+    var v=Number(r.net||r.total||r.amount||r.value||r.netAmount||r.grandTotal||0);
+    catMap[c]=(catMap[c]||0)+v;
   });
+  fixF.forEach(function(r){
+    var c=r.name||r.expense||r.category||'Fixed Cost';
+    catMap[c]=(catMap[c]||0)+Number(r.amount||0);
+  });
+  // ── AP fallback: if individual AP amounts are all 0 but kpi.apPending > 0 ──
+  // add a single "📤 AP รวม" entry so the breakdown is consistent with the card
+  var _apSum=apF.reduce(function(s,r){return s+Number(r.net||r.total||r.amount||r.value||r.netAmount||r.grandTotal||0);},0);
+  var _kpiAP=(window._fos_cache&&window._fos_cache.kpi)?Number(window._fos_cache.kpi.apPending||0):0;
+  if(_apSum===0 && _kpiAP>0){
+    catMap['📤 AP ค้างจ่าย (รวม)']=(catMap['📤 AP ค้างจ่าย (รวม)']||0)+_kpiAP;
+  }
+  var entries=Object.keys(catMap).map(function(k){return{n:k,a:catMap[k]};})
+    .filter(function(x){return x.a>0;}).sort(function(a,b){return b.a-a.a;});
+  var grand=entries.reduce(function(s,x){return s+x.a;},0);
+  if(!entries.length){
+    tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--t3);padding:16px;font-size:11px">ไม่มีข้อมูล Expenses ในช่วงที่เลือก</td></tr>';
+    var tot=document.getElementById('fin-exp-bkd-tot'); if(tot) tot.textContent='฿0';
+    return;
+  }
+  tbody.innerHTML=entries.slice(0,8).map(function(x,i){
+    var pct=grand>0?Math.round(x.a/grand*100):0;
+    var clr=colors[i%colors.length];
+    var last=(i===entries.length-1)||i===7;
+    return '<tr'+(last?'':' style="border-bottom:1px solid var(--b1)"')+'>'+
+      '<td style="padding:6px 8px;color:var(--t1);font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+clr+';margin-right:5px"></span>'+x.n+'</td>'+
+      '<td style="text-align:right;padding:6px 8px;color:#f87171;font-weight:700">฿'+B(x.a)+'</td>'+
+      '<td style="text-align:right;padding:6px 8px;color:var(--t2)">'+pct+'%</td>'+
+      '<td style="padding:6px 8px"><div style="background:var(--b1);border-radius:3px;height:5px"><div style="width:'+Math.min(pct,100)+'%;height:5px;background:'+clr+';border-radius:3px"></div></div></td></tr>';
+  }).join('');
+  var tot=document.getElementById('fin-exp-bkd-tot'); if(tot) tot.textContent='฿'+B(grand);
+  var fixLabel=fixF.length?'AP+Fixed':'AP'; var liveTag=_apSum>0||fixF.length?'(live)':'(kpi fallback)';
+  var src=document.getElementById('fin-exp-bkd-src'); if(src) src.textContent=fixLabel+' '+liveTag;
+}
+
+function updateExpensesPane(ap){
+  var tbExp = $id('fin-exp-body');
+  var tbAP  = $id('fin-ap-pane-body');
+  if(!tbExp && !tbAP) return;
+
+  // ── helpers ──────────────────────────────────────────────────────
+  var _isPaid = function(r){
+    var s=(r.status||'').toLowerCase().trim();
+    if(s==='done'||s==='cheque-done'||s==='ชำระแล้ว'||s==='paid'||s==='จ่ายแล้ว') return true;
+    // col D เลขที่จ่าย: PS-... หรือ PV-... = จ่ายแล้ว
+    var pr=((r.payRef||r.payNo||'')+'').toUpperCase().trim();
+    return pr.indexOf('PS-')===0 || pr.indexOf('PV-')===0;
+  };
+  var _isCheque = function(r){
+    var s=(r.status||'').toLowerCase().trim();
+    return s==='cheque-done'||s.indexOf('cheque')!==-1;
+  };
+  var _isAPRow = function(r){
+    // Check all possible PO Link / AP reference fields from GAS
+    var poLink = ((r.poLink||r.ref||r.docNo||r.poRef||'')+'').toUpperCase().trim();
+    if(poLink.indexOf('AP-')===0) return true;
+    // Also check if category/tradeType says AP/เจ้าหนี้ (fallback when poLink is empty)
+    var cat = ((r.category||r.tradeType||'')+'').toUpperCase();
+    return cat.indexOf('AP')===0 || cat==='เจ้าหนี้' || cat.indexOf('ACCOUNTS PAYABLE')===0;
+  };
+  var fmtDate = function(d){
+    if(!d) return '—';
+    var p=d.split('-');
+    return p.length===3 ? p[2]+'/'+p[1]+'/'+p[0].slice(2) : d.slice(0,10);
+  };
   var typeClass = function(tt){
     tt=(tt||'').toLowerCase();
-    if(tt.indexOf('import')!==-1) return 'bk bp';
+    if(tt.indexOf('import')!==-1||tt.indexOf('นำเข้า')!==-1) return 'bk bp';
     if(tt.indexOf('fix')!==-1||tt.indexOf('rent')!==-1||tt.indexOf('เช่า')!==-1) return 'bk bb';
     if(tt.indexOf('payroll')!==-1||tt.indexOf('เงินเดือน')!==-1) return 'bk bp';
     return 'bk ba';
   };
-  var typeLabel = function(tt){
-    tt=(tt||'').trim();
-    return tt||'Operating';
-  };
-  var stClass = function(st){
-    st=(st||'').toLowerCase();
-    if(st.indexOf('paid')!==-1||st.indexOf('จ่ายแล้ว')!==-1) return 'bk bg';
-    if(st.indexOf('cancel')!==-1) return 'bk br';
-    return 'bk ba';
-  };
-  var fmtDate = function(d){
-    if(!d) return '—';
-    var parts=d.split('-');
-    if(parts.length===3) return parts[2]+'/'+parts[1];
-    return d.slice(0,10)||'—';
-  };
-  tbody.innerHTML = items.map(function(r){
-    var poLink = (r.ref||r.docNo) ? '<span class="tl" style="font-size:11px">'+(r.ref||r.docNo)+'</span>' : '<span style="color:var(--t3)">–</span>';
+  var sortDesc = function(arr){ return arr.slice().sort(function(a,b){return (b.payDate||'').localeCompare(a.payDate||'');}); };
+  var rowHTML = function(r, amtColor){
+    amtColor = amtColor||'#f87171';
+    var poLink=(r.ref||r.docNo)?'<span class="tl" style="font-size:11px">'+(r.ref||r.docNo)+'</span>':'<span style="color:var(--t3)">—</span>';
     return '<tr>'
-      +'<td>'+fmtDate(r.payDate)+'</td>'
-      +'<td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+(r.vendor||r.project||r.note||'')+'">'+(r.vendor||r.project||r.note||'—')+'</td>'
-      +'<td><span class="'+typeClass(r.tradeType)+'">'+typeLabel(r.tradeType)+'</span></td>'
+      +'<td style="white-space:nowrap">'+fmtDate(r.payDate)+'</td>'
+      +'<td style="min-width:140px" title="'+(r.vendor||r.project||r.note||'')+'">'+(r.vendor||r.project||r.note||'—')+'</td>'
+      +'<td><span class="'+typeClass(r.tradeType)+'">'+(r.tradeType||'Operating')+'</span></td>'
       +'<td>'+poLink+'</td>'
-      +'<td style="text-align:right;color:#f87171">฿'+B(r.net||r.total||0)+'</td>'
-      +'<td><span class="'+stClass(r.status)+'">'+(r.status||'Pending')+'</span></td>'
+      +'<td style="text-align:right;font-weight:700;color:'+amtColor+'">฿'+B(r.net||r.total||0)+'</td>'
+      +'<td><span class="bk '+((_isCheque(r)?'bb':(_isPaid(r)?'bg':'ba')))+'">'+(r.status||'Pending')+'</span></td>'
       +'</tr>';
-  }).join('');
+  };
+  var sectionHeader = function(label, count, total, color, bg){
+    return '<tr style="background:'+bg+'">'
+      +'<td colspan="4" style="padding:6px 8px;font-weight:800;color:'+color+';font-size:11px">'+label
+      +'  <span style="font-weight:400;color:var(--t3);font-size:10px">('+count+' รายการ)</span></td>'
+      +'<td style="text-align:right;font-weight:800;color:'+color+';padding:6px 8px">฿'+B(total)+'</td>'
+      +'<td></td>'
+      +'</tr>';
+  };
+  var sumAmt = function(arr){ return arr.reduce(function(s,r){return s+(r.net||r.total||0);},0); };
+  var txt = function(id,v){ var el=$id(id); if(el) el.textContent=v; };
+
+  // ── route rows: AP- prefix → apRows, others → expRows ───────────
+  var all = ap||[];
+  // If poLink/ref data is present and has AP- values, use selective split.
+  // If ALL rows have empty poLink/ref (GAS not yet redeployed), fall back:
+  // show all in AP pane (since _cache.ap IS the AP sheet), none in Expenses.
+  var _hasAPData = all.some(function(r){
+    var fl=((r.poLink||r.ref||r.docNo||'')+'').toUpperCase().trim();
+    return fl.indexOf('AP-')===0;
+  });
+  var _hasNonAPData = all.some(function(r){ return !_isAPRow(r); });
+  var _usePoLinkSplit = _hasAPData; // only split when there is actual AP- data
+  var apRows, expRows;
+  if(_usePoLinkSplit){
+    apRows  = sortDesc(all.filter(function(r){ return  _isAPRow(r); }));
+    expRows = sortDesc(all.filter(function(r){ return !_isAPRow(r); }));
+  } else {
+    // GAS not yet redeployed — put everything in AP pane, Expenses empty
+    apRows  = sortDesc(all);
+    expRows = [];
+  }
+
+  // ── Expenses pane (non-AP- rows) ─────────────────────────────────
+  if(tbExp){
+    if(!expRows.length){
+      tbExp.innerHTML='<tr><td colspan="6" style="text-align:center;color:#475569;padding:16px">ไม่มีข้อมูล Expenses</td></tr>';
+    } else {
+      var epPend   = expRows.filter(function(r){ return !_isPaid(r); });
+      var epCheque = expRows.filter(function(r){ return _isCheque(r); });
+      var epPaid   = expRows.filter(function(r){ return _isPaid(r) && !_isCheque(r); });
+      var eRows = '';
+      eRows += sectionHeader('🔴 ค้างจ่าย', epPend.length, sumAmt(epPend), '#f87171', 'rgba(239,68,68,.06)');
+      if(epPend.length) eRows += epPend.map(function(r){ return rowHTML(r,'#f87171'); }).join('');
+      else eRows += '<tr><td colspan="6" style="text-align:center;color:#475569;padding:8px;font-size:11px">✅ ไม่มีรายการค้างจ่าย</td></tr>';
+      eRows += sectionHeader('✅ ชำระรวมทั้งปี', epPaid.length, sumAmt(epPaid), '#34d399', 'rgba(16,185,129,.06)');
+      if(epPaid.length) eRows += epPaid.map(function(r){ return rowHTML(r,'#34d399'); }).join('');
+      else eRows += '<tr><td colspan="6" style="text-align:center;color:#475569;padding:8px;font-size:11px">— ยังไม่มีรายการ</td></tr>';
+      eRows += sectionHeader('🏦 จ่ายผ่าน Cashier\'s Check', epCheque.length, sumAmt(epCheque), '#60a5fa', 'rgba(59,130,246,.06)');
+      if(epCheque.length) eRows += epCheque.map(function(r){ return rowHTML(r,'#60a5fa'); }).join('');
+      else eRows += '<tr><td colspan="6" style="text-align:center;color:#475569;padding:8px;font-size:11px">— ยังไม่มีรายการ</td></tr>';
+      tbExp.innerHTML = eRows;
+    }
+  }
+
+  // ── AP / เจ้าหนี้ pane (AP- prefix rows) ────────────────────────
+  if(tbAP){
+    var apPend   = apRows.filter(function(r){ return !_isPaid(r); });
+    var apCheque = apRows.filter(function(r){ return _isCheque(r); });
+    var apPaid   = apRows.filter(function(r){ return _isPaid(r) && !_isCheque(r); });
+
+    // update KPI mini-cards
+    txt('fin-ap-pend-amt', '฿'+B(sumAmt(apPend)));
+    txt('fin-ap-pend-cnt', apPend.length+' รายการ');
+    txt('fin-ap-paid-amt', '฿'+B(sumAmt(apPaid)));
+    txt('fin-ap-paid-cnt', apPaid.length+' รายการ');
+    txt('fin-ap-cheq-amt', '฿'+B(sumAmt(apCheque)));
+    txt('fin-ap-cheq-cnt', apCheque.length+' รายการ');
+
+    if(!apRows.length){
+      tbAP.innerHTML='<tr><td colspan="6" style="text-align:center;color:#475569;padding:16px">ไม่มีข้อมูล AP (รายการที่ขึ้นต้นด้วย AP-)</td></tr>';
+    } else {
+      var aRows = '';
+      aRows += sectionHeader('🔴 ค้างจ่าย (Outstanding AP)', apPend.length, sumAmt(apPend), '#f87171', 'rgba(239,68,68,.06)');
+      if(apPend.length) aRows += apPend.map(function(r){ return rowHTML(r,'#f87171'); }).join('');
+      else aRows += '<tr><td colspan="6" style="text-align:center;color:#475569;padding:8px;font-size:11px">✅ ไม่มีรายการค้างจ่าย</td></tr>';
+      aRows += sectionHeader('✅ ชำระรวมทั้งปี (YTD Paid)', apPaid.length, sumAmt(apPaid), '#34d399', 'rgba(16,185,129,.06)');
+      if(apPaid.length) aRows += apPaid.map(function(r){ return rowHTML(r,'#34d399'); }).join('');
+      else aRows += '<tr><td colspan="6" style="text-align:center;color:#475569;padding:8px;font-size:11px">— ยังไม่มีรายการ</td></tr>';
+      aRows += sectionHeader('🏦 จ่ายผ่าน Cashier\'s Check (Cheque-Done)', apCheque.length, sumAmt(apCheque), '#60a5fa', 'rgba(59,130,246,.06)');
+      if(apCheque.length) aRows += apCheque.map(function(r){ return rowHTML(r,'#60a5fa'); }).join('');
+      else aRows += '<tr><td colspan="6" style="text-align:center;color:#475569;padding:8px;font-size:11px">— ยังไม่มีรายการ</td></tr>';
+      tbAP.innerHTML = aRows;
+    }
+  }
 }
+
 /* ── PO DOM / INTL / Vendors tables — live from _cache.po ── */
 function updatePOTables(po){
   var list = po||[];
@@ -6472,12 +8234,13 @@ function updatePOTables(po){
   var domB = $id('po-dom-body');
   if(domB){
     if(!dom.length){
-      domB.innerHTML='<tr><td colspan="6" style="text-align:center;color:#475569;padding:20px">ไม่มีข้อมูล DOM PO</td></tr>';
+      domB.innerHTML='<tr><td colspan="7" style="text-align:center;color:#475569;padding:20px">ไม่มีข้อมูล DOM PO</td></tr>';
     } else {
       domB.innerHTML = dom.map(function(r){
         var amt = Number(r.net||r.value||0);
         return '<tr>'
           +'<td class="tl" style="color:#a78bfa;font-weight:700">'+(r.docNo||'—')+'</td>'
+          +'<td style="font-size:11px;color:#94a3b8;white-space:nowrap">'+(r.docDate||r.date||'—')+'</td>'
           +'<td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:'+_tc('#e2e8f0')+'">'+(r.supplier||'—')+'</td>'
           +'<td style="font-size:10.5px;color:#94a3b8">'+(r.poRef||r.apRef||'—')+'</td>'
           +'<td style="text-align:right;font-weight:700;color:#f87171">฿'+B(amt)+'</td>'
@@ -6494,25 +8257,31 @@ function updatePOTables(po){
   var intlF = $id('po-intl-foot');
   if(intlB){
     if(!intl.length){
-      intlB.innerHTML='<tr><td colspan="10" style="text-align:center;color:#475569;padding:20px">ไม่มีข้อมูล INTL PO</td></tr>';
+      intlB.innerHTML='<tr><td colspan="11" style="text-align:center;color:#475569;padding:20px">ไม่มีข้อมูล INTL PO</td></tr>';
       if(intlF) intlF.style.display='none';
     } else {
       var totAmt=0, totDuty=0, totVat=0;
       intlB.innerHTML = intl.map(function(r){
-        var amt  = Number(r.net||r.value||0);
-        var cur  = r.currency||'';
-        var rate = Number(r.rate||1);
-        var rStr = cur&&cur!=='THB'?'1 '+cur+' = '+rate.toFixed(2)+' THB':'—';
+        // r.net (สุทธิ col M) is already in THB — Rate+Currency are reference only
+        var amtTHB = Number(r.net||r.value||0);
+        var cur    = (r.currency||'THB').toUpperCase();
+        var rate   = Number(r.rate||1);
+        // FX Rate cell: show "31.5700 USD" style — reference only, no multiplication
+        var rStr   = (cur && cur!=='THB' && rate && rate!==1)
+          ? '<span style="font-size:11px;font-weight:600;color:#fbbf24">'+rate.toFixed(4)+'</span>'
+            +'<span style="font-size:10px;color:#94a3b8;margin-left:3px">'+cur+'</span>'
+          : '<span style="color:var(--t3);font-size:11px">THB</span>';
         var duty = Number(r.importDuty||0);
-        var vat7 = Math.round((amt+duty)*0.07);
+        var vat7 = Math.round((amtTHB+duty)*0.07);
         var tot  = duty+vat7;
-        totAmt+=amt; totDuty+=duty; totVat+=vat7;
+        totAmt+=amtTHB; totDuty+=duty; totVat+=vat7;
         return '<tr>'
           +'<td class="tl" style="color:#a78bfa;font-weight:700">'+(r.docNo||'—')+'</td>'
+          +'<td style="font-size:11px;color:#94a3b8;white-space:nowrap">'+(r.docDate||r.date||'—')+'</td>'
           +'<td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:'+_tc('#e2e8f0')+'">'+(r.supplier||'—')+'</td>'
           +'<td style="color:#64748b;font-size:11px">'+cur+'</td>'
           +'<td style="font-size:10.5px;color:#94a3b8">'+rStr+'</td>'
-          +'<td style="text-align:right;font-weight:700">฿'+B(amt)+'</td>'
+          +'<td style="text-align:right;font-weight:700">฿'+B(amtTHB)+'</td>'
           +'<td style="text-align:right;color:#f87171;font-weight:700">฿'+B(duty)+'</td>'
           +'<td style="text-align:right;color:#fbbf24;font-weight:700">฿'+B(vat7)+'</td>'
           +'<td style="text-align:right;font-weight:800;color:#f87171">฿'+B(tot)+'</td>'
@@ -6523,7 +8292,7 @@ function updatePOTables(po){
       if(intlF){
         intlF.style.display='';
         intlF.innerHTML='<tr style="border-top:2px solid var(--b2)">'
-          +'<td colspan="4" style="padding:7px 8px;font-weight:800;color:var(--t1)">รวม</td>'
+          +'<td colspan="5" style="padding:7px 8px;font-weight:800;color:var(--t1)">รวม</td>'
           +'<td style="text-align:right;font-weight:800">฿'+B(totAmt)+'</td>'
           +'<td style="text-align:right;font-weight:800;color:#f87171">฿'+B(totDuty)+'</td>'
           +'<td style="text-align:right;font-weight:800;color:#fbbf24">฿'+B(totVat)+'</td>'
@@ -6660,7 +8429,7 @@ function updateOverviewTable(ar){
     var st=normStatus(r); var c=st==='ชำระแล้ว'?_tc('#34d399'):_tc('#fbbf24');
     return '<tr>'
       +'<td style="font-size:10.5px;color:#a78bfa;font-weight:700">'+r.docNo+'</td>'
-      +'<td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+shortName(r.customer)+'</td>'
+      +'<td style="min-width:160px">'+( r.customer||'—')+'</td>'
       +'<td style="font-size:10px;color:#64748b">'+(r.date||'')+'</td>'
       +'<td style="text-align:right;font-weight:700;color:'+c+'">+'+B(r.net)+'</td>'
       +'<td>'+(stM[st]||'<span class="bk ba">'+st+'</span>')+'</td></tr>';
@@ -6699,7 +8468,9 @@ function updateOverviewDashboard(kpi, ar, cashData){
   /* ── AP KPI sub-text ── */
   var apAmt    = kpi.apPending || 0;
   setTagTxt('ov-ks-ap-tag', apAmt>0?'ค้างจ่าย':'ปกติ', apAmt>0?'td':'tu');
-  setTxt('ov-ks-ap-txt', apAmt>0?'AP ค้างจ่าย ฿'+B(apAmt):'ไม่มี AP ค้างชำระ');
+  var _paidYTDkpi = kpi.apPaidYTD||0, _cheqYTD = kpi.apChequePaidYTD||0;
+  var _apSubline = apAmt>0 ? 'ค้างจ่าย ฿'+B(apAmt)+(_paidYTDkpi>0?' · ชำระ YTD ฿'+B(_paidYTDkpi):'') : (_paidYTDkpi>0?'ชำระ YTD ฿'+B(_paidYTDkpi):'ไม่มี AP ค้างชำระ');
+  setTxt('ov-ks-ap-txt', _apSubline);
 
   /* ── Cash KPI sub-text ── */
   var odLim  = 0, odUsed = 0, totalBal = 0;
@@ -7019,18 +8790,22 @@ function loadData(opts){
       updateSalesRanking(_cache.ar);
       updateAgingPane(_cache.ar);
       updateFinanceARPane(_cache.ar);
+      updateCustRevCards(_cache.ar);
       updateExpensesPane(_cache.ap);
+      updateExpensesBreakdown(_cache.ap, _cache.fix);
       updateFixedExpenses(_cache.fix);
       updateTaxPane(_cache.kpi, _cache.po);
       updatePOKPIs(_cache.po);
       updatePOBody(_cache.po);
       updatePOTables(_cache.po);
       updateCashTable(_cache.kpi, _cache.cash);
+      updateReportKPIs(_cache.kpi);
       patchKPIModals(_cache.kpi, _cache.ar, _cache.fix, _cache.ap);
 
       setSyncUI('Live &#183; '+new Date().toLocaleTimeString('th-TH'), true);
       _cache._lastSync = Date.now(); logAudit('system','SYNC','Google Sheets','AR:'+(_cache.ar||[]).length+' AP:'+(_cache.ap||[]).length+' PO:'+(_cache.po||[]).length);
       updateDebugPanel(data);
+      _initAllFilters();
       if(_firstLoad||_showUI){_sl.step(3,'done'); _sl.success(new Date().toLocaleTimeString('th-TH'));} _firstLoad=false;
       var eb=$id('_gasErrBox');
       if(eb){ eb.style.display='none'; eb.textContent=''; }
@@ -7065,6 +8840,7 @@ function loadData(opts){
       try{
         var c=localStorage.getItem('pt_kpi_cache');
         if(c) applyKPI(JSON.parse(c));
+        setTimeout(_initAllFilters, 200);
       }catch(e){}
 
       // Auto-retry สูงสุด 3 ครั้ง
@@ -7170,6 +8946,86 @@ window._ptTestConn = function(){
       if(errBox){ errBox.style.display='block'; errBox.textContent='❌ '+msg+hint; }
     });
 };
+
+/* ════ UNIVERSAL TABLE FILTER ════════════════════════════════ */
+window._tfCfgs = {};
+
+function _tfSetup(cfg){
+  if($id(cfg.id+'-fbar')) return;
+  var tbody = $id(cfg.id); if(!tbody) return;
+  var tbl = tbody.closest('table'); if(!tbl) return;
+  var target = tbl.closest('.tbl-wrap') || tbl;
+  var parent = target.parentNode; if(!parent) return;
+  window._tfCfgs[cfg.id] = cfg;
+  var bar = document.createElement('div');
+  bar.id = cfg.id+'-fbar';
+  bar.style.cssText = 'display:flex;align-items:center;gap:7px;margin-bottom:8px;flex-wrap:wrap;';
+  bar.innerHTML =
+    '<input id="'+cfg.id+'-fi" type="text" placeholder="\u{1F50D} '+(cfg.ph||'ค้นหา...')+'" '+
+    'style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:6px;'+
+    'color:var(--t1);font-size:11px;padding:5px 10px;flex:1;min-width:130px;max-width:240px;outline:none;transition:.15s" '+
+    'onfocus="this.style.borderColor=\'rgba(139,92,246,.6)\'" '+
+    'onblur="this.style.borderColor=\'rgba(255,255,255,.12)\'">'
+    +'<span id="'+cfg.id+'-fs" style="font-size:10px;color:var(--t3);flex:1;white-space:nowrap;min-width:80px">—</span>'
+    +'<button id="'+cfg.id+'-fc" onclick="var i=$id(\''+cfg.id+'-fi\');if(i){i.value=\'\';}_tfR(\''+cfg.id+'\');" '
+    +'style="font-size:9.5px;padding:2px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);'
+    +'border-radius:4px;color:var(--t3);cursor:pointer;display:none">✕ ล้าง</button>';
+  parent.insertBefore(bar, target);
+  var inp = $id(cfg.id+'-fi');
+  if(inp) inp.addEventListener('input', function(){ _tfR(cfg.id); });
+}
+
+function _tfR(tbodyId){
+  var cfg = window._tfCfgs[tbodyId]; if(!cfg) return;
+  var tbody = $id(tbodyId); if(!tbody) return;
+  var inp = $id(tbodyId+'-fi');
+  var q = inp ? inp.value.trim().toLowerCase() : '';
+  var clearBtn = $id(tbodyId+'-fc');
+  if(clearBtn) clearBtn.style.display = q ? 'inline-block' : 'none';
+  var rows = Array.from(tbody.querySelectorAll('tr'));
+  var count=0, sum=0;
+  rows.forEach(function(row){
+    if(!row.cells.length || (row.cells[0] && row.cells[0].colSpan > 1)){
+      row.style.display = q ? 'none' : ''; return;
+    }
+    var match = !q || row.textContent.toLowerCase().indexOf(q) !== -1;
+    row.style.display = match ? '' : 'none';
+    if(match){
+      count++;
+      if(cfg.amtCol != null && row.cells[cfg.amtCol]){
+        var n = parseFloat((row.cells[cfg.amtCol].textContent||'').replace(/[฿, ]/g,'').replace(/[^\d.-]/g,'')) || 0;
+        if(n > 0) sum += n;
+      }
+    }
+  });
+  var sumEl = $id(tbodyId+'-fs');
+  if(sumEl){
+    sumEl.style.color = q ? _tc('#a78bfa') : 'var(--t3)';
+    sumEl.textContent = q
+      ? 'กรอง: '+count+' รายการ'+(sum>0?' · ฿'+B(sum):'')
+      : count+' รายการ'+(sum>0?' · ฿'+B(sum):'');
+  }
+}
+
+function _initAllFilters(){
+  var cfgs = [
+    {id:'fin-ar-pane-body',   ph:'อินวอยซ์, ลูกค้า, สถานะ...', amtCol:2},
+    {id:'fin-exp-body',       ph:'Vendor, ประเภท, สถานะ...', amtCol:4},
+    {id:'fin-ap-pane-body',   ph:'AP Ref, Vendor, สถานะ...', amtCol:4},
+    {id:'fix-body',           ph:'หมวด, รายการ...', amtCol:2},
+    {id:'aging-cust-body',    ph:'ลูกค้า, วัน...', amtCol:4},
+    {id:'tax-body',           ph:'ภาษี, Form, สถานะ...', amtCol:2},
+    {id:'po-all-body',        ph:'PO#, Supplier, สถานะ...', amtCol:4},
+    {id:'po-dom-body',        ph:'PO#, Supplier, วันที่...', amtCol:4},
+    {id:'po-intl-body',       ph:'PO#, Supplier, Currency, วันที่...', amtCol:5},
+    {id:'po-vendor-body',     ph:'Vendor, Country...', amtCol:null},
+    {id:'sales-ranking-body', ph:'ลูกค้า...', amtCol:2},
+    {id:'ov-txn-body',        ph:'อินวอยซ์, ลูกค้า...', amtCol:3},
+  ];
+  cfgs.forEach(function(cfg){ _tfSetup(cfg); _tfR(cfg.id); });
+}
+/* ═══════════════════════════════════════════════════════════ */
+
 })();
 </script>
 </body>
