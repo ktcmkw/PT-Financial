@@ -1181,9 +1181,9 @@ html,body{
                   </div>
                   <!-- Cash status indicator -->
                   <div style="text-align:center;padding:10px 0 6px">
-                    <div style="font-size:36px;margin-bottom:4px">🟢</div>
-                    <div style="font-size:17px;font-weight:800;color:#34d399">SAFE</div>
-                    <div style="font-size:11px;color:var(--t2);margin-top:2px">เงินเพียงพอสำหรับ ~109 วัน</div>
+                    <div id="fin-health-icon" style="font-size:36px;margin-bottom:4px">—</div>
+                    <div id="fin-health-label" style="font-size:17px;font-weight:800;color:#34d399">—</div>
+                    <div id="fin-health-days" style="font-size:11px;color:var(--t2);margin-top:2px">รอข้อมูลจาก Google Sheet</div>
                   </div>
                   <!-- Cash breakdown -->
                   <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
@@ -1193,7 +1193,7 @@ html,body{
                     </div>
                     <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:7px">
                       <span style="font-size:11px;color:var(--t2)">🏦 OD วงเงินคงเหลือ</span>
-                      <span style="font-size:13px;font-weight:700;color:#60a5fa">฿600,000</span>
+                      <span id="fin-od-avail" style="font-size:13px;font-weight:700;color:#60a5fa">—</span>
                     </div>
                     <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:7px">
                       <span style="font-size:11px;color:var(--t2)">📬 AR คาดรับเร็วๆ นี้</span>
@@ -1201,7 +1201,7 @@ html,body{
                     </div>
                     <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:7px">
                       <span style="font-size:11px;color:var(--t2)">📤 AP ต้องจ่ายเร็วๆ นี้</span>
-                      <span style="font-size:13px;font-weight:700;color:#f87171">−฿840,000</span>
+                      <span id="fin-ap-due" style="font-size:13px;font-weight:700;color:#f87171">—</span>
                     </div>
                   </div>
                 </div>
@@ -1219,10 +1219,10 @@ html,body{
                       <span style="color:var(--t2)">Fixed Cost</span><span id="fin-fixcost-inline" style="color:#f87171;font-weight:700">—</span>
                     </div>
                     <div style="border-top:1px solid var(--b2);margin:4px 0;padding-top:4px;display:flex;justify-content:space-between;font-size:13px">
-                      <span style="color:var(--t1);font-weight:800">Net Profit</span><span style="color:#34d399;font-weight:800">฿6,680,000</span>
+                      <span style="color:var(--t1);font-weight:800">Net Profit</span><span id="fin-net-profit" style="color:#34d399;font-weight:800">—</span>
                     </div>
                     <div style="display:flex;justify-content:space-between;font-size:11px">
-                      <span style="color:var(--t3)">Net Margin</span><span style="color:#a78bfa;font-weight:700">36.4%</span>
+                      <span style="color:var(--t3)">Net Margin</span><span id="fin-net-margin" style="color:#a78bfa;font-weight:700">—</span>
                     </div>
                   </div>
                 </div>
@@ -6420,6 +6420,90 @@ function updateByIDs(kpi, ar){
   setText('fin-rev-inline',     '+฿'+B(kpi.revenueMTD));
   setText('fin-cogs-inline',    '−฿'+B(kpi.expensesMTD||0));
   setText('fin-fixcost-inline', '−฿'+B(kpi.fixedCostMTD||0));
+
+  // ── Finance page Cash Sufficiency + P&L panel (live) ──────────────────
+  // OD วงเงินคงเหลือ — derive from kpi fields; fallback to localStorage config
+  var _finOdAvail = kpi.odAvailable || kpi.odBalance || 0;
+  if(!_finOdAvail){
+    var _finOdLim  = kpi.odLimit  || 0;
+    var _finOdUsed = kpi.odUsed   || 0;
+    if(!_finOdLim){
+      try { var _finCfg = JSON.parse(localStorage.getItem('fos_od_cfg')||'{}'); _finOdLim = Number(_finCfg.limit||0); } catch(e){}
+    }
+    _finOdAvail = _finOdLim > 0 ? (_finOdLim - _finOdUsed) : 0;
+  }
+  var _finOdEl = $id('fin-od-avail');
+  if(_finOdEl){
+    _finOdEl.textContent = _finOdAvail > 0 ? '฿'+B(_finOdAvail) : '—';
+    _finOdEl.style.color = _tc('#60a5fa');
+  }
+
+  // AP ต้องจ่ายเร็วๆ นี้ — use _apPend already computed above
+  var _finApDueAmt = (typeof _apPend !== 'undefined' ? _apPend : 0) || kpi.apPending || 0;
+  var _finApEl = $id('fin-ap-due');
+  if(_finApEl){
+    _finApEl.textContent = _finApDueAmt > 0 ? '−฿'+B(_finApDueAmt) : '—';
+    _finApEl.style.color = _tc('#f87171');
+  }
+
+  // Net Profit + Net Margin
+  var _finNetPr = kpi.netProfit || kpi.grossProfit || 0;
+  // fallback: compute from revenue - expenses if GAS doesn't return netProfit
+  if(!_finNetPr && kpi.revenueMTD){
+    var _finExp = (typeof _apPend !== 'undefined' ? _apPend : 0) + (kpi.fixedCostMTD||0);
+    if(_finExp > 0) _finNetPr = (kpi.revenueMTD||0) - _finExp;
+  }
+  var _finNetMg = kpi.netMargin || kpi.grossMargin || 0;
+  if(!_finNetMg && kpi.revenueMTD > 0 && _finNetPr !== 0)
+    _finNetMg = _finNetPr / kpi.revenueMTD * 100;
+
+  var _finNpEl = $id('fin-net-profit');
+  if(_finNpEl){
+    _finNpEl.textContent = _finNetPr ? (_finNetPr<0?'−':'')+'฿'+B(Math.abs(_finNetPr)) : '—';
+    _finNpEl.style.color = _tc(_finNetPr >= 0 ? '#34d399' : '#f87171');
+  }
+  var _finNmEl = $id('fin-net-margin');
+  if(_finNmEl){
+    _finNmEl.textContent = _finNetMg ? _finNetMg.toFixed(1)+'%' : '—';
+    _finNmEl.style.color = _tc(_finNetMg >= 35 ? '#34d399' : _finNetMg >= 20 ? '#fbbf24' : '#f87171');
+  }
+
+  // SAFE / WARNING / CRITICAL cash health indicator
+  var _finCashBal   = kpi.cashBalance || kpi.netCashPosition || 0;
+  var _finMonthBurn = _finApDueAmt + (kpi.fixedCostMTD||0);
+  if(!_finMonthBurn) _finMonthBurn = kpi.expensesMTD || 0;
+  var _finTotalLiq  = _finCashBal + _finOdAvail;
+  var _finRunway    = _finMonthBurn > 0 ? Math.round(_finTotalLiq / _finMonthBurn * 30) : null;
+
+  var _finHIcon, _finHLabel, _finHColor;
+  if(_finCashBal < 0 || _finTotalLiq <= 0){
+    _finHIcon = '🔴'; _finHLabel = 'CRITICAL'; _finHColor = '#f87171';
+  } else if(_finRunway !== null && _finRunway < 30){
+    _finHIcon = '🔴'; _finHLabel = 'CRITICAL'; _finHColor = '#f87171';
+  } else if(_finRunway !== null && _finRunway < 60){
+    _finHIcon = '🟡'; _finHLabel = 'WARNING';  _finHColor = '#fbbf24';
+  } else if(_finCashBal > 0 || _finOdAvail > 0){
+    _finHIcon = '🟢'; _finHLabel = 'SAFE';     _finHColor = '#34d399';
+  } else {
+    _finHIcon = '⚪'; _finHLabel = 'รอข้อมูล'; _finHColor = 'var(--t3)';
+  }
+
+  var _finIconEl = $id('fin-health-icon');
+  if(_finIconEl) _finIconEl.textContent = _finHIcon;
+
+  var _finLblEl = $id('fin-health-label');
+  if(_finLblEl){ _finLblEl.textContent = _finHLabel; _finLblEl.style.color = _tc(_finHColor); }
+
+  var _finDaysEl = $id('fin-health-days');
+  if(_finDaysEl){
+    if(_finRunway !== null && _finCashBal > 0)
+      _finDaysEl.textContent = 'เงินเพียงพอสำหรับ ~'+_finRunway+' วัน';
+    else if(_finCashBal > 0)
+      _finDaysEl.textContent = 'มีเงินสด ฿'+B(_finCashBal)+' (ไม่ทราบ burn rate)';
+    else
+      _finDaysEl.textContent = 'รอข้อมูลจาก Google Sheet';
+  }
+  // ────────────────────────────────────────────────────────────────────────
 
   // Color margin
   var mvEl = $id('ov-margin');
