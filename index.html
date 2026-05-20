@@ -2525,6 +2525,7 @@ html,body{
           <div id="e304-status-dot" style="width:8px;height:8px;border-radius:50%;background:#64748b;flex-shrink:0"></div>
           <span id="e304-status-text" style="font-size:11px;color:var(--t3)">กำลังโหลดข้อมูล...</span>
           <button onclick="load304Data(true)" style="margin-left:auto;font-size:10px;padding:3px 10px;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:5px;color:#818cf8;cursor:pointer">🔄 Refresh</button>
+          <button onclick="toggle304Debug()" style="font-size:10px;padding:3px 8px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:5px;color:#fbbf24;cursor:pointer">🔧 Debug</button>
         </div>
 
         <!-- Department Summary Table -->
@@ -2558,6 +2559,12 @@ html,body{
             <div style="color:var(--t3);font-size:11px;align-self:center">กำลังโหลด...</div>
           </div>
           <div id="e304-chart-labels" style="display:flex;gap:6px;margin-top:4px;padding:0 4px"></div>
+        </div>
+
+        <!-- Debug Panel (hidden by default) -->
+        <div id="e304-debug-panel" style="display:none;background:rgba(0,0,0,.4);border:1px solid #fbbf2466;border-radius:8px;padding:12px;margin-bottom:14px">
+          <div style="font-size:11px;font-weight:700;color:#fbbf24;margin-bottom:8px">🔧 Debug Info — GAS Response</div>
+          <pre id="e304-debug-text" style="font-size:10px;color:var(--t2);overflow-x:auto;max-height:320px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;margin:0"></pre>
         </div>
       </div>
 
@@ -9707,6 +9714,36 @@ function build304DetailTable(tbodyId, rows) {
 }
 
 /* ── DRILL-DOWN MODAL ────────────────────────────────────────── */
+function toggle304Debug() {
+  var panel = document.getElementById('e304-debug-panel');
+  if (!panel) return;
+  if (panel.style.display === 'none') {
+    var pre = document.getElementById('e304-debug-text');
+    if (pre && window._304_cache) {
+      var d = window._304_cache._debug || {};
+      var txt = 'GAS _ok: ' + window._304_cache._ok + '\n'
+              + 'Sheet rows: ' + (d.totalRows||'?') + '  cols: ' + (d.totalCols||'?') + '\n'
+              + 'actualHeaderRow: ' + d.actualHeaderRow + '\n'
+              + 'budgetHeaderRow: ' + d.budgetHeaderRow + '\n'
+              + 'summaryRowsFound: ' + JSON.stringify(d.summaryRowsFound||[], null, 2) + '\n\n'
+              + 'actualColMap: ' + JSON.stringify(d.actualColMap||{}) + '\n'
+              + 'bCol: ' + JSON.stringify(d.bCol||{}) + '\n\n'
+              + 'summary keys: ' + Object.keys(window._304_cache.summary||{}).join(', ') + '\n\n'
+              + '=== Raw rows near actualHeaderRow ===\n';
+      (d.rawSnap||[]).forEach(function(row, i) {
+        txt += '[row ' + ((d.actualHeaderRow||0) - 1 + i) + '] '
+             + row.map(function(v,ci){ return ci + ':' + (v||'·'); }).join('  ') + '\n';
+      });
+      pre.textContent = txt || '(ยังไม่ได้โหลด)';
+    } else if (pre) {
+      pre.textContent = window._304_cache ? JSON.stringify(window._304_cache._debug||{}, null, 2) : 'ยังไม่ได้โหลด — กด Refresh ก่อน';
+    }
+    panel.style.display = 'block';
+  } else {
+    panel.style.display = 'none';
+  }
+}
+
 function show304Modal(key) {
   var data = window._304_cache;
   if (!data || !data.summary) {
