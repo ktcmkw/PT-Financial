@@ -1853,7 +1853,10 @@ html,body{
             <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:8px">OD / Credit Line Configuration <span id="od-config-src"></span></div>
             <div id="od-gas-status" style="font-size:10px;margin-bottom:12px;padding:4px 8px;border-radius:4px;display:inline-block"></div>
             <div class="tbl-wrap"><table class="tbl" style="margin-bottom:16px"><thead><tr><th>บัญชี</th><th>ธนาคาร</th><th style="text-align:right">วงเงิน OD</th><th style="text-align:right">Alert %</th><th>Action</th></tr></thead>
-            <tbody><tr><td>KBank OD</td><td>กสิกรไทย</td><td style="text-align:right"><input id="od-limit-input" type="text" value="2,000,000" style="width:100px;font-size:12px;text-align:right;padding:3px 6px;border:1px solid var(--b2);border-radius:4px;background:var(--card2);color:var(--t1)"></td><td style="text-align:right"><input id="od-alert-input" type="text" value="70%" style="width:50px;font-size:12px;text-align:right;padding:3px 6px;border:1px solid var(--b2);border-radius:4px;background:var(--card2);color:var(--t1)"></td><td><button class="btn p sm" onclick="saveOdConfig()">Save</button></td></tr></tbody></table></div>
+            <tbody><tr><td>KBank OD</td><td>กสิกรไทย</td><td style="text-align:right"><input id="od-limit-input" type="text" value="2,000,000" style="width:100px;font-size:12px;text-align:right;padding:3px 6px;border:1px solid var(--b2);border-radius:4px;background:var(--card2);color:var(--t1)"></td><td style="text-align:right"><input id="od-alert-input" type="text" value="70%" style="width:50px;font-size:12px;text-align:right;padding:3px 6px;border:1px solid var(--b2);border-radius:4px;background:var(--card2);color:var(--t1)"></td><td style="white-space:nowrap">
+              <button class="btn p sm" id="od-save-btn" onclick="saveOdConfig()">Save</button>
+              <span id="od-save-status" style="font-size:10px;margin-left:8px;color:var(--gr)"></span>
+            </td></tr></tbody></table></div>
             <div class="cfgr"><div><div class="cfgl">แจ้งเตือนเมื่อ OD เกิน threshold</div><div class="cfgs">ส่งแจ้งเตือนใน dashboard และ email</div></div><div class="tgl" id="tgl-od-notify" onclick="toggleCfg(this)"></div></div>
             <div class="cfgr"><div><div class="cfgl">Daily OD Digest</div><div class="cfgs">สรุป OD ทุกเช้า 8:00 น.</div></div><div class="tgl off" id="tgl-od-digest" onclick="toggleCfg(this)"></div></div>
           </div>
@@ -3325,10 +3328,13 @@ function loadOdConfig() {
   if (odGasEl) {
     var _gu = ''; try { _gu = localStorage.getItem('pt_gas_url') || ''; } catch(e2) {}
     if (_gu) {
-      odGasEl.textContent = '✓ GAS URL ตั้งค่าแล้ว — บันทึกจะ sync ไป CASH_Bank อัตโนมัติ';
+      var _guShort = _gu.length > 60 ? '...' + _gu.slice(-40) : _gu;
+      odGasEl.innerHTML = '✓ GAS URL ตั้งค่าแล้ว — บันทึกจะ sync ไป CASH_Bank อัตโนมัติ'
+        + ' <span style="opacity:.5;font-family:monospace">(' + _guShort + ')</span>';
       odGasEl.style.cssText = 'font-size:10px;padding:4px 8px;border-radius:4px;display:inline-block;background:rgba(16,185,129,.12);color:var(--gr)';
     } else {
-      odGasEl.textContent = '⚠ ยังไม่ได้ตั้ง GAS URL — กดบันทึกจะเก็บ local เท่านั้น (แท็บ Google Sheets เพื่อตั้งค่า)';
+      odGasEl.innerHTML = '⚠ ยังไม่ได้ตั้ง GAS URL — กดบันทึกจะเก็บ local เท่านั้น'
+        + ' <span style="opacity:.7">→ ไปที่แท็บ <b>Google Sheets</b> เพื่อตั้งค่า GAS URL</span>';
       odGasEl.style.cssText = 'font-size:10px;padding:4px 8px;border-radius:4px;display:inline-block;background:rgba(245,158,11,.12);color:#d97706';
     }
   }
@@ -3352,12 +3358,18 @@ function saveOdConfig() {
 
   // ── 2. Optimistic UI update — อัปเดต dashboard ทันที ไม่รอ Sheet ──
   try { if (window._fos_cache) window._fos_cache.odConfig = cfg; } catch(e) {}
-  _applyOdCfgToUI(cfg);
+  try { _applyOdCfgToUI(cfg); } catch(uiErr) { console.warn('[OD] _applyOdCfgToUI error:', uiErr); }
 
   // ── 3. Write กลับ CASH_Bank ผ่าน GAS (async, ไม่บล็อก UI) ──
   var gasUrl = '';
-  try { gasUrl = localStorage.getItem('pt_gas_url') || ''; } catch(e) {}
-  var saveBtn = document.querySelector('#pn-od button.btn.p');
+  try { gasUrl = (localStorage.getItem('pt_gas_url') || '').replace(/[?&]+$/, ''); } catch(e) {}
+  var saveBtn = document.getElementById('od-save-btn') ||
+                document.querySelector('#pn-od button.btn.p') ||
+                document.querySelector('[onclick*="saveOdConfig"]');
+  var statusSpan = document.getElementById('od-save-status');
+  var _setStatus = function(msg, color) {
+    if (statusSpan) { statusSpan.textContent = msg; statusSpan.style.color = color||'var(--gr)'; }
+  };
   if (gasUrl) {
     if (saveBtn) { saveBtn.textContent = '⏳'; saveBtn.disabled = true; }
     var qs = 'action=updateOdConfig'
@@ -3365,24 +3377,56 @@ function saveOdConfig() {
            + '&alert='  + encodeURIComponent(alert)
            + '&notify=' + (notify ? '1' : '0')
            + '&digest=' + (digest ? '1' : '0');
-    fetch(gasUrl + '?' + qs, {mode:'cors', cache:'no-store'})
-      .then(function(r){ return r.json(); })
-      .then(function(d){
-        if (saveBtn) { saveBtn.textContent='✓ Saved'; saveBtn.disabled=false;
-          setTimeout(function(){ if(saveBtn) saveBtn.textContent='Save'; }, 2000); }
+    var _restoreBtn = function(label){
+      if (saveBtn) { saveBtn.textContent = label||'Save'; saveBtn.disabled = false; }
+    };
+    fetch(gasUrl + '?' + qs, {method:'GET', redirect:'follow', cache:'no-store'})
+      .then(function(r){
+        if (!r.ok && r.status !== 0) throw new Error('HTTP ' + r.status);
+        return r.text();
+      })
+      .then(function(txt){
+        var d = {};
+        try { d = JSON.parse(txt); } catch(ex) {
+          // GAS returned HTML (error page) — show snippet
+          throw new Error('GAS ส่ง HTML แทน JSON: ' + txt.replace(/<[^>]+>/g,'').trim().slice(0,80));
+        }
         if (d._ok) {
-          showToast('✓ บันทึก OD Config → CASH_Bank แล้ว', 'success');
+          _restoreBtn('✓ Saved');
+          _setStatus('✓ sync CASH_Bank แล้ว', 'var(--gr)');
+          setTimeout(function(){ _restoreBtn('Save'); }, 3000);
+          showToast('✓ บันทึก OD Config → CASH_Bank แล้ว (฿'+B(limit)+')', 'success');
           logAudit(CURRENT_USER||'admin','CONFIG','Bank/OD (CASH_Bank)','วงเงิน ฿'+limit.toLocaleString('en')+' Alert '+alert+'%');
+          // Update odConfig source badge
+          var srcEl = document.getElementById('od-config-src');
+          if (srcEl) srcEl.innerHTML = ' <span style="color:var(--gr);font-size:9px">● ✓ sync CASH_Bank</span>';
         } else {
-          showToast('GAS error: '+(d.error||'unknown')+' (บันทึก local แล้ว)', 'warning');
+          _restoreBtn('Save');
+          var errMsg = d.error || 'unknown error';
+          _setStatus('⚠ GAS: '+errMsg.slice(0,40), '#f87171');
+          showToast('⚠ GAS: ' + errMsg + ' (บันทึก local แล้ว)', 'warning');
+          // Show diagnostic info in od-gas-status
+          var diagEl = document.getElementById('od-gas-status');
+          if (diagEl) {
+            diagEl.textContent = '⚠ GAS error: ' + errMsg;
+            diagEl.style.cssText = 'font-size:10px;padding:4px 8px;border-radius:4px;display:inline-block;background:rgba(245,158,11,.12);color:#d97706';
+          }
         }
       })
-      .catch(function(){
-        if (saveBtn) { saveBtn.textContent='Save'; saveBtn.disabled=false; }
-        showToast('บันทึก local แล้ว — GAS offline (จะ sync ครั้งหน้า)', 'warning');
+      .catch(function(err){
+        _restoreBtn('Save');
+        var msg = err && err.message ? err.message : 'ไม่สามารถเชื่อมต่อ GAS';
+        _setStatus('⚠ local only — GAS: '+msg.slice(0,30), '#d97706');
+        showToast('บันทึก local แล้ว — ' + msg, 'warning');
         logAudit(CURRENT_USER||'admin','CONFIG','Bank/OD (local)','วงเงิน ฿'+limit.toLocaleString('en')+' Alert '+alert+'%');
+        var diagEl = document.getElementById('od-gas-status');
+        if (diagEl) {
+          diagEl.textContent = '⚠ ' + msg + ' — บันทึกไว้ใน local, จะ sync ครั้งหน้า';
+          diagEl.style.cssText = 'font-size:10px;padding:4px 8px;border-radius:4px;display:inline-block;background:rgba(239,68,68,.1);color:#f87171';
+        }
       });
   } else {
+    _setStatus('✓ บันทึก local', 'var(--gr)');
     showToast('✓ บันทึก local แล้ว — ตัวเลข dashboard อัปเดตแล้ว', 'success');
     logAudit(CURRENT_USER||'admin','CONFIG','Bank/OD (local)','วงเงิน ฿'+limit.toLocaleString('en')+' Alert '+alert+'%');
   }
@@ -3545,14 +3589,17 @@ function showToast(msg, type) {
   if (!t) {
     t = document.createElement('div');
     t.id = 'toast';
-    t.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:9px;font-size:12px;font-weight:600;transition:opacity .3s;pointer-events:none';
     document.body.appendChild(t);
   }
-  var colors = {success:'background:rgba(16,185,129,.9);color:#fff',warning:'background:rgba(245,158,11,.9);color:#fff',error:'background:rgba(239,68,68,.9);color:#fff'};
-  t.style.cssText += ';' + (colors[type]||colors.success);
+  var bg = type==='error' ? 'rgba(239,68,68,.92)' : type==='warning' ? 'rgba(245,158,11,.92)' : 'rgba(16,185,129,.92)';
+  t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;padding:11px 18px;'
+    + 'border-radius:10px;font-size:12px;font-weight:700;color:#fff;pointer-events:none;'
+    + 'box-shadow:0 6px 24px rgba(0,0,0,.5);max-width:340px;word-break:break-word;'
+    + 'background:' + bg + ';display:block;opacity:1;transition:opacity .4s';
   t.textContent = msg;
-  t.style.opacity = '1';
-  setTimeout(function(){ t.style.opacity='0' }, 2800);
+  clearTimeout(t._th);
+  t._th = setTimeout(function(){ t.style.opacity='0';
+    setTimeout(function(){ t.style.display='none'; },420); }, 3000);
 }
 
 function toggleRoleSwitcher() {
@@ -5096,12 +5143,7 @@ function invSyncSheet(){
   }
 }
 
-function showToast(msg){
-  var t=document.getElementById('toast');
-  t.textContent=msg; t.style.display='block';
-  clearTimeout(t._timer);
-  t._timer=setTimeout(function(){t.style.display='none'},3500);
-}
+/* showToast — defined in block 1 */
 
 // ══ Finance Detail Modal ══
 // Render invoice table on page load
