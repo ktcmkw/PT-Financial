@@ -9596,6 +9596,72 @@ function update304Module(data) {
   var elMoCount = document.getElementById('e304-month-count');
   if (elMoCount) elMoCount.textContent = (curMo + 1) + ' เดือน (ม.ค.–' + _M304[curMo] + ')';
 
+  /* ── Resolve Service/Logistic summary from detail rows ──────────
+     These depts have no total row in the sheet — their summary row
+     is a section header with all zeros. Sum detail items instead.  */
+  (function() {
+    var MK = ['jan','feb','mar','q1','apr','may','jun','q2',
+               'jul','aug','sep','q3','oct','nov','dec'];
+    ['service','logistic'].forEach(function(k) {
+      var sm   = s[k];
+      var rows = (data.detail || {})[k] || [];
+      if (!sm || !rows.length) return;
+      var sumBudTotal = 0, sumActYtd = 0;
+      var bm = {}, am = {};
+      rows.forEach(function(r) {
+        sumBudTotal += (r.budget && r.budget.total) || 0;
+        sumActYtd   += (r.actual && r.actual.ytd)   || 0;
+        MK.forEach(function(m) {
+          bm[m] = (bm[m] || 0) + ((r.budget && r.budget[m]) || 0);
+          am[m] = (am[m] || 0) + ((r.actual && r.actual[m]) || 0);
+        });
+      });
+      if (!sm.budget) sm.budget = {};
+      if (!sm.actual) sm.actual = {};
+      if ((sm.budget.total || 0) === 0 && sumBudTotal > 0) {
+        MK.forEach(function(m) { sm.budget[m] = bm[m] || 0; });
+        sm.budget.total = sumBudTotal;
+      }
+      if ((sm.actual.ytd || 0) === 0 && sumActYtd > 0) {
+        MK.forEach(function(m) { sm.actual[m] = am[m] || 0; });
+        sm.actual.ytd = sumActYtd;
+      }
+    });
+    /* Recompute s.total from all dept summaries so KPI cards are correct */
+    var DEPTS = ['sales','service','logistic','welfare','salary'];
+    var MK2   = MK.concat(['total']);
+    if (!s.total) s.total = { budget: {}, actual: {} };
+    var tb = {}, ta = {};
+    DEPTS.forEach(function(k) {
+      var sm2 = s[k]; if (!sm2) return;
+      MK2.forEach(function(m) { tb[m] = (tb[m] || 0) + ((sm2.budget && sm2.budget[m]) || 0); });
+      MK.forEach(function(m)  { ta[m] = (ta[m] || 0) + ((sm2.actual && sm2.actual[m]) || 0); });
+      ta.ytd = (ta.ytd || 0) + ((sm2.actual && sm2.actual.ytd) || 0);
+    });
+    s.total.budget = tb;
+    s.total.actual = ta;
+    /* Update tot reference + re-render KPI cards */
+    tot      = s.total;
+    budYtd   = (tot.budget && tot.budget.total) || 0;
+    actYtd   = (tot.actual && tot.actual.ytd)   || 0;
+    remBud   = budYtd - actYtd;
+    usagePct = budYtd > 0 ? (actYtd / budYtd * 100) : 0;
+    remPct   = 100 - usagePct;
+    if (elBudYtd) elBudYtd.textContent = _b304(budYtd);
+    if (elActYtd) elActYtd.textContent = _b304(actYtd);
+    if (elUsage) {
+      elUsage.textContent = _b304(remBud);
+      elUsage.style.color = remBud < 0 ? '#f87171' : '#34d399';
+    }
+    if (elDiffLbl) {
+      elDiffLbl.textContent = remBud < 0
+        ? ('⚠️ เกินงบ ' + _pct304(Math.abs(remPct)))
+        : (_pct304(remPct) + ' ยังไม่ใช้');
+      elDiffLbl.style.color = remBud < 0 ? '#f87171' : 'var(--t3)';
+    }
+    if (elDiff) elDiff.textContent = _b304(actYtd - budYtd);
+  })();
+
   /* ── Dept Cards ─────────────────────────────────────────────── */
   var deptWrap = document.getElementById('e304-dept-cards');
   if (deptWrap) {
