@@ -1113,7 +1113,7 @@ html,body{
         <div class="kc cb" onclick="showModuleKpi('finance','ar')"><div class="kl">⏳ AR ทั้งหมด <span style="font-size:9px;opacity:.5">↗ คลิก</span></div><div class="kv" id="fin-ar">—</div><div class="ks"><span class="tag td">5 overdue</span></div></div>
         <div class="kc ca" onclick="showModuleKpi('finance','ap')"><div class="kl">📤 AP ค้างจ่าย <span style="font-size:9px;opacity:.5">↗ คลิก</span></div><div class="kv" id="fin-ap">—</div><div class="ks"><span class="tag ta2">3 due soon</span></div></div>
         <div class="kc cp" onclick="showModuleKpi('finance','vat')"><div class="kl">🧾 VAT ค้างส่ง <span style="font-size:9px;opacity:.5">↗ คลิก</span></div><div class="kv" id="fin-vat">—</div><div class="ks"><span class="tag tg">ส่งวันที่ 7 มิ.ย.</span></div></div>
-        <div class="kc cc" onclick="showModuleKpi('finance','fixed-cost')"><div class="kl">🏢 Fixed Cost/เดือน <span style="font-size:9px;opacity:.5">↗ คลิก</span></div><div class="kv" id="fin-fix">—</div><div class="ks"><span class="tag tg">8 รายการ</span></div></div>
+        <div class="kc cc" onclick="showModuleKpi('finance','fixed-cost')"><div class="kl">🏢 Fixed Cost/เดือน <span style="font-size:9px;opacity:.5">↗ คลิก</span></div><div class="kv" id="fin-fix">—</div><div class="ks"><span class="tag tg" id="fin-fix-cnt">— รายการ</span></div></div>
       </div>
       <div class="cd">
         <div class="tbar" id="tb-f"><div class="tt on" onclick="sw('tb-f',0,'pn-f')">📊 P&L (กำไรขาดทุน)</div><div class="tt" onclick="sw('tb-f',1,'pn-f')">AR (ลูกหนี้)</div><div class="tt" onclick="sw('tb-f',2,'pn-f')">Aging (อายุหนี้)</div><div class="tt" onclick="sw('tb-f',3,'pn-f')">Expenses (ค่าใช้จ่าย)</div><div class="tt" onclick="sw('tb-f',4,'pn-f')">AP (เจ้าหนี้)</div><div class="tt" onclick="sw('tb-f',5,'pn-f')">Fixed Expenses (คงที่)</div><div class="tt" onclick="sw('tb-f',6,'pn-f')">Tax (ภาษี)</div></div>
@@ -1330,11 +1330,11 @@ html,body{
         <div id="pn-p">
           <div>
             <div class="fb"><button class="btn p" data-perm="purchasing:create" onclick="ov('mv-po')">+ New PO</button></div>
-            <div class="tbl-wrap"><table class="tbl"><thead><tr><th>PO #</th><th>Supplier</th><th>ประเภท</th><th>วันที่</th><th style="text-align:right">จำนวน</th><th>Finance AP</th><th>สถานะ</th></tr></thead>
+            <div class="tbl-wrap"><table class="tbl"><thead><tr><th>PO #</th><th>Supplier</th><th>ประเภท</th><th>วันที่</th><th style="text-align:right">จำนวน</th><th>สถานะ</th><th>วิธีชำระ</th></tr></thead>
             <tbody id="po-all-body"><tr><td colspan="7" style="text-align:center;color:#475569;padding:20px">กำลังโหลด...</td></tr></tbody></table></div>
           </div>
           <div style="display:none">
-            <div class="tbl-wrap"><table class="tbl"><thead><tr><th>PO #</th><th>วันที่เอกสาร</th><th>Supplier</th><th>สินค้า</th><th style="text-align:right">จำนวน</th><th>Lead Time</th><th>สถานะ</th></tr></thead>
+            <div class="tbl-wrap"><table class="tbl"><thead><tr><th>PO #</th><th>วันที่เอกสาร</th><th>Supplier</th><th>เลขที่อ้างอิง</th><th style="text-align:right">จำนวน</th><th>หมายเหตุ</th><th>สถานะ</th></tr></thead>
             <tbody id="po-dom-body"><tr><td colspan="7" style="text-align:center;color:#475569;padding:20px">กำลังโหลด...</td></tr></tbody></table></div>
           </div>
           <div style="display:none">
@@ -2967,11 +2967,19 @@ window.addEventListener('DOMContentLoaded',function(){
    RBAC + LOGIN SYSTEM
    ══════════════════════════════════════════════════ */
 
-// Demo accounts map
-var ACCOUNTS = {
+// Accounts — load from localStorage (set via Admin page); hardcoded defaults as fallback
+var _ACCOUNTS_DEFAULT = {
   'service.tech@peothailand.com': { pass:'Admin@1234', role:'SUPER_ADMIN', name:'Nack K.' },
   'admin@peothailand.com':        { pass:'Admin@1234',  role:'ADMIN',      name:'Admin User' },
 };
+var ACCOUNTS = (function(){
+  try {
+    var s = localStorage.getItem('pt_accounts');
+    if(s){ var p = JSON.parse(s); if(p && Object.keys(p).length) return p; }
+  } catch(e){}
+  /* ⚠️ Security: update credentials via Admin → Settings → User Management */
+  return _ACCOUNTS_DEFAULT;
+})();
 
 // RBAC matrix (mirrors ROLE_PERMISSIONS in types/index.ts)
 var ROLE_PERMISSIONS = {
@@ -5166,12 +5174,14 @@ function getExpData(){
   ];
 }
 function getTaxData(){
+  var k = (window._fos_cache && window._fos_cache.kpi) || {};
+  var fx = window._fos_cache && window._fos_cache.fix || [];
   return [
-    {type:'ภาษีมูลค่าเพิ่ม (VAT)',      form:'ภ.พ.30',      amt:299600,  due:'2026-06-07', status:'รอส่ง'},
-    {type:'ภาษีหัก ณ ที่จ่าย (WHT)',    form:'ภ.ง.ด.53',    amt:84200,   due:'2026-06-07', status:'รอส่ง'},
-    {type:'ภาษีเงินได้นิติบุคคล (CIT)', form:'ภ.ง.ด.50',    amt:310000,  due:'2026-08-31', status:'ประมาณการ'},
-    {type:'ภาษีนำเข้า (Import Duty)',   form:'กรมศุลกากร',  amt:54000,   due:'ตามกำหนด',   status:'รอชำระ'},
-    {type:'VAT นำเข้า 7%',             form:'กรมศุลกากร',  amt:26600,   due:'ตามกำหนด',   status:'รอชำระ'},
+    {type:'ภาษีมูลค่าเพิ่ม (VAT)',      form:'ภ.พ.30',      amt:k.vatPayable||299600,          due:'2026-06-07', status:'รอส่ง'},
+    {type:'ภาษีหัก ณ ที่จ่าย (WHT)',    form:'ภ.ง.ด.53',    amt:k.whtPayable||84200,            due:'2026-06-07', status:'รอส่ง'},
+    {type:'ภาษีเงินได้นิติบุคคล (CIT)', form:'ภ.ง.ด.50',    amt:k.citPayable||310000,           due:'2026-08-31', status:'ประมาณการ'},
+    {type:'ภาษีนำเข้า (Import Duty)',   form:'กรมศุลกากร',  amt:k.importDutyMTD||54000,         due:'ตามกำหนด',   status:'รอชำระ'},
+    {type:'VAT นำเข้า 7%',             form:'กรมศุลกากร',  amt:Math.round((k.fxExposure||380000)*0.07),due:'ตามกำหนด',status:'รอชำระ'},
   ];
 }
 function getPOData(){
@@ -5647,7 +5657,7 @@ function _buildReportContent(reportId){
   }
 
   if(reportId==='ar-aging'){
-    var invAg = getInvData().filter(function(d){return d.od>0;});
+    var invAg = getInvData().filter(function(d){ var _s=(d.status||'').toLowerCase(); return d.od>0 && _s.indexOf('ชำระ')===-1 && _s!=='ลดหนี้' && _s!=='ยกเลิก'; });
     var b1=0,b2=0,b3=0,b4=0;
     var agRows = invAg.map(function(d){
       var bk,bc;
@@ -5729,7 +5739,7 @@ function _buildReportContent(reportId){
       var st=(d.status||'').toLowerCase();
       var hasAct=d.actDate&&d.actDate!==''&&d.actDate!=='null'&&d.actDate!=='—';
       var isPd=st.indexOf('paid')!==-1||st==='done'||st.indexOf('ชำระ')!==-1||st==='ลดหนี้'||hasAct;
-      var tag=isPd?'<span class="tag-paid">ชำระแล้ว</span>':'<span class="tag-pend">รอรับ</span>';
+      var tag=isPd?'<span class="tag-paid">ชำระแล้ว</span>':d.od>0?'<span class="tag-over">เกิน '+d.od+' วัน</span>':'<span class="tag-pend">รอรับ</span>';
       return [d.no,d.cust,_printFmtN(d.net),d.credit,_printFmtD(d.expDate),_printFmtD(d.actDate),tag];
     });
     return '<div style="padding:20px">'
@@ -5756,11 +5766,32 @@ function _buildReportContent(reportId){
   }
 
   if(reportId==='import-duty'){
-    var impRows = [
-      ['PO-046','Ningbo Wheel Ltd.','China','CNY','380,000','38,000','29,260','67,260','8716.80.00'],
-      ['PO-044','SG Logistics','Singapore','SGD','320,000','16,000','23,520','39,520','8431.20.00'],
-      ['<strong>รวม</strong>','','','','<strong>700,000</strong>','<strong>54,000</strong>','<strong>52,780</strong>','<strong>106,780</strong>',''],
-    ];
+    var _intlPO = (window._fos_cache && window._fos_cache.po||[]).filter(function(r){
+      var t=(r.type||r.docType||'').toLowerCase();
+      var c=(r.currency||'THB').toUpperCase();
+      return t.indexOf('intl')!==-1||t.indexOf('ต่างประเทศ')!==-1||t.indexOf('นำเข้า')!==-1||['CNY','USD','EUR','SGD','JPY','GBP'].indexOf(c)!==-1;
+    });
+    var impRows;
+    if(_intlPO.length){
+      var _iTotAmt=0,_iTotDuty=0,_iTotVat=0;
+      impRows = _intlPO.map(function(r){
+        var amtTHB=Number(r.net||r.value||r.amount||0);
+        var duty=Number(r.importDuty||0);
+        var vat7=Math.round((amtTHB+duty)*0.07);
+        _iTotAmt+=amtTHB;_iTotDuty+=duty;_iTotVat+=vat7;
+        return [r.docNo||'—',r.supplier||r.vendor||'—',r.country||'—',r.currency||'—',
+          _printFmtN(amtTHB),_printFmtN(duty),_printFmtN(vat7),_printFmtN(duty+vat7),r.hsCode||r.hs||'—'];
+      });
+      impRows.push(['<strong>รวม</strong>','','','',
+        '<strong>'+_printFmtN(_iTotAmt)+'</strong>','<strong>'+_printFmtN(_iTotDuty)+'</strong>',
+        '<strong>'+_printFmtN(_iTotVat)+'</strong>','<strong>'+_printFmtN(_iTotDuty+_iTotVat)+'</strong>','']);
+    } else {
+      impRows = [
+        ['PO-046','Ningbo Wheel Ltd.','China','CNY','380,000','38,000','29,260','67,260','8716.80.00'],
+        ['PO-044','SG Logistics','Singapore','SGD','320,000','16,000','23,520','39,520','8431.20.00'],
+        ['<strong>รวม</strong>','','','','<strong>700,000</strong>','<strong>54,000</strong>','<strong>52,780</strong>','<strong>106,780</strong>',''],
+      ];
+    }
     var impKpis = _printMiniKpis([
       {lbl:'FX Exposure',val:_printB(k.fxExposure),c:'#f59e0b'},
       {lbl:'Import Duty MTD',val:_printB(k.importDutyMTD),c:'#ef4444'},
@@ -6225,7 +6256,7 @@ function normStatus(r){
   // ยกเลิก
   if(s==='ยกเลิก'||s==='cancelled'||s==='cancel') return 'ยกเลิก';
   // เกินกำหนด — Debtor flag หรือ isOverdue จาก GAS
-  if(s==='debtor'||s==='ลูกหนี้ค้างชำระ'||r.isOverdue) return 'เกินกำหนด';
+  if(s==='debtor'||s==='overdue'||s==='เกินกำหนด'||s==='ลูกหนี้ค้างชำระ'||s==='ลูกหนี้'||r.isOverdue) return 'เกินกำหนด';
   // รอชำระ — Billing Note / Purchasing / pending / ค่าเริ่มต้น
   return 'รอชำระ';
 }
@@ -6246,7 +6277,7 @@ function gasARtoInv(r, idx){
     credit:  r.creditDays || 30,
     expDate: r.expectedPay || '',
     actDate: r.actualPay  || '',
-    od:      r.overdueDays || 0,
+    od:      r.overdueDays || (function(){ var ep=r.expectedPay||''; if(!ep) return 0; var diff=Math.floor((Date.now()-new Date(ep))/(864e5)); return diff>0?diff:0; })(),
     _raw:    r
   };
 }
@@ -6267,6 +6298,7 @@ function updateByIDs(kpi, ar){
   setText('fin-ap',  '฿'+B(typeof _apPend!=='undefined'?_apPend:(kpi.apPending||0)));
   setText('fin-vat', '฿'+B(kpi.vatPayable));
   setText('fin-fix', '฿'+B(kpi.fixedCostMTD));
+  setText('fin-fix-cnt', ((window._fos_cache&&window._fos_cache.fix||[]).length||'—')+' รายการ');
 
   // Finance big revenue block
   setText('fin-rev-big', '฿'+B(kpi.revenueMTD));
@@ -6546,10 +6578,35 @@ function patchKPIModals(kpi, ar, fix, ap){
       +'<td style="color:var(--t1)">รวม YTD</td>'
       +'<td style="text-align:right;color:#34d399;font-weight:800">฿'+B2(kpi.revenueYTD||ytd)+'</td>'
       +'<td colspan="2"></td></tr>';
+    // Build live customer YTD bars from AR
+    var _invA = typeof getInvData==='function' ? getInvData() : (window.invData||[]);
+    var _cMapY = {}, _totY = 0;
+    _invA.forEach(function(d){
+      var c = d.customer||d.cust||'อื่นๆ';
+      _cMapY[c] = (_cMapY[c]||0) + (d.value||d.net||0);
+      _totY += (d.value||d.net||0);
+    });
+    var _cArrY = Object.keys(_cMapY).map(function(c){ return {name:c,val:_cMapY[c]}; })
+      .sort(function(a,b){ return b.val-a.val; });
+    var _colsY = ['linear-gradient(90deg,#3b82f6,#60a5fa)','linear-gradient(90deg,#10b981,#34d399)',
+                  'linear-gradient(90deg,#f59e0b,#fbbf24)','linear-gradient(90deg,#8b5cf6,#a78bfa)','rgba(255,255,255,.2)'];
+    var _custYBars = '';
+    if(_totY>0){
+      _cArrY.slice(0,5).forEach(function(c,i){
+        var w = Math.round(c.val/_totY*100);
+        _custYBars += '<div class="kpi-bar-row">'
+          +'<div class="kpi-bar-label">'+c.name+'</div>'
+          +'<div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:'+w+'%;background:'+_colsY[i%_colsY.length]+'"></div></div>'
+          +'<div class="kpi-bar-val">฿'+B2(c.val)+'</div></div>';
+      });
+    }
     md.html = '<div class="kpi-section"><div class="kpi-section-title">รายรับรายเดือน (Google Sheets)</div>'
       +'<table class="kpi-tbl"><tr><th>เดือน</th><th style="text-align:right">Revenue</th>'
       +'<th style="text-align:right">vs ก่อน</th><th style="text-align:right">Margin</th></tr>'
-      +tableRows+totalRow+'</table></div>';
+      +tableRows+totalRow+'</table></div>'
+      +(_custYBars
+        ? '<div class="kpi-section"><div class="kpi-section-title">แยกตาม Customer YTD (Google Sheets)</div>'+_custYBars+'</div>'
+        : '');
   }
 
   // ── AR modal rebuild helper ─────────────────────────────────────────────────
@@ -6783,7 +6840,21 @@ function patchKPIModals(kpi, ar, fix, ap){
   // ap / vat handled by apMod / vatMod loops below which search by title
   if(MODULE_KPI_DATA.finance && MODULE_KPI_DATA.finance['fixed-cost']){
     var md5 = MODULE_KPI_DATA.finance['fixed-cost'];
-    if(md5.stats && md5.stats[0]) md5.stats[0] = {label:'Fixed Cost MTD', val:'฿'+B2(kpi.fixedCostMTD), note:(fix||[]).length+' รายการ'};
+    var _fixCnt  = (fix||[]).length;
+    var _fixLive = fix.reduce(function(s,r){ return s+Number(r.amount||0); },0) || (kpi.fixedCostMTD||0);
+    var _fixRev  = kpi.revenueMTD||0;
+    var _fixPct  = _fixRev>0 ? (_fixLive/_fixRev*100).toFixed(1)+'%' : '—';
+    var _fixBudg = kpi.fixBudget||kpi.fixedCostBudget||1206000;
+    var _fixDiff = _fixLive - _fixBudg;
+    var _fixVsBudg = _fixBudg>0 ? (_fixDiff>=0?'+':'')+(_fixDiff/_fixBudg*100).toFixed(1)+'%' : '—';
+    var _fixNote2 = 'Revenue ฿'+B2(_fixRev);
+    var _fixNote3 = (_fixDiff>=0?'เกิน':'ต่ำกว่า')+' Budget ฿'+B2(_fixBudg);
+    md5.sub = 'พฤษภาคม 2026 · ค่าใช้จ่ายคงที่ '+_fixCnt+' รายการ';
+    if(md5.stats){
+      md5.stats[0] = {label:'Fixed Cost MTD', val:'฿'+B2(_fixLive), note:_fixCnt+' รายการ'};
+      md5.stats[1] = {label:'% of Revenue',   val:_fixPct,          note:_fixNote2};
+      md5.stats[2] = {label:'vs Budget',       val:_fixVsBudg,       note:_fixNote3};
+    }
     // Rebuild fix table from live data
     if((fix||[]).length){
       var fixRows = fix.map(function(r){
@@ -7489,6 +7560,72 @@ function patchKPIModals(kpi, ar, fix, ap){
       +(_dsoVal>30?'<div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:10px 14px;font-size:11px;color:#f87171">🔴 DSO '+(_dsoVal>0?_dsoVal.toFixed(0):'')+' วัน — เกิน target '+(_dsoVal>30?Math.round(_dsoVal-30)+' วัน':'')+' · แนะนำเจรจา Payment Terms กับลูกค้า</div>':'<div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:8px;padding:10px 14px;font-size:11px;color:#34d399">✅ DSO ปกติ</div>');
   }
 
+  // ── Gross Margin modal (key: 'margin') ──
+  if(typeof MODULE_KPI_DATA!=='undefined' && MODULE_KPI_DATA.mgmt && MODULE_KPI_DATA.mgmt['margin'] && kpi){
+    var _mm = MODULE_KPI_DATA.mgmt['margin'];
+    var _gmRev    = kpi.revenueMTD||0;
+    var _gmProfit = kpi.grossProfit||kpi.netProfit||0;
+    var _gmPct    = (_gmRev>0 && _gmProfit>0) ? (_gmProfit/_gmRev*100) : (kpi.netMargin||kpi.grossMargin||0);
+    var _gmTarget = 35; // % target
+    var _gmVsBud  = _gmPct>0 ? (_gmPct>=_gmTarget ? '+'+(_gmPct-_gmTarget).toFixed(1)+'%' : (_gmPct-_gmTarget).toFixed(1)+'%') : '—';
+    var _gmBudgAmt= _gmTarget>0&&_gmRev>0 ? Math.round(_gmRev*_gmTarget/100) : 0;
+    var _gmDiff   = _gmProfit - _gmBudgAmt;
+    if(_mm.stats){
+      _mm.stats[0]={label:'Gross Margin',   val:_gmPct>0?_gmPct.toFixed(1)+'%':'—',  note:_gmPct>=_gmTarget?'เป้า '+_gmTarget+'% ✓':'เป้า '+_gmTarget+'%'};
+      _mm.stats[1]={label:'Gross Profit',   val:_gmProfit>0?'฿'+B2(_gmProfit):'—',   note:'เดือนนี้'};
+      _mm.stats[2]={label:'vs Budget',      val:_gmVsBud,                             note:_gmDiff!==0?(_gmDiff>0?'เกินเป้า ':'ต่ำกว่าเป้า ')+'฿'+B2(Math.abs(_gmDiff)):'On target'};
+    }
+    _mm.sub = 'พฤษภาคม 2026 · P&L vs Budget (Google Sheets)';
+
+    // Rebuild current-month row in Margin Trend table from live data
+    var _gmCurRow = _gmRev>0
+      ? '<tr style="font-weight:800;color:#a78bfa"><td>พฤษภาคม</td>'
+        +'<td style="text-align:right">฿'+B2(_gmRev)+'</td>'
+        +'<td style="text-align:right;color:#34d399">฿'+B2(_gmProfit)+'</td>'
+        +'<td style="text-align:right;color:#34d399">'+(_gmPct>0?_gmPct.toFixed(1)+'%':'—')+'</td>'
+        +'<td><span class="kpi-badge '+(_gmPct>=_gmTarget?'green':'yellow')+'">'+_gmVsBud+'</span></td></tr>'
+      : '';
+
+    // Revenue share per customer from AR (proxy for customer contribution)
+    var _invArr = typeof getInvData==='function' ? getInvData() : (window.invData||[]);
+    var _custMap = {};
+    var _totalRev = 0;
+    _invArr.forEach(function(d){
+      var c = d.customer||d.cust||'อื่นๆ';
+      _custMap[c] = (_custMap[c]||0) + (d.value||d.net||0);
+      _totalRev += (d.value||d.net||0);
+    });
+    var _custArr = Object.keys(_custMap).map(function(c){ return {name:c,val:_custMap[c]}; });
+    _custArr.sort(function(a,b){ return b.val-a.val; });
+    var _colors = ['linear-gradient(90deg,#10b981,#34d399)','linear-gradient(90deg,#3b82f6,#60a5fa)',
+                   'linear-gradient(90deg,#f59e0b,#fbbf24)','linear-gradient(90deg,#8b5cf6,#a78bfa)',
+                   'linear-gradient(90deg,#ec4899,#f472b6)'];
+    var _custBars = '';
+    if(_totalRev>0 && _custArr.length>0){
+      _custArr.slice(0,5).forEach(function(c,i){
+        var pct = Math.round(c.val/_totalRev*100);
+        _custBars += '<div class="kpi-bar-row">'
+          +'<div class="kpi-bar-label">'+c.name+'</div>'
+          +'<div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:'+Math.min(pct,100)+'%;background:'+_colors[i%_colors.length]+'"></div></div>'
+          +'<div class="kpi-bar-val">'+pct+'%</div></div>';
+      });
+    }
+
+    _mm.html = '<div class="kpi-section"><div class="kpi-section-title">Margin Trend 2026</div>'
+      +'<table class="kpi-tbl"><tr><th>เดือน</th><th style="text-align:right">Revenue</th><th style="text-align:right">Gross Profit</th><th style="text-align:right">Margin</th><th>vs Budget</th></tr>'
+      +'<tr><td>มกราคม</td><td style="text-align:right">฿3,820,000</td><td style="text-align:right">฿1,302,620</td><td style="text-align:right">34.1%</td><td><span class="kpi-badge yellow">−0.9%</span></td></tr>'
+      +'<tr><td>กุมภาพันธ์</td><td style="text-align:right">฿3,940,000</td><td style="text-align:right">฿1,379,000</td><td style="text-align:right">35.0%</td><td><span class="kpi-badge green">On target</span></td></tr>'
+      +'<tr><td>มีนาคม</td><td style="text-align:right">฿4,180,000</td><td style="text-align:right">฿1,496,440</td><td style="text-align:right">35.8%</td><td><span class="kpi-badge green">+0.8%</span></td></tr>'
+      +'<tr><td>เมษายน</td><td style="text-align:right">฿5,180,000</td><td style="text-align:right">฿1,928,360</td><td style="text-align:right">37.2%</td><td><span class="kpi-badge green">+2.2%</span></td></tr>'
+      +(_gmCurRow||'<tr><td colspan="5" style="color:var(--t3);text-align:center">⏳ รอข้อมูล Google Sheets</td></tr>')
+      +'</table></div>'
+      +(_custBars
+        ? '<div class="kpi-section"><div class="kpi-section-title">Revenue Share แยกตาม Customer (Google Sheets)</div>'
+          +_custBars+'</div>'
+        : '<div class="kpi-section"><div class="kpi-section-title">Revenue Share แยกตาม Customer</div>'
+          +'<div style="color:var(--t3);text-align:center;padding:16px">⏳ รอข้อมูล AR จาก Google Sheets</div></div>');
+  }
+
 }
 
 /* ── Update notification panel with live AP data ──────────── */
@@ -8028,7 +8165,7 @@ function updateExpensesBreakdown(ap, fix){
   var tbody = document.getElementById('fin-exp-bkd-body'); if(!tbody) return;
   var pF=window._periodFrom||'', pT=window._periodTo||'';
   // AP filter — date-less entries pass when no period set; always include when no period
-  var apF  = (ap||[]).filter(function(r){ var d=r.date||r.docDate||r.payDate||''; if(!d) return !pF&&!pT; return (!pF||d>=pF)&&(!pT||d<=pT); });
+  var apF  = (ap||[]).filter(function(r){ var _st=(r.status||r.payStatus||'').toLowerCase(); if(_st==='done'||_st==='cheque-done'||_st.indexOf('ชำระ')!==-1||_st==='paid') return false; var d=r.date||r.docDate||r.payDate||''; if(!d) return !pF&&!pT; return (!pF||d>=pF)&&(!pT||d<=pT); });
   var fixF = (fix||[]).filter(function(r){ var d=r.date||r.docDate||''; if(!d) return true; return (!pF||d>=pF)&&(!pT||d<=pT); });
   // update period label
   var pEl=document.getElementById('fin-exp-bkd-period');
@@ -8483,7 +8620,7 @@ function updateOverviewDashboard(kpi, ar, cashData){
   setTxt('ov-ks-cash-txt', odLim>0?'OD ฿'+B(odLim)+' · ใช้ '+odPct+'%':'Balance ฿'+B(totalBal));
 
   /* ── Chart legend ── */
-  var expMTD   = kpi.apPending||0 + kpi.fixedCostMTD||0;
+  var expMTD   = (kpi.apPending||0) + (kpi.fixedCostMTD||0);
   var profitN  = profit;
   setTxt('ov-leg-rev',    '฿'+B(revMTD));
   setTxt('ov-leg-exp',    '฿'+B(expMTD||kpi.totalExpenses||0));
