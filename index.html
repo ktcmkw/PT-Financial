@@ -2592,9 +2592,10 @@ html,body{
     <!-- Detail tabs (below tabs bar injected via tbar / pn-304) -->
     <div class="tbar" id="tb-304">
       <div class="tt on" onclick="sw('tb-304',0,'pn-304')">📊 ภาพรวม</div>
-      <div class="tt" onclick="sw('tb-304',1,'pn-304')">🛒 ฝ่ายขาย</div>
-      <div class="tt" onclick="sw('tb-304',2,'pn-304')">🔧 Service</div>
-      <div class="tt" onclick="sw('tb-304',3,'pn-304')">🚚 Logistic</div>
+      <div class="tt" id="tb-304-sales-btn"    onclick="sw('tb-304',1,'pn-304')">🛒 ฝ่ายขาย</div>
+      <div class="tt" id="tb-304-service-btn"  onclick="sw('tb-304',2,'pn-304')">🔧 Service</div>
+      <div class="tt" id="tb-304-logistic-btn" onclick="sw('tb-304',3,'pn-304')">🚚 Logistic</div>
+      <div class="tt" id="tb-304-central-btn"  onclick="sw('tb-304',4,'pn-304')" style="display:none">🏢 ส่วนกลาง</div>
     </div>
     <div id="pn-304">
 
@@ -2681,6 +2682,35 @@ html,body{
                 <th style="padding:7px 8px;text-align:right;color:var(--t2);font-weight:600;white-space:nowrap">คงเหลือ</th>
               </tr></thead>
               <tbody id="e304-detail-logistic-tbody">
+                <tr><td colspan="10" style="padding:20px;text-align:center;color:var(--t3)">กำลังโหลด...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4 — ส่วนกลาง Detail -->
+      <div style="display:none">
+        <div style="background:var(--card);border-radius:10px;overflow:hidden;margin-bottom:14px">
+          <div style="padding:12px 14px;border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:8px">
+            <span style="width:24px;height:24px;border-radius:6px;background:#9333EA30;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:#C084FC"><i class="ti ti-building"></i></span>
+            <span style="font-size:12px;font-weight:700;color:var(--t1)">รายละเอียดค่าใช้จ่าย — ส่วนกลาง</span>
+          </div>
+          <div id="e304-detail-central-wrap" style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;font-size:11px">
+              <thead><tr style="background:var(--b2)">
+                <th style="padding:7px 10px;text-align:left;color:var(--t2);font-weight:600;min-width:220px">รายการ</th>
+                <th style="padding:7px 8px;text-align:right;color:var(--t2);font-weight:600;white-space:nowrap">Code</th>
+                <th style="padding:7px 8px;text-align:right;color:#AFA9EC;font-weight:600;white-space:nowrap">เป้าทั้งปี</th>
+                <th style="padding:7px 8px;text-align:right;color:var(--t3);font-weight:600;white-space:nowrap">ม.ค.</th>
+                <th style="padding:7px 8px;text-align:right;color:var(--t3);font-weight:600;white-space:nowrap">ก.พ.</th>
+                <th style="padding:7px 8px;text-align:right;color:var(--t3);font-weight:600;white-space:nowrap">มี.ค.</th>
+                <th style="padding:7px 8px;text-align:right;color:var(--t3);font-weight:600;white-space:nowrap">เม.ย.</th>
+                <th style="padding:7px 8px;text-align:right;color:var(--t3);font-weight:600;white-space:nowrap">พ.ค.</th>
+                <th style="padding:7px 8px;text-align:right;color:#C084FC;font-weight:600;white-space:nowrap">YTD ใช้</th>
+                <th style="padding:7px 8px;text-align:right;color:var(--t2);font-weight:600;white-space:nowrap">คงเหลือ</th>
+              </tr></thead>
+              <tbody id="e304-detail-central-tbody">
                 <tr><td colspan="10" style="padding:20px;text-align:center;color:var(--t3)">กำลังโหลด...</td></tr>
               </tbody>
             </table>
@@ -9550,19 +9580,14 @@ var _DEPT_CFG_304 = [
   {key:'logistic',      label:'Logistic',           color:'#EF9F27'}
 ];
 var _DEPT_CFG_CTR = [
-  {key:'salaryCtr',     label:'เงินเดือนส่วนกลาง',  color:'#7F77DD'},
-  {key:'saimai',        label:'ค่าสายไหม',          color:'#1D9E75'},
-  {key:'saimaiCentral', label:'งด.สายไหมส่วนกลาง',  color:'#378ADD'},
-  {key:'centerCost',    label:'ค่าส่วนกลาง',        color:'#EF9F27'}
+  {key:'central', label:'ส่วนกลาง', color:'#9333EA'}
 ];
 var _DEPT_CFG_ALL = [
-  {key:'salary',        label:'Salary (304)',        color:'#7F77DD'},
-  {key:'sales',         label:'Sales',              color:'#1D9E75'},
-  {key:'service',       label:'Service',            color:'#378ADD'},
-  {key:'logistic',      label:'Logistic',           color:'#EF9F27'},
-  {key:'salaryCtr',     label:'เงินเดือน Ctr',      color:'#A855F7'},
-  {key:'saimai',        label:'ค่าสายไหม',          color:'#06B6D4'},
-  {key:'centerCost',    label:'ค่าส่วนกลาง',        color:'#F97316'}
+  {key:'salary',   label:'Salary',    color:'#7F77DD'},
+  {key:'sales',    label:'Sales',     color:'#1D9E75'},
+  {key:'service',  label:'Service',   color:'#378ADD'},
+  {key:'logistic', label:'Logistic',  color:'#EF9F27'},
+  {key:'central',  label:'ส่วนกลาง', color:'#9333EA'}
 ];
 
 /* ── FORMATTER ───────────────────────────────────────────────── */
@@ -9637,6 +9662,18 @@ function switch304Tab(t) {
     btn.style.color      = on ? '#818cf8' : 'var(--t3)';
     btn.style.fontWeight = on ? '600' : '400';
   });
+  /* Show/hide inner detail tabs based on active outer tab */
+  var isCenter = (t === 'center');
+  var isSales  = document.getElementById('tb-304-sales-btn');
+  var isSvc    = document.getElementById('tb-304-service-btn');
+  var isLog    = document.getElementById('tb-304-logistic-btn');
+  var isCtr    = document.getElementById('tb-304-central-btn');
+  if (isSales)   isSales.style.display   = isCenter ? 'none' : '';
+  if (isSvc)     isSvc.style.display     = isCenter ? 'none' : '';
+  if (isLog)     isLog.style.display     = isCenter ? 'none' : '';
+  if (isCtr)     isCtr.style.display     = isCenter ? '' : 'none';
+  /* Reset inner tabs to overview when switching outer tab */
+  sw('tb-304', 0, 'pn-304');
   render304Active();
 }
 
@@ -9963,9 +10000,15 @@ function update304Module(data) {
 
   /* ── Detail Tables ──────────────────────────────────────────── */
   var detail = data.detail || {};
-  build304DetailTable('e304-detail-sales-tbody',    detail.sales    || []);
-  build304DetailTable('e304-detail-service-tbody',  detail.service  || []);
-  build304DetailTable('e304-detail-logistic-tbody', detail.logistic || []);
+  var _activeOuterTab = window._304_activeTab || '304';
+  if (_activeOuterTab === 'center') {
+    build304DetailTable('e304-detail-central-tbody', detail.central || []);
+  } else {
+    build304DetailTable('e304-detail-sales-tbody',    detail.sales    || []);
+    build304DetailTable('e304-detail-service-tbody',  detail.service  || []);
+    build304DetailTable('e304-detail-logistic-tbody', detail.logistic || []);
+    build304DetailTable('e304-detail-central-tbody',  detail.central  || []);
+  }
 
   set304Status('ok', 'ข้อมูลล่าสุด · Live จาก Google Sheets');
 }
