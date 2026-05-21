@@ -2591,7 +2591,7 @@ html,body{
 
     <!-- Detail tabs (below tabs bar injected via tbar / pn-304) -->
     <div class="tbar" id="tb-304">
-      <div class="tt on" onclick="sw('tb-304',0,'pn-304')">📊 ภาพรวม</div>
+      <div class="tt on" id="tb-304-overview-btn" onclick="sw('tb-304',0,'pn-304')">📊 ภาพรวม</div>
       <div class="tt" id="tb-304-sales-btn"    onclick="sw('tb-304',1,'pn-304')">🛒 ฝ่ายขาย</div>
       <div class="tt" id="tb-304-service-btn"  onclick="sw('tb-304',2,'pn-304')">🔧 Service</div>
       <div class="tt" id="tb-304-logistic-btn" onclick="sw('tb-304',3,'pn-304')">🚚 Logistic</div>
@@ -9662,16 +9662,23 @@ function switch304Tab(t) {
   });
   /* Show/hide inner detail tabs based on active outer tab */
   var isCenter = (t === 'center');
+  var isOvr    = document.getElementById('tb-304-overview-btn');
   var isSales  = document.getElementById('tb-304-sales-btn');
   var isSvc    = document.getElementById('tb-304-service-btn');
   var isLog    = document.getElementById('tb-304-logistic-btn');
   var isCtr    = document.getElementById('tb-304-central-btn');
-  if (isSales)   isSales.style.display   = isCenter ? 'none' : '';
-  if (isSvc)     isSvc.style.display     = isCenter ? 'none' : '';
-  if (isLog)     isLog.style.display     = isCenter ? 'none' : '';
-  if (isCtr)     isCtr.style.display     = isCenter ? '' : 'none';
-  /* Reset inner tabs to overview when switching outer tab */
-  sw('tb-304', 0, 'pn-304');
+  /* Tab visibility rules:
+     304  → ซ่อน ภาพรวม + ส่วนกลาง, โชว์ ขาย/Service/Logistic, default idx 1
+     Center → ซ่อน ภาพรวม + ขาย/Service/Logistic, โชว์ ส่วนกลาง, default idx 4
+     All  → โชว์ทุก tab, default idx 0 (ภาพรวม) */
+  var isAll = (t === 'all');
+  if (isOvr)   isOvr.style.display    = (!isCenter && !isAll) ? 'none' : (isAll ? '' : 'none');
+  if (isSales) isSales.style.display  = isCenter ? 'none' : '';
+  if (isSvc)   isSvc.style.display    = isCenter ? 'none' : '';
+  if (isLog)   isLog.style.display    = isCenter ? 'none' : '';
+  if (isCtr)   isCtr.style.display    = isCenter || isAll ? '' : 'none';
+  /* Default tab: Center→4, 304→1 (ฝ่ายขาย), All→0 (ภาพรวม) */
+  sw('tb-304', isCenter ? 4 : (isAll ? 0 : 1), 'pn-304');
   render304Active();
 }
 
