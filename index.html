@@ -748,6 +748,9 @@ html,body{
     <div class="ng">Favorites</div>
     <div class="ni on" id="n-dash" onclick="go('dashboard')"><span class="ic">⊞</span>Overview</div>
     <div class="ndv"></div>
+    <div class="ng">Live 304</div>
+    <div class="ni" id="n-304" onclick="go('e304',0)"><span class="ic">📋</span>Budget vs Actual<span class="nb nb-g pulse">NEW</span></div>
+    <div class="ndv"></div>
     <div class="ng">Sales</div>
     <div class="ni has-danger" id="n-inv" onclick="go('sales',0)"><span class="ic">📄</span>Invoice / รายรับ<span class="nb nb-r pulse">3</span></div>
     <div class="ni" id="n-cust" onclick="go('sales',3)"><span class="ic">🏪</span>Customers</div>
@@ -774,9 +777,6 @@ html,body{
     <div class="ndv"></div>
     <div class="ng">Executive</div>
     <div class="ni" id="n-audit" onclick="go('audit',0)"><span class="ic">🔍</span>Data Audit<span class="nb nb-g">NEW</span></div>
-    <div class="ndv"></div>
-    <div class="ng">Live 304</div>
-    <div class="ni" id="n-304" onclick="go('e304',0)"><span class="ic">📋</span>Budget vs Actual<span class="nb nb-g pulse">NEW</span></div>
     <div class="ndv"></div>
     <div class="ng">System</div>
     <div class="ni" id="n-usr" onclick="go('admin',0)"><span class="ic">🛡</span>Admin / Users<span class="nb nb-g pulse">4</span></div>
@@ -2490,7 +2490,7 @@ html,body{
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <div>
         <div style="font-size:14px;font-weight:700;color:var(--t1)">บันทึกจ่ายจริง (304)</div>
-        <div style="font-size:11px;color:var(--t3)">Budget vs Actual · Exp PT 304</div>
+        <div id="e304-subtitle" style="font-size:11px;color:var(--t3)">Budget vs Actual · Exp PT 304</div>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         <div style="display:flex;align-items:center;gap:5px;font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid rgba(100,116,139,.35)">
@@ -2502,49 +2502,82 @@ html,body{
       </div>
     </div>
 
-    <!-- KPI Row: 3 cards -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
-      <div class="kc cb" onclick="show304Modal('total')">
-        <div class="kl">งบปีทั้งหมด</div>
-        <div class="kv" id="e304-bud-ytd">—</div>
-        <div class="ks">Total budget 2026</div>
+    <!-- Tab Switcher -->
+    <div id="e304-tab-bar" style="display:flex;gap:4px;margin-bottom:14px">
+      <button id="tab-304"    onclick="switch304Tab('304')"    style="font-size:11px;padding:4px 12px;border-radius:6px;cursor:pointer;transition:all .2s;background:rgba(99,102,241,.25);border:1px solid rgba(99,102,241,.5);color:#818cf8;font-weight:600">PT 304</button>
+      <button id="tab-center" onclick="switch304Tab('center')" style="font-size:11px;padding:4px 12px;border-radius:6px;cursor:pointer;transition:all .2s;background:transparent;border:1px solid rgba(100,116,139,.3);color:var(--t3)">PT Center</button>
+      <button id="tab-all"    onclick="switch304Tab('all')"    style="font-size:11px;padding:4px 12px;border-radius:6px;cursor:pointer;transition:all .2s;background:transparent;border:1px solid rgba(100,116,139,.3);color:var(--t3)">รวมทั้งหมด</button>
+    </div>
+
+    <!-- ═══ PREMIUM v2: 3-Col Metric Strip ═══ -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);margin-bottom:20px;border-bottom:0.5px solid rgba(255,255,255,.07);padding-bottom:20px">
+
+      <!-- เดือนนี้ -->
+      <div style="padding-right:18px">
+        <div style="font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">เดือนนี้ · <span id="v2-mo-name">—</span></div>
+        <div style="font-size:36px;font-weight:500;line-height:1;margin-bottom:4px;color:#34d399" id="v2-mo-pct">—%</div>
+        <div style="font-size:12px;color:var(--t3);margin-bottom:10px" id="v2-mo-sub">— / —</div>
+        <div style="height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:5px">
+          <div id="v2-mo-bar" style="height:100%;border-radius:2px;width:0%;background:#34d399;transition:width .7s ease"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3)">
+          <span id="v2-mo-used-lbl">จ่าย —</span><span id="v2-mo-rem-lbl">คงเหลือ —</span>
+        </div>
       </div>
-      <div class="kc cb" onclick="show304Modal('total')">
-        <div class="kl">จ่ายจริง YTD</div>
-        <div class="kv" id="e304-act-ytd">—</div>
-        <div class="ks" id="e304-asof">ม.ค.–ปัจจุบัน</div>
+
+      <!-- M1-M5 -->
+      <div style="padding:0 18px;border-left:0.5px solid rgba(255,255,255,.07)">
+        <div style="font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">M1-M5 · ม.ค.–<span id="v2-asof-lbl">—</span></div>
+        <div style="font-size:36px;font-weight:500;line-height:1;margin-bottom:4px;color:#34d399" id="v2-ytd-pct">—%</div>
+        <div style="font-size:12px;color:var(--t3);margin-bottom:10px" id="v2-ytd-sub">— / —</div>
+        <div style="height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:5px">
+          <div id="v2-ytd-bar" style="height:100%;border-radius:2px;width:0%;background:#34d399;transition:width .7s ease"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3)">
+          <span id="v2-ytd-used-lbl">จ่าย —</span><span id="v2-ytd-rem-lbl">คงเหลือ —</span>
+        </div>
       </div>
-      <div class="kc cb" onclick="show304Modal('total')">
-        <div class="kl">งบคงเหลือ</div>
-        <div class="kv" id="e304-usage-pct">—</div>
-        <div class="ks" id="e304-diff-label">ยังไม่ใช้</div>
+
+      <!-- ทั้งปี -->
+      <div style="padding-left:18px;border-left:0.5px solid rgba(255,255,255,.07)">
+        <div style="font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">เป้าทั้งปี 2568</div>
+        <div style="font-size:36px;font-weight:500;line-height:1;margin-bottom:4px;color:#7F77DD" id="v2-yr-pct">—%</div>
+        <div style="font-size:12px;color:var(--t3);margin-bottom:10px" id="v2-yr-sub">— / —</div>
+        <div style="height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:5px">
+          <div id="v2-yr-bar" style="height:100%;border-radius:2px;width:0%;background:#7F77DD;transition:width .7s ease"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3)">
+          <span>จ่าย YTD</span><span id="v2-yr-rem-lbl">คงเหลือ —</span>
+        </div>
       </div>
     </div>
 
-    <!-- Dept breakdown header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <span style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em">แยกตามแผนก</span>
-      <div style="display:flex;gap:10px">
-        <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3)"><span style="width:8px;height:8px;border-radius:2px;background:#1D9E75;display:inline-block"></span>จ่ายจริง</span>
-        <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3)"><span style="width:8px;height:8px;border-radius:2px;background:rgba(99,102,241,.25);display:inline-block"></span>งบ</span>
+    <!-- ═══ PREMIUM v2: Dept Scorecard Table ═══ -->
+    <div style="margin-bottom:20px">
+      <div style="font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">แยกตามแผนก · M1-M5</div>
+      <div style="display:grid;grid-template-columns:90px 1fr 52px 80px 80px;gap:8px;padding-bottom:7px;border-bottom:0.5px solid rgba(255,255,255,.1)">
+        <span style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em">แผนก</span>
+        <span></span>
+        <span style="font-size:10px;color:var(--t3);text-align:right">%</span>
+        <span style="font-size:10px;color:var(--t3);text-align:right">จ่ายจริง</span>
+        <span style="font-size:10px;color:var(--t3);text-align:right">คงเหลือ</span>
       </div>
+      <div id="v2-dept-tbl"><div style="padding:16px 0;text-align:center;font-size:12px;color:var(--t3)">กำลังโหลด...</div></div>
     </div>
 
-    <!-- Dept Cards — JS renders here -->
-    <div id="e304-dept-cards" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
-      <div style="padding:20px;text-align:center;color:var(--t3);font-size:12px">กำลังโหลด...</div>
-    </div>
-
-    <!-- Monthly Chart -->
-    <div style="background:var(--card);border-radius:10px;padding:14px;margin-bottom:14px">
+    <!-- ═══ PREMIUM v2: Trend Chart ═══ -->
+    <div style="margin-bottom:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <span style="font-size:11px;font-weight:700;color:var(--t2)">จ่ายจริงรายเดือน (YTD)</span>
-        <span style="font-size:10px;color:var(--t3)" id="e304-month-count"></span>
+        <span style="font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.07em">แนวโน้มรายเดือน</span>
+        <div style="display:flex;gap:12px;font-size:10px;color:var(--t3)">
+          <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(127,119,221,.45)"></span>เป้า</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#1D9E75"></span>จ่ายจริง</span>
+          <span id="e304-month-count" style="margin-left:4px;color:var(--t3)"></span>
+        </div>
       </div>
-      <div id="e304-chart-wrap" style="display:flex;align-items:flex-end;gap:6px;height:90px;padding:0 4px">
-        <div style="color:var(--t3);font-size:11px;align-self:center">กำลังโหลด...</div>
+      <div style="position:relative;height:170px;width:100%">
+        <canvas id="v2-trend-chart" role="img" aria-label="Monthly budget vs actual bar chart"></canvas>
       </div>
-      <div id="e304-chart-labels" style="display:flex;gap:6px;margin-top:4px;padding:0 4px"></div>
     </div>
 
     <!-- Debug Panel -->
@@ -9492,6 +9525,10 @@ window._304_cache = null;
 var _304_loading  = false;
 var _304_lastFetch = 0;
 var _304_TTL      = 5 * 60 * 1000; // 5 min cache TTL
+window._ctr_cache    = null;
+var _ctr_loading     = false;
+var _ctr_lastFetch   = 0;
+window._304_activeTab = '304'; // '304' | 'center' | 'all'
 
 /* ── MONTH LABELS (Thai) ─────────────────────────────────────── */
 var _M304 = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -9504,6 +9541,29 @@ var _DEPT_LABELS = {
   interest:'ดอกเบี้ย', admin:'ค่าใช้จ่าย บริหาร', welfare:'สวัสดิการพนักงาน',
   total:'TOTAL Expenses', importPO:'ซื้อ ตปท.', domesticPO:'ซื้อ ในปท.'
 };
+
+/* ── DEPT CONFIGS PER TAB ───────────────────────────────────── */
+var _DEPT_CFG_304 = [
+  {key:'salary',        label:'Salary',             color:'#7F77DD'},
+  {key:'sales',         label:'Sales',              color:'#1D9E75'},
+  {key:'service',       label:'Service',            color:'#378ADD'},
+  {key:'logistic',      label:'Logistic',           color:'#EF9F27'}
+];
+var _DEPT_CFG_CTR = [
+  {key:'salaryCtr',     label:'เงินเดือนส่วนกลาง',  color:'#7F77DD'},
+  {key:'saimai',        label:'ค่าสายไหม',          color:'#1D9E75'},
+  {key:'saimaiCentral', label:'งด.สายไหมส่วนกลาง',  color:'#378ADD'},
+  {key:'centerCost',    label:'ค่าส่วนกลาง',        color:'#EF9F27'}
+];
+var _DEPT_CFG_ALL = [
+  {key:'salary',        label:'Salary (304)',        color:'#7F77DD'},
+  {key:'sales',         label:'Sales',              color:'#1D9E75'},
+  {key:'service',       label:'Service',            color:'#378ADD'},
+  {key:'logistic',      label:'Logistic',           color:'#EF9F27'},
+  {key:'salaryCtr',     label:'เงินเดือน Ctr',      color:'#A855F7'},
+  {key:'saimai',        label:'ค่าสายไหม',          color:'#06B6D4'},
+  {key:'centerCost',    label:'ค่าส่วนกลาง',        color:'#F97316'}
+];
 
 /* ── FORMATTER ───────────────────────────────────────────────── */
 function _b304(n) {
@@ -9520,8 +9580,10 @@ function _pct304(n) {
 /* ── FETCH ───────────────────────────────────────────────────── */
 function load304Data(force) {
   var now = Date.now();
-  if (!force && window._304_cache && (now - _304_lastFetch) < _304_TTL) {
-    update304Module(window._304_cache);
+  var cacheOk304 = !force && window._304_cache && (now - _304_lastFetch) < _304_TTL;
+  var cacheOkCtr = !force && window._ctr_cache  && (now - _ctr_lastFetch)  < _304_TTL;
+  if (cacheOk304 && cacheOkCtr) {
+    render304Active();
     return;
   }
   if (_304_loading) return;
@@ -9535,23 +9597,113 @@ function load304Data(force) {
   _304_loading = true;
   set304Status('loading', 'กำลังโหลดข้อมูลจาก Google Sheets...');
 
-  var url = gasUrl + (gasUrl.indexOf('?') >= 0 ? '&' : '?') + 'action=exp304&_t=' + now;
-  fetch(url)
-    .then(function(r){ return r.json(); })
-    .then(function(data) {
+  var base = gasUrl + (gasUrl.indexOf('?') >= 0 ? '&' : '?');
+  var p304    = cacheOk304
+    ? Promise.resolve(window._304_cache)
+    : fetch(base + 'action=exp304&_t='    + now).then(function(r){ return r.json(); });
+  var pCenter = cacheOkCtr
+    ? Promise.resolve(window._ctr_cache)
+    : fetch(base + 'action=expCenter&_t=' + (now + 1)).then(function(r){ return r.json(); });
+
+  Promise.all([p304, pCenter])
+    .then(function(results) {
       _304_loading = false;
-      if (!data || !data._ok) {
-        set304Status('error', 'GAS ตอบกลับผิดพลาด: ' + (data && data.error ? data.error : 'unknown'));
+      var d304    = results[0];
+      var dCenter = results[1];
+      if (d304 && d304._ok)    { window._304_cache = d304;    _304_lastFetch = Date.now(); }
+      if (dCenter && dCenter._ok) { window._ctr_cache = dCenter; _ctr_lastFetch  = Date.now(); }
+      if (!window._304_cache) {
+        set304Status('error', 'exp304 ตอบกลับผิดพลาด: ' + (d304 && d304.error ? d304.error : 'unknown'));
         return;
       }
-      window._304_cache = data;
-      _304_lastFetch = Date.now();
-      update304Module(data);
+      render304Active();
     })
     .catch(function(err) {
       _304_loading = false;
       set304Status('error', 'โหลดไม่สำเร็จ: ' + err.message);
     });
+}
+
+/* ── TAB SWITCH & RENDER ─────────────────────────────────────── */
+function switch304Tab(t) {
+  window._304_activeTab = t;
+  var tabs = ['304', 'center', 'all'];
+  tabs.forEach(function(id) {
+    var btn = document.getElementById('tab-' + id);
+    if (!btn) return;
+    var on = (id === t);
+    btn.style.background = on ? 'rgba(99,102,241,.25)' : 'transparent';
+    btn.style.border     = on ? '1px solid rgba(99,102,241,.5)' : '1px solid rgba(100,116,139,.3)';
+    btn.style.color      = on ? '#818cf8' : 'var(--t3)';
+    btn.style.fontWeight = on ? '600' : '400';
+  });
+  render304Active();
+}
+
+function render304Active() {
+  var tab = window._304_activeTab || '304';
+  var data, deptCfg, subtitle;
+  if (tab === 'center') {
+    data     = window._ctr_cache;
+    deptCfg  = _DEPT_CFG_CTR;
+    subtitle = 'Budget vs Actual · Exp PT Center';
+  } else if (tab === 'all') {
+    data     = _merge304(window._304_cache, window._ctr_cache);
+    deptCfg  = _DEPT_CFG_ALL;
+    subtitle = 'Budget vs Actual · รวม 304 + Center';
+  } else {
+    data     = window._304_cache;
+    deptCfg  = _DEPT_CFG_304;
+    subtitle = 'Budget vs Actual · Exp PT 304';
+  }
+  var subEl = document.getElementById('e304-subtitle');
+  if (subEl) subEl.textContent = subtitle;
+  window._304_deptCfg = deptCfg;
+  if (!data) {
+    set304Status('error', tab === 'center'
+      ? 'ยังไม่ได้โหลด PT Center — กด Sync'
+      : 'ยังไม่มีข้อมูล — กด Sync');
+    return;
+  }
+  update304Module(data);
+}
+
+function _merge304(d304, dCenter) {
+  if (!d304 && !dCenter) return null;
+  if (!dCenter || !dCenter._ok) return d304;
+  if (!d304   || !d304._ok)    return dCenter;
+  var MK_ALL = ['jan','feb','mar','q1','apr','may','jun','q2',
+                'jul','aug','sep','q3','oct','nov','dec','total'];
+  var merged = { _ok: true, summary: {}, detail: {} };
+  /* collect all dept keys from both sheets */
+  var allKeys = {};
+  Object.keys(d304.summary   || {}).forEach(function(k){ allKeys[k] = true; });
+  Object.keys(dCenter.summary|| {}).forEach(function(k){ allKeys[k] = true; });
+  Object.keys(allKeys).forEach(function(k) {
+    var s3 = (d304.summary    || {})[k];
+    var sc = (dCenter.summary || {})[k];
+    if (!s3 && !sc) return;
+    if (!s3) { merged.summary[k] = sc; return; }
+    if (!sc) { merged.summary[k] = s3; return; }
+    /* sum both */
+    var mb = {}, ma = {};
+    MK_ALL.forEach(function(m) {
+      mb[m] = ((s3.budget||{})[m]||0) + ((sc.budget||{})[m]||0);
+      ma[m] = ((s3.actual||{})[m]||0) + ((sc.actual||{})[m]||0);
+    });
+    ma.ytd = ((s3.actual||{}).ytd||0) + ((sc.actual||{}).ytd||0);
+    merged.summary[k] = { budget: mb, actual: ma, label: s3.label || sc.label || k };
+  });
+  /* merge detail arrays */
+  var dd3 = d304.detail    || {};
+  var ddc = dCenter.detail || {};
+  var allDK = {};
+  Object.keys(dd3).forEach(function(k){ allDK[k]=true; });
+  Object.keys(ddc).forEach(function(k){ allDK[k]=true; });
+  Object.keys(allDK).forEach(function(k) {
+    merged.detail[k] = (dd3[k]||[]).concat(ddc[k]||[]);
+  });
+  return merged;
 }
 
 function set304Status(state, msg) {
@@ -9562,6 +9714,31 @@ function set304Status(state, msg) {
 }
 
 /* ── MAIN UPDATE ─────────────────────────────────────────────── */
+/* ── Donut chart helper (create/update Chart.js donut) ── */
+function _donut304(id, used, total, color) {
+  if (!window._304charts) window._304charts = {};
+  var canvas = document.getElementById(id);
+  if (!canvas) return;
+  if (window._304charts[id]) { try { window._304charts[id].destroy(); } catch(e){} delete window._304charts[id]; }
+  if (typeof Chart === 'undefined') return;
+  var rem = Math.max(total - used, 0);
+  window._304charts[id] = new Chart(canvas, {
+    type: 'doughnut',
+    data: { datasets: [{ data: [used, rem],
+      backgroundColor: [color, 'rgba(255,255,255,.07)'],
+      borderWidth: 0, borderRadius: 4, hoverOffset: 3 }] },
+    options: { responsive: true, maintainAspectRatio: true, cutout: '70%',
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      animation: { duration: 700, easing: 'easeOutQuart' } }
+  });
+}
+
+/* ── M1-M5 budget helper (sum Jan-May monthly budget columns) ── */
+function _bm5(b) {
+  if (!b) return 0;
+  return (b.jan||0)+(b.feb||0)+(b.mar||0)+(b.apr||0)+(b.may||0);
+}
+
 function update304Module(data) {
   if (!data || !data.summary) {
     set304Status('error', 'ไม่มีข้อมูล summary');
@@ -9573,20 +9750,38 @@ function update304Module(data) {
   var curMo  = now.getMonth();
 
   /* ── KPI Cards ────────────────────────────────────────────── */
-  var budYtd   = (tot.budget && tot.budget.total) || 0;
+  var curMoKey = _MK304[curMo];
+  var budMo    = (tot.budget && tot.budget[curMoKey]) || 0;
+  var budYtd   = _bm5(tot.budget);
+  var budYr    = (tot.budget && tot.budget.total) || 0;
+  var actMo    = (tot.actual && tot.actual[curMoKey]) || 0;
   var actYtd   = (tot.actual && tot.actual.ytd)   || 0;
   var remBud   = budYtd - actYtd;
   var usagePct = budYtd > 0 ? (actYtd / budYtd * 100) : 0;
   var remPct   = 100 - usagePct;
+  var moName   = _M304[curMo] || '';
 
+  var elBudMo   = document.getElementById('e304-bud-mo');
+  var elBudMoLb = document.getElementById('e304-bud-mo-label');
   var elBudYtd  = document.getElementById('e304-bud-ytd');
+  var elBudYr   = document.getElementById('e304-bud-yr');
+  var elActMo   = document.getElementById('e304-act-mo');
+  var elActMoLb = document.getElementById('e304-act-mo-label');
   var elActYtd  = document.getElementById('e304-act-ytd');
   var elUsage   = document.getElementById('e304-usage-pct');
   var elDiffLbl = document.getElementById('e304-diff-label');
   var elDiff    = document.getElementById('e304-diff-ytd');
 
-  if (elBudYtd) elBudYtd.textContent = _b304(budYtd);
-  if (elActYtd) elActYtd.textContent = _b304(actYtd);
+  if (elBudMo)   elBudMo.textContent  = _b304(budMo);
+  if (elBudMoLb) elBudMoLb.textContent = 'เป้างบ ' + moName + ' 2568';
+  if (elBudYtd)  elBudYtd.textContent = _b304(budYtd);
+  if (elBudYr)   elBudYr.textContent  = _b304(budYr);
+  if (elActMo) {
+    elActMo.textContent  = _b304(actMo);
+    elActMo.style.color  = (budMo > 0 && actMo > budMo) ? '#f87171' : '#34d399';
+  }
+  if (elActMoLb) elActMoLb.textContent = 'ยอดจ่าย' + moName;
+  if (elActYtd)  elActYtd.textContent  = _b304(actYtd);
   if (elUsage) {
     elUsage.textContent = _b304(remBud);
     elUsage.style.color = remBud < 0 ? '#f87171' : '#34d399';
@@ -9598,14 +9793,33 @@ function update304Module(data) {
     elDiffLbl.style.color = remBud < 0 ? '#f87171' : 'var(--t3)';
   }
   if (elDiff) elDiff.textContent = _b304(actYtd - budYtd);
-
-  /* ── As-of date ──────────────────────────────────────────── */
-  var elAsof = document.getElementById('e304-asof');
-  if (elAsof && data.asOf) {
-    var asofD = new Date(data.asOf);
-    elAsof.textContent = 'อัปเดต: ' + asofD.toLocaleDateString('th-TH',
-      {day:'2-digit',month:'short',year:'numeric'});
-  }
+  /* ── v2 executive wiring (initial pass — before dept resolve) ── */
+  var _v2n = function(id){return document.getElementById(id);};
+  var _v2s = function(id,v){var el=_v2n(id);if(el)el.textContent=v;};
+  var _v2c = function(u,b){return(u>b&&b>0)?'#f87171':'#34d399';};
+  var _v2p = function(a,b){return b>0?(a/b*100).toFixed(1):'0';};
+  _v2s('v2-mo-name',  moName);
+  _v2s('v2-asof-lbl', moName);
+  var _pMo0  = parseFloat(_v2p(actMo,budMo));
+  var _pYtd0 = parseFloat(_v2p(actYtd,budYtd));
+  var _pYr0  = parseFloat(_v2p(actYtd,budYr));
+  var _cMo0  = _v2c(actMo,budMo);
+  var _cYtd0 = _v2c(actYtd,budYtd);
+  var _eMoP  = _v2n('v2-mo-pct');  if(_eMoP) {_eMoP.textContent=_pMo0.toFixed(1)+'%'; _eMoP.style.color=_cMo0;}
+  var _eYtdP = _v2n('v2-ytd-pct'); if(_eYtdP){_eYtdP.textContent=_pYtd0.toFixed(1)+'%';_eYtdP.style.color=_cYtd0;}
+  var _eYrP  = _v2n('v2-yr-pct');  if(_eYrP)  _eYrP.textContent=_pYr0.toFixed(1)+'%';
+  _v2s('v2-mo-sub',       _b304(actMo)+' / '+_b304(budMo));
+  _v2s('v2-ytd-sub',      _b304(actYtd)+' / '+_b304(budYtd));
+  _v2s('v2-yr-sub',       _b304(actYtd)+' / '+_b304(budYr));
+  _v2s('v2-mo-used-lbl',  'จ่าย '+_b304(actMo));
+  _v2s('v2-mo-rem-lbl',   'คงเหลือ '+_b304(Math.max(budMo-actMo,0)));
+  _v2s('v2-ytd-used-lbl', 'จ่าย '+_b304(actYtd));
+  _v2s('v2-ytd-rem-lbl',  'คงเหลือ '+_b304(Math.max(budYtd-actYtd,0)));
+  _v2s('v2-yr-rem-lbl',   'คงเหลือ '+_b304(Math.max(budYr-actYtd,0)));
+  var _eBM0=_v2n('v2-mo-bar'),_eBY0=_v2n('v2-ytd-bar'),_eBYR0=_v2n('v2-yr-bar');
+  if(_eBM0) {_eBM0.style.width=Math.min(_pMo0,100).toFixed(1)+'%'; _eBM0.style.background=_cMo0;}
+  if(_eBY0) {_eBY0.style.width=Math.min(_pYtd0,100).toFixed(1)+'%';_eBY0.style.background=_cYtd0;}
+  if(_eBYR0) _eBYR0.style.width=Math.min(_pYr0,100).toFixed(1)+'%';
 
   /* ── Month count label ──────────────────────────────────────── */
   var elMoCount = document.getElementById('e304-month-count');
@@ -9653,16 +9867,25 @@ function update304Module(data) {
       MK.forEach(function(m)  { ta[m] = (ta[m] || 0) + ((sm2.actual && sm2.actual[m]) || 0); });
       ta.ytd = (ta.ytd || 0) + ((sm2.actual && sm2.actual.ytd) || 0);
     });
-    s.total.budget = tb;
-    s.total.actual = ta;
+    /* Only overwrite s.total when computed values are non-zero (skip for Center data) */
+    if ((tb.total || 0) > 0 || (ta.ytd || 0) > 0) {
+      s.total.budget = tb;
+      s.total.actual = ta;
+    }
     /* Update tot reference + re-render KPI cards */
     tot      = s.total;
-    budYtd   = (tot.budget && tot.budget.total) || 0;
+    budMo    = (tot.budget && tot.budget[curMoKey]) || 0;
+    budYtd   = _bm5(tot.budget);
+    budYr    = (tot.budget && tot.budget.total) || 0;
+    actMo    = (tot.actual && tot.actual[curMoKey]) || 0;
     actYtd   = (tot.actual && tot.actual.ytd)   || 0;
     remBud   = budYtd - actYtd;
     usagePct = budYtd > 0 ? (actYtd / budYtd * 100) : 0;
     remPct   = 100 - usagePct;
+    if (elBudMo)  elBudMo.textContent  = _b304(budMo);
     if (elBudYtd) elBudYtd.textContent = _b304(budYtd);
+    if (elBudYr)  elBudYr.textContent  = _b304(budYr);
+    if (elActMo) { elActMo.textContent = _b304(actMo); elActMo.style.color = (budMo>0&&actMo>budMo)?'#f87171':'#34d399'; }
     if (elActYtd) elActYtd.textContent = _b304(actYtd);
     if (elUsage) {
       elUsage.textContent = _b304(remBud);
@@ -9675,57 +9898,64 @@ function update304Module(data) {
       elDiffLbl.style.color = remBud < 0 ? '#f87171' : 'var(--t3)';
     }
     if (elDiff) elDiff.textContent = _b304(actYtd - budYtd);
+    /* ── v2 executive re-render (after dept resolve) ───────── */
+    var _v2re = function(id){return document.getElementById(id);};
+    var _v2se = function(id,v){var el=_v2re(id);if(el)el.textContent=v;};
+    var _v2ce = function(u,b){return(u>b&&b>0)?'#f87171':'#34d399';};
+    var _cMoR  = _v2ce(actMo,budMo);
+    var _cYtdR = _v2ce(actYtd,budYtd);
+    var _pMoR  = budMo>0?(actMo/budMo*100).toFixed(1):'0';
+    var _pYtdR = budYtd>0?(actYtd/budYtd*100).toFixed(1):'0';
+    var _pYrR  = budYr>0?(actYtd/budYr*100).toFixed(1):'0';
+    var _eMoPR =_v2re('v2-mo-pct');  if(_eMoPR) {_eMoPR.textContent=_pMoR+'%'; _eMoPR.style.color=_cMoR;}
+    var _eYtdPR=_v2re('v2-ytd-pct'); if(_eYtdPR){_eYtdPR.textContent=_pYtdR+'%';_eYtdPR.style.color=_cYtdR;}
+    var _eYrPR =_v2re('v2-yr-pct');  if(_eYrPR)  _eYrPR.textContent=_pYrR+'%';
+    _v2se('v2-mo-sub',       _b304(actMo)+' / '+_b304(budMo));
+    _v2se('v2-ytd-sub',      _b304(actYtd)+' / '+_b304(budYtd));
+    _v2se('v2-yr-sub',       _b304(actYtd)+' / '+_b304(budYr));
+    _v2se('v2-mo-used-lbl',  'จ่าย '+_b304(actMo));
+    _v2se('v2-mo-rem-lbl',   'คงเหลือ '+_b304(Math.max(budMo-actMo,0)));
+    _v2se('v2-ytd-used-lbl', 'จ่าย '+_b304(actYtd));
+    _v2se('v2-ytd-rem-lbl',  'คงเหลือ '+_b304(Math.max(budYtd-actYtd,0)));
+    _v2se('v2-yr-rem-lbl',   'คงเหลือ '+_b304(Math.max(budYr-actYtd,0)));
+    var _eBMR=_v2re('v2-mo-bar'),_eBYR2=_v2re('v2-ytd-bar'),_eBYRR=_v2re('v2-yr-bar');
+    if(_eBMR)  {_eBMR.style.width=Math.min(parseFloat(_pMoR),100).toFixed(1)+'%'; _eBMR.style.background=_cMoR;}
+    if(_eBYR2) {_eBYR2.style.width=Math.min(parseFloat(_pYtdR),100).toFixed(1)+'%';_eBYR2.style.background=_cYtdR;}
+    if(_eBYRR)  _eBYRR.style.width=Math.min(parseFloat(_pYrR),100).toFixed(1)+'%';
   })();
 
-  /* ── Dept Cards ─────────────────────────────────────────────── */
-  var deptWrap = document.getElementById('e304-dept-cards');
-  if (deptWrap) {
-    var DEPT_CFG = [
-      {key:'salary',  label:'เงินเดือน + สวัสดิการ', sub:'Salary & Welfare',  icon:'ti-users',       bg:'rgba(60,52,137,.18)',  ic:'#AFA9EC', bar:'#7F77DD'},
-      {key:'sales',   label:'ฝ่ายขาย',               sub:'Sales',              icon:'ti-trending-up', bg:'rgba(15,110,86,.18)',  ic:'#5DCAA5', bar:'#1D9E75'},
-      {key:'service', label:'ฝ่าย Service',           sub:'Service',            icon:'ti-tool',        bg:'rgba(24,95,165,.18)',  ic:'#85B7EB', bar:'#378ADD'},
-      {key:'logistic',label:'ฝ่าย Logistic',          sub:'Logistic',           icon:'ti-truck',       bg:'rgba(133,79,11,.18)', ic:'#FAC775', bar:'#EF9F27'}
+  /* ── v2 Dept Scorecard Table ───────────────────────────────── */
+  var v2DeptTbl = document.getElementById('v2-dept-tbl');
+  if (v2DeptTbl) {
+    var V2_DEPT = window._304_deptCfg || [
+      {key:'salary',  label:'Salary',   color:'#7F77DD'},
+      {key:'sales',   label:'Sales',    color:'#1D9E75'},
+      {key:'service', label:'Service',  color:'#378ADD'},
+      {key:'logistic',label:'Logistic', color:'#EF9F27'}
     ];
-    var cardsHtml = '';
-    DEPT_CFG.forEach(function(cfg) {
-      var d2  = s[cfg.key];
-      if (!d2) return;
-      var dBud     = (d2.budget && d2.budget.total) || 0;
-      var dAct     = (d2.actual && d2.actual.ytd)   || 0;
-      var pctReal  = dBud > 0 ? (dAct / dBud * 100) : 0;
-      var pctBar   = Math.min(pctReal, 100);
-      var over     = pctReal > 100;
-      var warn     = pctReal > 90;
-      var badgeBg  = over ? 'rgba(248,113,113,.18)' : warn ? 'rgba(251,191,36,.18)' : 'rgba(52,211,153,.12)';
-      var badgeCol = over ? '#f87171' : warn ? '#fbbf24' : cfg.bar;
-      var barCol   = over ? '#f87171' : warn ? '#fbbf24' : cfg.bar;
-      var dRem     = dBud - dAct;
-      var remLabel = dRem >= 0
-        ? ('เหลือ ' + _b304(dRem))
-        : ('<span style="color:#f87171">⚠ เกิน ' + _b304(-dRem) + '</span>');
-      cardsHtml += '<div style="background:var(--card);border:1px solid var(--b2);border-radius:10px;padding:12px 14px;cursor:pointer" onclick="show304Modal(\'' + cfg.key + '\')">'
-        + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">'
-        +   '<div style="display:flex;align-items:center;gap:9px">'
-        +     '<div style="width:30px;height:30px;border-radius:7px;background:' + cfg.bg + ';display:flex;align-items:center;justify-content:center;color:' + cfg.ic + ';font-size:15px;flex-shrink:0"><i class="ti ' + cfg.icon + '"></i></div>'
-        +     '<div><div style="font-size:13px;font-weight:700;color:var(--t1)">' + cfg.label + '</div>'
-        +       '<div style="font-size:10px;color:var(--t3)">' + cfg.sub + '</div></div>'
-        +   '</div>'
-        +   '<div style="text-align:right">'
-        +     '<div style="font-size:14px;font-weight:700;color:var(--t1)">' + _b304(dAct)
-        +       '<span style="font-size:10px;padding:1px 6px;border-radius:20px;margin-left:5px;background:' + badgeBg + ';color:' + badgeCol + '">' + _pct304(pctReal) + '</span>'
-        +     '</div>'
-        +     '<div style="font-size:10px;color:var(--t3)">งบ ' + _b304(dBud) + '</div>'
-        +   '</div>'
+    var v2Rows = '';
+    V2_DEPT.forEach(function(cfg, i) {
+      var d2   = s[cfg.key]; if (!d2) return;
+      var dBud = _bm5(d2.budget);
+      var dAct = (d2.actual && d2.actual.ytd) || 0;
+      var pct  = dBud > 0 ? (dAct / dBud * 100) : 0;
+      var barW = Math.min(pct, 100).toFixed(1);
+      var barC = pct > 100 ? '#f87171' : pct > 90 ? '#fbbf24' : cfg.color;
+      var pctC = pct > 100 ? '#f87171' : pct > 90 ? '#fbbf24' : cfg.color;
+      var dRem = dBud - dAct;
+      var remC = dRem < 0 ? '#f87171' : 'rgba(148,163,184,.6)';
+      var bord = i < V2_DEPT.length - 1 ? 'border-bottom:0.5px solid rgba(255,255,255,.05);' : '';
+      v2Rows += '<div style="display:grid;grid-template-columns:90px 1fr 52px 80px 80px;gap:8px;align-items:center;padding:9px 0;' + bord + '">'
+        + '<span style="font-size:13px;font-weight:500;color:var(--t1)">' + cfg.label + '</span>'
+        + '<div style="position:relative;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden">'
+        +   '<div style="position:absolute;left:0;top:0;height:100%;width:' + barW + '%;background:' + barC + ';border-radius:2px;transition:width .8s ease"></div>'
         + '</div>'
-        + '<div style="height:5px;background:var(--b2);border-radius:3px;overflow:hidden;margin-bottom:5px">'
-        +   '<div style="height:100%;border-radius:3px;background:' + barCol + ';width:' + pctBar.toFixed(1) + '%"></div>'
-        + '</div>'
-        + '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3)">'
-        +   '<span>ใช้ไป ' + _b304(dAct) + '</span><span>' + remLabel + '</span>'
-        + '</div>'
+        + '<span style="font-size:12px;font-weight:500;text-align:right;color:' + pctC + '">' + pct.toFixed(1) + '%</span>'
+        + '<span style="font-size:12px;text-align:right;color:var(--t2)">' + _b304(dAct) + '</span>'
+        + '<span style="font-size:12px;text-align:right;color:' + remC + '">' + (dRem < 0 ? '−' : '') + _b304(Math.abs(dRem)) + '</span>'
         + '</div>';
     });
-    deptWrap.innerHTML = cardsHtml || '<div style="padding:20px;text-align:center;color:var(--t3)">ไม่มีข้อมูลแผนก</div>';
+    v2DeptTbl.innerHTML = v2Rows || '<div style="padding:16px 0;text-align:center;font-size:12px;color:var(--t3)">ไม่มีข้อมูล</div>';
   }
 
   /* ── Monthly Chart ──────────────────────────────────────────── */
@@ -9741,57 +9971,61 @@ function update304Module(data) {
 }
 
 
-/* ── BAR CHART ───────────────────────────────────────────────── */
+/* ── TREND CHART (Chart.js) ──────────────────────────────────── */
 function build304Chart(summary) {
-  var chartWrap   = document.getElementById('e304-chart-wrap');
-  var chartLabels = document.getElementById('e304-chart-labels');
-  if (!chartWrap || !chartLabels) return;
-
+  var canvas = document.getElementById('v2-trend-chart');
+  if (!canvas || typeof Chart === 'undefined') return;
   var tot = summary.total || {};
   var now = new Date();
   var curMo = now.getMonth();
-  var maxMonths = curMo + 1; // Jan=0 → show 1 bar
-
-  var actVals = [];
-  var budVals = [];
-  var labels  = [];
-
+  var maxMonths = curMo + 1;
+  var actVals = [], budVals = [], labels = [];
   for (var i = 0; i < maxMonths; i++) {
     var k = _MK304[i];
-    var actVal = (tot.actual && tot.actual[k]) || 0;
-    var budVal = (tot.budget && tot.budget[k]) || 0;
-    actVals.push(actVal);
-    budVals.push(budVal);
+    actVals.push((tot.actual && tot.actual[k]) || 0);
+    budVals.push((tot.budget && tot.budget[k]) || 0);
     labels.push(_M304[i]);
   }
-
-  var maxVal = Math.max.apply(null, actVals.concat(budVals)) || 1;
-
-  var barsHtml   = '';
-  var labelsHtml = '';
-  var barW = Math.min(32, Math.floor(280 / maxMonths));
-
-  for (var j = 0; j < labels.length; j++) {
-    var actH = Math.round((actVals[j] / maxVal) * 80);
-    var budH = Math.round((budVals[j] / maxVal) * 80);
-    var actColor = actVals[j] > budVals[j] ? '#f87171' : '#34d399';
-    barsHtml += '<div style="display:flex;flex-direction:column;align-items:center;gap:2px;justify-content:flex-end;width:' + barW + 'px">'
-              + '<div title="งบ ' + _b304(budVals[j]) + '" style="width:' + Math.max(barW-4,6) + 'px;height:' + Math.max(budH,2) + 'px;background:rgba(99,102,241,.3);border-radius:3px 3px 0 0;position:relative">'
-              + '<div title="จริง ' + _b304(actVals[j]) + '" style="position:absolute;bottom:0;width:100%;height:' + Math.round(actH/Math.max(budH,1)*100) + '%;background:' + actColor + ';border-radius:3px 3px 0 0;opacity:.85"></div>'
-              + '</div>'
-              + '</div>';
-    labelsHtml += '<div style="text-align:center;font-size:9px;color:var(--t3);width:' + barW + 'px">' + labels[j] + '</div>';
-  }
-
-  // Legend
-  barsHtml = '<div style="display:flex;align-items:flex-end;gap:4px;height:80px">' + barsHtml + '</div>'
-           + '<div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:var(--t3)">'
-           + '<span><span style="display:inline-block;width:10px;height:10px;background:rgba(99,102,241,.3);border-radius:2px;margin-right:3px;vertical-align:middle"></span>งบ</span>'
-           + '<span><span style="display:inline-block;width:10px;height:10px;background:#34d399;border-radius:2px;margin-right:3px;vertical-align:middle"></span>จริง (ต่ำกว่างบ)</span>'
-           + '<span><span style="display:inline-block;width:10px;height:10px;background:#f87171;border-radius:2px;margin-right:3px;vertical-align:middle"></span>จริง (เกินงบ)</span>'
-           + '</div>';
-  chartWrap.innerHTML   = barsHtml;
-  chartLabels.innerHTML = '<div style="display:flex;gap:4px">' + labelsHtml + '</div>';
+  /* update month count label */
+  var elMC = document.getElementById('e304-month-count');
+  if (elMC) elMC.textContent = maxMonths + ' เดือน (ม.ค.–' + _M304[curMo] + ')';
+  /* destroy old chart if exists */
+  if (!window._304charts) window._304charts = {};
+  if (window._304charts.trend) { try { window._304charts.trend.destroy(); } catch(e){} delete window._304charts.trend; }
+  window._304charts.trend = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'เป้า',     data: budVals,
+          backgroundColor: 'rgba(127,119,221,.28)',
+          borderColor:     'rgba(127,119,221,.55)',
+          borderWidth: 1, borderRadius: 5, borderSkipped: false },
+        { label: 'จ่ายจริง', data: actVals,
+          backgroundColor: '#1D9E75',
+          borderColor:     '#0F6E56',
+          borderWidth: 1, borderRadius: 5, borderSkipped: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: function(c) {
+          return c.dataset.label + ': ฿' + Math.round(c.raw).toLocaleString('en-US');
+        }}}
+      },
+      scales: {
+        x: { grid: { display: false },
+             ticks: { color: 'rgba(148,163,184,.65)', font: { size: 11 } },
+             border: { display: false } },
+        y: { grid: { color: 'rgba(255,255,255,.04)' },
+             ticks: { color: 'rgba(148,163,184,.5)', font: { size: 10 },
+               callback: function(v) { return v >= 1000 ? '฿' + (v/1000).toFixed(0) + 'k' : '฿' + v; } },
+             border: { display: false } }
+      }
+    }
+  });
 }
 
 /* ── DETAIL TABLE ────────────────────────────────────────────── */
@@ -9841,16 +10075,17 @@ function toggle304Debug() {
   if (!panel) return;
   if (panel.style.display === 'none') {
     var pre = document.getElementById('e304-debug-text');
-    if (pre && window._304_cache) {
-      var d = window._304_cache._debug || {};
-      var txt = 'GAS _ok: ' + window._304_cache._ok + '\n'
+    var _activeCache = (window._304_activeTab === 'center') ? window._ctr_cache : window._304_cache;
+    if (pre && _activeCache) {
+      var d = _activeCache._debug || {};
+      var txt = '[Tab: ' + (window._304_activeTab||'304') + ']  GAS _ok: ' + _activeCache._ok + '\n'
               + 'Sheet rows: ' + (d.totalRows||'?') + '  cols: ' + (d.totalCols||'?') + '\n'
               + 'actualHeaderRow: ' + d.actualHeaderRow + '\n'
               + 'budgetHeaderRow: ' + d.budgetHeaderRow + '\n'
               + 'summaryRowsFound: ' + JSON.stringify(d.summaryRowsFound||[], null, 2) + '\n\n'
               + 'actualColMap: ' + JSON.stringify(d.actualColMap||{}) + '\n'
               + 'bCol: ' + JSON.stringify(d.bCol||{}) + '\n\n'
-              + 'summary keys: ' + Object.keys(window._304_cache.summary||{}).join(', ') + '\n\n'
+              + 'summary keys: ' + Object.keys(_activeCache.summary||{}).join(', ') + '\n\n'
               + '=== Raw rows near actualHeaderRow ===\n';
       (d.rawSnap||[]).forEach(function(row, i) {
         txt += '[row ' + ((d.actualHeaderRow||0) - 1 + i) + '] '
@@ -9858,7 +10093,7 @@ function toggle304Debug() {
       });
       pre.textContent = txt || '(ยังไม่ได้โหลด)';
     } else if (pre) {
-      pre.textContent = window._304_cache ? JSON.stringify(window._304_cache._debug||{}, null, 2) : 'ยังไม่ได้โหลด — กด Refresh ก่อน';
+      pre.textContent = _activeCache ? JSON.stringify(_activeCache._debug||{}, null, 2) : 'ยังไม่ได้โหลด — กด Refresh ก่อน';
     }
     panel.style.display = 'block';
   } else {
@@ -9881,7 +10116,7 @@ function show304Modal(key) {
   var curMo  = new Date().getMonth();
   var curKey = _MK304[curMo];
 
-  var budYtd  = (d.budget && d.budget.total) || 0;
+  var budYtd  = _bm5(d.budget);   /* M1-M5 budget */
   var actYtd  = (d.actual && d.actual.ytd)   || 0;
   var diff    = actYtd - budYtd;
   var usagePct = budYtd > 0 ? (actYtd / budYtd * 100) : 0;
